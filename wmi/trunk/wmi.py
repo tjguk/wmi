@@ -85,6 +85,13 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 
 (c) Tim Golden <tim.golden@iname.com> 5th June 2003
 
+25th May 2005 0.6b Removed late-dispatch code (EnsureDispatch)
+                    and replaced with dynamic dispatch, using
+                    Thomas Heller's ProvideConstants class to
+                    avoid hard-coding WMI constants. This is
+                    to help people using py2exe who would
+                    otherwise need to specify one or more
+                    typelibs.
 19th May 2004 0.6  Added namespace support to wmi.__init__.
                    This means you can now do, eg: 
                     wmi.WMI (namespace="MicrosoftIISv2")
@@ -116,17 +123,44 @@ Many thanks, obviously to Mark Hammond for creating the win32all
  5th Jun 2003 0.1  Initial release by Tim Golden
 """
 
-__VERSION__ = "0.6"
+__VERSION__ = "0.6b"
 
 _DEBUG = False
 
-wbemErrInvalidQuery = 0x80041017
-wbemErrTimedout = 0x80043001
-wbemFlagReturnImmediately = 0x10
-wbemFlagForwardOnly = 0x20
-
 import win32com.client
 import pywintypes
+
+#
+# This class provided by Thomas Heller on c.l.py
+#
+class ProvideConstants (object):
+   """A class which, when called on a win32com.client.Dispatch object,
+   provides lazy access to constants defined in the typelib.
+
+   They can be accessed as attributes of the _constants property."""
+   def __init__(self, comobj):
+     comobj.__dict__["_constants"] = self
+     # Get the typelibrary's typecomp interface
+     self.__typecomp = \
+      comobj._oleobj_.GetTypeInfo().GetContainingTypeLib()[0].GetTypeComp()
+
+   def __getattr__(self, name):
+     if name.startswith("__") and name.endswith("__"):
+       raise AttributeError, name
+     result = self.__typecomp.Bind(name)
+     # Bind returns a 2-tuple, first item is TYPEKIND,
+     # the second item has the value
+     if not result[0]:
+       raise AttributeError, name
+     return result[1].value
+         
+obj = win32com.client.GetObject ("winmgmts:")
+ProvideConstants (obj)
+
+wbemErrInvalidQuery = obj._constants.wbemErrInvalidQuery
+wbemErrTimedout = obj._constants.wbemErrTimedout
+wbemFlagReturnImmediately = obj._constants.wbemFlagReturnImmediately
+wbemFlagForwardOnly = obj._constants.wbemFlagForwardOnly
 
 def handle_com_error (error_info):
   hresult_code, hresult_name, additional_info, parameter_in_error = error_info
