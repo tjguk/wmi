@@ -21,6 +21,7 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+15th Aug 2006 1.1.1  . Fixed a small bug reported and patched by Jonas Bjering
 7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
                        qualifiers are held as a dictionary member of the class).
                      . If a moniker is passed which doesn't start with winmgmts:

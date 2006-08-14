@@ -94,6 +94,7 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+15th Aug 2006 1.1.1  . Fixed a small bug reported and patched by Jonas Bjering
 7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
                        qualifiers are held as a dictionary member of the class).
                      . If a moniker is passed which doesn't start with winmgmts:
@@ -170,7 +171,7 @@ http://www.opensource.org/licenses/mit-license.php
  5th Jun 2003 0.1    Initial release by Tim Golden
 """
 
-__VERSION__ = "1.1"
+__VERSION__ = "1.1.1"
 
 _DEBUG = False
 
@@ -362,7 +363,10 @@ class _wmi_method:
       for name, is_array in self.out_parameter_names:
         value = result.Properties_ (name).Value
         if is_array:
-          results.append (list (value))
+          #
+          # Thanks to Jonas Bjering for bug report and path
+          #
+          results.append (list (value or []))
         else:
           results.append (value)
       return tuple (results)
