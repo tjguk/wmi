@@ -94,6 +94,13 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
+                     . Remove final Put_ from .new method as some classes are
+                       not intended to be created (eg Win32_ProcessStartup).
+                     . Add .put method to allow explicit instance creation.
+                     . Allow user to prevent the namespace from searching for
+                       valid classes at startup. This makes the startup
+                       much faster, but means you don't get a list of classes.
 29th Nov 2005 1.0rc3 . Small changes to allow array of output parameters
                      . Added qualifiers to list of private attributes
                      . Added details of required privs to method docstring
@@ -149,7 +156,7 @@ http://www.opensource.org/licenses/mit-license.php
  5th Jun 2003 0.1    Initial release by Tim Golden
 """
 
-__VERSION__ = "1.0rc3"
+__VERSION__ = "1.0rc4"
 
 _DEBUG = False
 
@@ -197,15 +204,51 @@ def handle_com_error (error_info):
     exception_string.append ("  %s - %s" % (hex (scode), error_description.strip ()))
   raise x_wmi, "\n".join (exception_string)
 
+def from_time (year=None, month=None, day=None, hours=None, minutes=None, seconds=None, microseconds=None, timezone=None):
+  """Returns a WMI time string of the form yyyymmddHHMMSS.mmmmmm+UUU
+  replacing each placeholder by its respective integer value, or
+  stars if None is supplied
+  """
+  def str_or_stars (i, length):
+    if i is None:
+      return "*" * length
+    else:
+      return str (i).rjust (length, "0")
+
+  wmi_time = ""
+  wmi_time += str_or_stars (year, 4)
+  wmi_time += str_or_stars (month, 2)
+  wmi_time += str_or_stars (day, 2)
+  wmi_time += str_or_stars (hours, 2)
+  wmi_time += str_or_stars (minutes, 2)
+  wmi_time += str_or_stars (seconds, 2)
+  wmi_time += "."
+  wmi_time += str_or_stars (microseconds, 6)
+  wmi_time += str_or_stars (timezone, 4)
+  
+  return wmi_time
+
 def to_time (wmi_time):
   """Expects a WMI time string of the form yyyymmddHHMMSS.mmmmmm+UUU
   and returns:
 
   year, month, day, hours, minutes, seconds, microseconds, timezone
+  
+  If any part of the string is "*", returns None
   """
-  year, month, day = [int (i) for i in wmi_time[:4], wmi_time[4:6], wmi_time[6:8]]
-  hours, minutes, seconds = [int (i) for i in wmi_time[8:10], wmi_time[10:12], wmi_time[12:14]]
-  microseconds = int (wmi_time[15:21])
+  def int_or_none (s, start, end):
+    try:
+      return int (s[start:end])
+    except ValueError:
+      return None
+  
+  year = int_or_none (wmi_time, 0, 4)
+  month = int_or_none (wmi_time, 4, 6)
+  day = int_or_none (wmi_time, 6, 8)
+  hours = int_or_none (wmi_time, 8, 10)
+  minutes = int_or_none (wmi_time, 10, 12)
+  seconds = int_or_none (wmi_time, 12, 14)
+  microseconds = int_or_none (wmi_time, 15, 21)
   timezone = wmi_time[21:]
 
   return year, month, day, hours, minutes, seconds, microseconds, timezone
@@ -396,20 +439,24 @@ class _wmi_object:
     else:
       raise x_wmi, "Can't compare a WMI object with something else"
 
+  def put (self):
+    self.ole_object.Put_ ()
+  
   def set (self, **kwargs):
     """Set several properties of the underlying object
      at one go. This is particularly useful in combination
      with the new () method below.
     """
-    try:
-      for attribute, value in kwargs.items ():
-        if attribute in self._properties:
-          self.ole_object.Properties_ (attribute).Value = value
-        else:
-          raise AttributeError, attribute
-      self.ole_object.Put_ ()
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    if kwargs:
+      try:
+        for attribute, value in kwargs.items ():
+          if attribute in self._properties:
+            self.ole_object.Properties_ (attribute).Value = value
+          else:
+            raise AttributeError, attribute
+        self.ole_object.Put_ ()
+      except pywintypes.com_error, error_info:
+        handle_com_error (error_info)
 
   def path (self):
     """Return the WMI URI to this object. Can be used to
@@ -554,7 +601,12 @@ class _wmi_class (_wmi_object):
     """
     try:
       obj = _wmi_object (self.SpawnInstance_ ())
-      obj.set (**kwargs)
+      #
+      # Don't use .set method which will do a
+      #  final Put_
+      #
+      for attribute, value in kwargs.items ():
+        self.ole_object.Properties_ (attribute).Value = value
       return obj
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
@@ -572,7 +624,7 @@ class _wmi_namespace:
      if "user" in i.lower ():
        print i
   """
-  def __init__ (self, namespace):
+  def __init__ (self, namespace, find_classes):
     _set (self, "_namespace", namespace)
     #
     # wmi attribute preserved for backwards compatibility
@@ -590,10 +642,11 @@ class _wmi_namespace:
     # If the namespace does not support SubclassesOf, carry on
     #  regardless
     #
-    try:
-      _set (self, "classes", [c.Path_.Class for c in namespace.SubclassesOf ()])
-    except AttributeError:
-      pass
+    if find_classes:
+      try:
+        _set (self, "classes", [c.Path_.Class for c in namespace.SubclassesOf ()])
+      except AttributeError:
+        pass
 
   def __repr__ (self):
     return "<_wmi_namespace: %s>" % self.wmi
@@ -747,16 +800,19 @@ class _wmi_namespace:
       handle_com_error (error_info)
 
   def __getattr__ (self, attribute):
-    """Attempt to match the property requested against one of
-     the classes picked up at the beginning. See the explanation
-     against the _wmi_class above.
+    """Don't try to match against known classes, as the list may
+    not have been requested (find_classes=False). Attempt to get
+    the attribute as a class; if that fails, try getting it with
+    Win32_ prepended. Failing that, assume it's a normal attribute
+    and pass through.
     """
-    if attribute in self.classes:
+    try:
       return _wmi_class (self, self._namespace.Get (attribute))
-    elif "Win32_" + attribute in self.classes:
-      return _wmi_class (self, self._namespace.Get ("Win32_" + attribute))
-    else:
-      return getattr (self._namespace, attribute)
+    except pywintypes.com_error, error_info:
+      try:
+        return _wmi_class (self, self._namespace.Get ("Win32_" + attribute))
+      except pywintypes.com_error, error_info:
+        return getattr (self._namespace, attribute)
 
 #
 # class _wmi_watcher
@@ -798,6 +854,7 @@ def connect (
   suffix="",
   user="",
   password="",
+  find_classes=True,
   debug=False
 ):
   """The WMI constructor can either take a ready-made moniker or as many
@@ -864,7 +921,7 @@ def connect (
     wmi_type = get_wmi_type (obj)
 
     if wmi_type == "namespace":
-      return _wmi_namespace (obj)
+      return _wmi_namespace (obj, find_classes)
     elif wmi_type == "class":
       return _wmi_class (None, obj)
     elif wmi_type == "instance":

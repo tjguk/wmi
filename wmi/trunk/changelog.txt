@@ -21,6 +21,13 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
+                     . Remove final Put_ from .new method as some classes are
+                       not intended to be created (eg Win32_ProcessStartup).
+                     . Add .put method to allow explicit instance creation.
+                     . Allow user to prevent the namespace from searching for
+                       valid classes at startup. This makes the startup
+                       much faster, but means you don't get a list of classes.
 29th Nov 2005 1.0rc3 . Small changes to allow array of output parameters
                      . Added qualifiers to list of private attributes
                      . Added details of required privs to method docstring
