@@ -21,6 +21,13 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
+                       qualifiers are held as a dictionary member of the class).
+                     . If a moniker is passed which doesn't start with winmgmts:
+                       then add it automatically (this helps with associations).
+                     . Special-cased associations, whose properties are the paths
+                       of the associated classes: when the properties are requested,
+                       automatically return the instantiated class.
 2nd Mar 2006  1.0    . Final release for v1.0
                      . Corrected example in .new method of _wmi_namespace, 
                        deprecating the previous inappropriate example of

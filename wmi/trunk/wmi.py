@@ -94,6 +94,13 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
+                       qualifiers are held as a dictionary member of the class).
+                     . If a moniker is passed which doesn't start with winmgmts:
+                       then add it automatically (this helps with associations).
+                     . Special-cased associations, whose properties are the paths
+                       of the associated classes: when the properties are requested,
+                       automatically return the instantiated class.
 2nd Mar 2006  1.0    . Final release for v1.0
                      . Corrected example in .new method of _wmi_namespace, 
                        deprecating the previous inappropriate example of
@@ -163,7 +170,7 @@ http://www.opensource.org/licenses/mit-license.php
  5th Jun 2003 0.1    Initial release by Tim Golden
 """
 
-__VERSION__ = "1.0rc4"
+__VERSION__ = "1.1"
 
 _DEBUG = False
 
@@ -411,7 +418,17 @@ class _wmi_object:
     """
     try:
       if attribute in self._properties:
-        return self.ole_object.Properties_ (attribute).Value
+        value = self.ole_object.Properties_ (attribute).Value
+        #
+        # If this is an association, its properties are
+        #  actually the paths to the two aspects of the
+        #  association, so translate them automatically
+        #  into WMI objects.
+        #
+        if self.qualifiers.get ("Association", False):
+          return WMI (moniker=value)
+        else:
+          return value
       elif attribute in self._methods:
         return _wmi_method (self.ole_object, attribute)
       else:
@@ -498,12 +515,6 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
-  def qualifiers (self):
-    try:
-      return self.ole_object.Qualifiers_
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
-
   def associators (self, wmi_association_class="", wmi_result_class=""):
     """Return a list of objects related to this one, optionally limited
      either by association class (ie the name of the class which relates
@@ -533,7 +544,11 @@ class _wmi_object:
 
   def references (self, wmi_class=""):
     """Return a list of associations involving this object, optionally
-     limited by the result class (the name of the association class)
+     limited by the result class (the name of the association class).
+     
+     NB Associations are treated specially; although WMI only returns
+     the string corresponding to the instance of each associated object,
+     this module will automatically convert that to the object itself.
 
     eg,
       c =  wmi.WMI ()
@@ -859,6 +874,7 @@ class _wmi_watcher:
           raise x_wmi_timed_out
       handle_com_error (error_info)
 
+PROTOCOL = "winmgmts:"
 IMPERSONATION_LEVEL = "impersonate"
 AUTHENTICATION_LEVEL = "default"
 NAMESPACE = "cimv2"
@@ -911,6 +927,8 @@ def connect (
       obj = wmi
 
     elif moniker:
+      if not moniker.startswith (PROTOCOL):
+        moniker = PROTOCOL + moniker
       obj = GetObject (moniker)
 
     else:
@@ -972,7 +990,7 @@ def construct_moniker (
   if authority and computer: security.append ("authority=%s" % authority)
   if privileges: security.append ("(%s)" % ", ".join (privileges))
 
-  moniker = ["winmgmts:"]
+  moniker = [PROTOCOL]
   if security: moniker.append ("{%s}/" % ",".join (security))
   if computer: moniker.append ("/%s/" % computer)
   moniker.append ("root/")
