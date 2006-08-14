@@ -21,6 +21,7 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
 10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
                      . Remove final Put_ from .new method as some classes are
                        not intended to be created (eg Win32_ProcessStartup).

@@ -94,6 +94,7 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
 10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
                      . Remove final Put_ from .new method as some classes are
                        not intended to be created (eg Win32_ProcessStartup).
@@ -606,7 +607,7 @@ class _wmi_class (_wmi_object):
       #  final Put_
       #
       for attribute, value in kwargs.items ():
-        self.ole_object.Properties_ (attribute).Value = value
+        obj.ole_object.Properties_ (attribute).Value = value
       return obj
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
@@ -688,11 +689,7 @@ class _wmi_namespace:
      p.Terminate ()
      for p in c.Win32_Process (name="notepad.exe"): print p
     """
-    class_name = wmi_class
-    if class_name not in self.classes:
-      raise Exception, class_name + " is not a WMI class"
-
-    return getattr (self, class_name).new (**kwargs)
+    return getattr (self, wmi_class).new (**kwargs)
 
   new_instance_of = new
 
