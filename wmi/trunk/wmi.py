@@ -66,7 +66,7 @@ Since the COM implementation doesn't give much away to Python
 + WMI classes (as opposed to instances) are first-class
   objects, so you can get hold of a class, and call
   its methods or set up a watch against it.
-  
+
   eg
     process = wmi.WMI ().Win32_Process
     process.Create (CommandLine="notepad.exe")
@@ -94,6 +94,8 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless
+                       the instance has a path (ie has not been spawned).
 10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
 10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
                      . Remove final Put_ from .new method as some classes are
@@ -116,7 +118,7 @@ http://www.opensource.org/licenses/mit-license.php
                      . Added username/password support to WMI connection.
                        Saves having to do separate connect_server call.
                      . Added optional debug flag to WMI connection.
-                     . Switched to MIT license (GPL-compatible and 
+                     . Switched to MIT license (GPL-compatible and
                        not Python-specific).
                      . Bumped version to 1.0
 25th May 2005 0.6b   . Removed late-dispatch code (EnsureDispatch)
@@ -226,7 +228,7 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   wmi_time += "."
   wmi_time += str_or_stars (microseconds, 6)
   wmi_time += str_or_stars (timezone, 4)
-  
+
   return wmi_time
 
 def to_time (wmi_time):
@@ -234,7 +236,7 @@ def to_time (wmi_time):
   and returns:
 
   year, month, day, hours, minutes, seconds, microseconds, timezone
-  
+
   If any part of the string is "*", returns None
   """
   def int_or_none (s, start, end):
@@ -242,7 +244,7 @@ def to_time (wmi_time):
       return int (s[start:end])
     except ValueError:
       return None
-  
+
   year = int_or_none (wmi_time, 0, 4)
   month = int_or_none (wmi_time, 4, 6)
   day = int_or_none (wmi_time, 6, 8)
@@ -421,7 +423,8 @@ class _wmi_object:
     try:
       if attribute in self._properties:
         self.ole_object.Properties_ (attribute).Value = value
-        self.ole_object.Put_ ()
+        if self.ole_object.Path_.Path:
+          self.ole_object.Put_ ()
       else:
         raise AttributeError, attribute
     except pywintypes.com_error, error_info:
@@ -442,11 +445,14 @@ class _wmi_object:
 
   def put (self):
     self.ole_object.Put_ ()
-  
+
   def set (self, **kwargs):
     """Set several properties of the underlying object
      at one go. This is particularly useful in combination
-     with the new () method below.
+     with the new () method below. However, an instance
+     which has been spawned in this way won't have enough
+     information to write pack, so only try if the
+     instance has a path.
     """
     if kwargs:
       try:
@@ -455,7 +461,12 @@ class _wmi_object:
             self.ole_object.Properties_ (attribute).Value = value
           else:
             raise AttributeError, attribute
-        self.ole_object.Put_ ()
+        #
+        # Only try to write the attributes
+        #  back if the object exists.
+        #
+        if self.ole_object.Path_.Path:
+          self.ole_object.Put_ ()
       except pywintypes.com_error, error_info:
         handle_com_error (error_info)
 
@@ -602,12 +613,7 @@ class _wmi_class (_wmi_object):
     """
     try:
       obj = _wmi_object (self.SpawnInstance_ ())
-      #
-      # Don't use .set method which will do a
-      #  final Put_
-      #
-      for attribute, value in kwargs.items ():
-        obj.ole_object.Properties_ (attribute).Value = value
+      obj.set (**kwargs)
       return obj
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
@@ -788,7 +794,7 @@ class _wmi_namespace:
       wql = \
         "SELECT * FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
         (notification_type, delay_secs, class_name, where)
-      
+
       if _DEBUG: print wql
 
     try:

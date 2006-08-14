@@ -8,7 +8,7 @@ What is it?
 The Python WMI module is a lightweight wrapper on top of the pywin32
 extensions, and hides some of the messy plumbing needed to get Python to
 talk to the WMI API. It's pure Python and should work with any version of
-Python from 2.1 onwards (list comprehensions) and any recent version of 
+Python from 2.1 onwards (list comprehensions) and any recent version of
 pywin32.
 
 
@@ -21,6 +21,8 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless
+                       the instance has a path (ie has not been spawned).
 10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
 10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
                      . Remove final Put_ from .new method as some classes are
