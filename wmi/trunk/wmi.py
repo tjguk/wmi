@@ -94,6 +94,10 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+2nd Mar 2006  1.0    . Final release for v1.0
+                     . Corrected example in .new method of _wmi_namespace, 
+                       deprecating the previous inappropriate example of
+                       Win32_Process, and substituting Win32_ProcessStartup.
 11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless
                        the instance has a path (ie has not been spawned).
 10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
@@ -608,8 +612,34 @@ class _wmi_class (_wmi_object):
       handle_com_error (error_info)
 
   def new (self, **kwargs):
-    """Create a new instance of this class, optionally
-     passing in startup parameters.
+    """This is the equivalent to the raw-WMI SpawnInstance_
+     method. Note that there are relatively few uses for
+     this, certainly fewer than you might imagine. Most
+     classes which need to create a new *real* instance
+     of themselves, eg Win32_Process, offer a .Create 
+     method. SpawnInstance_ is generally reserved for
+     instances which are passed as parameters to such
+     .Create methods, a common example being the
+     Win32_SecurityDescriptor, passed to Win32_Share.Create
+     and other instances which need security.
+     
+    The example here is Win32_ProcessStartup, which
+    controls the shown/hidden state etc. of a new
+    Win32_Process instance.
+    
+    import win32con
+    import wmi
+    c = wmi.WMI ()
+    startup = c.Win32_ProcessStartup.new (ShowWindow=win32con.SW_SHOWMINIMIZED)
+    pid, retval = c.Win32_Process.Create (
+      CommandLine="notepad.exe",
+      ProcessStartupInformation=startup
+    )
+    
+    NB previous versions of this module, used this function
+    to create new process. This is *not* a good example
+    of its use; it is better handled with something like
+    the example above.
     """
     try:
       obj = _wmi_object (self.SpawnInstance_ ())
@@ -685,23 +715,10 @@ class _wmi_namespace:
       handle_com_error (error_info)
 
   def new (self, wmi_class, **kwargs):
-    """Create a new <whatever>, typically something like
-     Win32_Process, eg:
-
-     c = wmi.WMI ("remote_machine")
-     for p in c.Win32_Process (name="notepad.exe"): print p
-     c.new ("Win32_Process").Create (CommandLine="notepad.exe")
-     for p in c.Win32_Process (name="notepad.exe"): print p
-     p.Terminate ()
-     for p in c.Win32_Process (name="notepad.exe"): print p
-    """
+    """This is now implemented by a call to _wmi_namespace.new (qv)"""
     return getattr (self, wmi_class).new (**kwargs)
 
   new_instance_of = new
-
-  def run (self, command_line):
-    """Convenience function to run a program against this computer"""
-    self.new ("Win32_Process").Create (CommandLine=command_line)
 
   def query (self, wql):
     """Perform an arbitrary query against a WMI object. Use the flags

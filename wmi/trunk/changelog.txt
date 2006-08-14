@@ -21,6 +21,10 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+2nd Mar 2006  1.0    . Final release for v1.0
+                     . Corrected example in .new method of _wmi_namespace, 
+                       deprecating the previous inappropriate example of
+                       Win32_Process, and substituting Win32_ProcessStartup.
 11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless
                        the instance has a path (ie has not been spawned).
 10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
@@ -45,7 +49,8 @@ What's Changed?
                      . Added username/password support to WMI connection.
                        Saves having to do separate connect_server call.
                      . Added optional debug flag to WMI connection.
-                     . Switched to MIT license
+                     . Switched to MIT license (GPL-compatible and
+                       not Python-specific).
                      . Bumped version to 1.0
 25th May 2005 0.6b   . Removed late-dispatch code (EnsureDispatch)
                        and replaced with dynamic dispatch, using

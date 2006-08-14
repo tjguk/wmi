@@ -23,6 +23,14 @@ Where do I get it?
 http://timgolden.me.uk/python/wmi.html
 
 
+Copyright & License?
+====================
+
+(c) Tim Golden <mail@timgolden.me.uk> 5th June 2003
+Licensed under the (GPL-compatible) MIT License:
+http://www.opensource.org/licenses/mit-license.php
+
+
 How do I install it?
 ====================
 
