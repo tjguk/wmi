@@ -175,6 +175,7 @@ __VERSION__ = "1.1.1"
 
 _DEBUG = False
 
+import re
 from win32com.client import GetObject, Dispatch
 import pywintypes
 
@@ -881,7 +882,7 @@ class _wmi_watcher:
 PROTOCOL = "winmgmts:"
 IMPERSONATION_LEVEL = "impersonate"
 AUTHENTICATION_LEVEL = "default"
-NAMESPACE = "cimv2"
+NAMESPACE = "root/cimv2"
 def connect (
   computer=".",
   impersonation_level="",
@@ -926,6 +927,14 @@ def connect (
   global _DEBUG
   _DEBUG = debug
 
+  #
+  # If namespace is a blank string, leave
+  # it unaltered as it might to trying to
+  # access the root namespace
+  #
+  #if namespace is None:
+  #  namespace = NAMESPACE
+    
   try:
     if wmi:
       obj = wmi
@@ -933,6 +942,7 @@ def connect (
     elif moniker:
       if not moniker.startswith (PROTOCOL):
         moniker = PROTOCOL + moniker
+      if _DEBUG: print moniker
       obj = GetObject (moniker)
 
     else:
@@ -955,9 +965,10 @@ def connect (
           authentication_level=authentication_level or AUTHENTICATION_LEVEL,
           authority=authority,
           privileges=privileges,
-          namespace=namespace or NAMESPACE,
+          namespace=namespace,
           suffix=suffix
         )
+        if _DEBUG: print moniker
         obj = GetObject (moniker)
 
     wmi_type = get_wmi_type (obj)
@@ -997,8 +1008,13 @@ def construct_moniker (
   moniker = [PROTOCOL]
   if security: moniker.append ("{%s}/" % ",".join (security))
   if computer: moniker.append ("/%s/" % computer)
-  moniker.append ("root/")
-  if namespace: moniker.append (namespace)
+  if namespace:
+    parts = re.split (r"[/\\]", namespace)
+    if parts[0] != 'root':
+      parts.insert (0, "root")
+    moniker.append ("/".join (parts))
+#  if namespace and not namespace.startswith ("root/"): moniker.append ("root/")
+#  if namespace: moniker.append (namespace)
   if suffix: moniker.append (":%s" % suffix)
   return "".join (moniker)
 
