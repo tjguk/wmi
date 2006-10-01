@@ -94,6 +94,15 @@ Many thanks, obviously to Mark Hammond for creating the win32all
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
+30th Sep 2006 1.2a   . Cosmetic changes
+                       _wmi_namespace.classes is now a dict, and acts as a cache
+                       for wrapper classes. If find_classes is True in the __init__,
+                       the names are populated but not the classes; if it is False,
+                       the names are not populated. In either case, a lookup against
+                       the namespace (eg for i in c.Win32_DiskDrive) will check the
+                       cache first.
+                       Additional user-callable subclasses_of to allow finer grained
+                       control over which classes are used.
 15th Aug 2006 1.1.1  . Fixed a small bug reported and patched by Jonas Bjering
 7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
                        qualifiers are held as a dictionary member of the class).
@@ -103,7 +112,7 @@ http://www.opensource.org/licenses/mit-license.php
                        of the associated classes: when the properties are requested,
                        automatically return the instantiated class.
 2nd Mar 2006  1.0    . Final release for v1.0
-                     . Corrected example in .new method of _wmi_namespace, 
+                     . Corrected example in .new method of _wmi_namespace,
                        deprecating the previous inappropriate example of
                        Win32_Process, and substituting Win32_ProcessStartup.
 11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless
@@ -175,6 +184,7 @@ __VERSION__ = "1.1.1"
 
 _DEBUG = False
 
+import sys
 import re
 from win32com.client import GetObject, Dispatch
 import pywintypes
@@ -461,7 +471,7 @@ class _wmi_object:
      another. Don't try to do anything if the other
      object is not a wmi object. It might be possible
      to compare this object's unique key with a string
-     or something, but this doesn't seem to be univeral
+     or something, but this doesn't seem to be universal
      enough to merit a special case.
     """
     if isinstance (other, self.__class__):
@@ -550,7 +560,7 @@ class _wmi_object:
   def references (self, wmi_class=""):
     """Return a list of associations involving this object, optionally
      limited by the result class (the name of the association class).
-     
+
      NB Associations are treated specially; although WMI only returns
      the string corresponding to the instance of each associated object,
      this module will automatically convert that to the object itself.
@@ -589,7 +599,7 @@ class _wmi_class (_wmi_object):
     _set (self, "_namespace", namespace)
     _set (self, "_class_name", wmi_class.Path_.Class)
 
-  def query (self, **where_clause):
+  def query (self, fields=[], **where_clause):
     """Make it slightly easier to query against the class,
      by calling the namespace's query with the class preset.
      Won't work if the class has been instantiated directly.
@@ -598,7 +608,8 @@ class _wmi_class (_wmi_object):
       raise x_wmi_no_namespace, "You cannot query directly from a WMI class"
 
     try:
-      wql = "SELECT * FROM " + self._class_name
+      field_list = ", ".join (fields) or "*"
+      wql = "SELECT " + field_list + " FROM " + self._class_name
       if where_clause:
         wql += " WHERE " + " AND ". join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])
       return self._namespace.query (wql)
@@ -636,17 +647,17 @@ class _wmi_class (_wmi_object):
      method. Note that there are relatively few uses for
      this, certainly fewer than you might imagine. Most
      classes which need to create a new *real* instance
-     of themselves, eg Win32_Process, offer a .Create 
+     of themselves, eg Win32_Process, offer a .Create
      method. SpawnInstance_ is generally reserved for
      instances which are passed as parameters to such
      .Create methods, a common example being the
      Win32_SecurityDescriptor, passed to Win32_Share.Create
      and other instances which need security.
-     
+
     The example here is Win32_ProcessStartup, which
     controls the shown/hidden state etc. of a new
     Win32_Process instance.
-    
+
     import win32con
     import wmi
     c = wmi.WMI ()
@@ -655,7 +666,7 @@ class _wmi_class (_wmi_object):
       CommandLine="notepad.exe",
       ProcessStartupInformation=startup
     )
-    
+
     NB previous versions of this module, used this function
     to create new process. This is *not* a good example
     of its use; it is better handled with something like
@@ -690,7 +701,7 @@ class _wmi_namespace:
 
     # Initialise the "classes" attribute, to avoid infinite recursion in the
     # __getattr__ method (which uses it).
-    self.classes = []
+    self.classes = {}
     #
     # Pick up the list of classes under this namespace
     #  so that they can be queried, and used as though
@@ -701,7 +712,7 @@ class _wmi_namespace:
     #
     if find_classes:
       try:
-        _set (self, "classes", [c.Path_.Class for c in namespace.SubclassesOf ()])
+        _set (self, "classes", self.subclasses_of ())
       except AttributeError:
         pass
 
@@ -720,6 +731,14 @@ class _wmi_namespace:
   def handle (self):
     """The raw OLE object representing the WMI namespace"""
     return self._namespace
+
+  def subclasses_of (self, root="", regex=r".*"):
+    classes = {}
+    for c in self._namespace.SubclassesOf (root):
+      klass = c.Path_.Class
+      if re.match (regex, klass):
+        classes[klass] = None
+    return classes
 
   def instances (self, class_name):
     """Return a list of instances of the WMI class. This is
@@ -846,13 +865,19 @@ class _wmi_namespace:
     Win32_ prepended. Failing that, assume it's a normal attribute
     and pass through.
     """
+
     try:
-      return _wmi_class (self, self._namespace.Get (attribute))
+      return self._cached_classes (attribute)
     except pywintypes.com_error, error_info:
       try:
-        return _wmi_class (self, self._namespace.Get ("Win32_" + attribute))
+        return self._cached_classes ("Win32_" + attribute)
       except pywintypes.com_error, error_info:
         return getattr (self._namespace, attribute)
+
+  def _cached_classes (self, class_name):
+    if self.classes.get (class_name) is None:
+      self.classes[class_name] = _wmi_class (self, self._namespace.Get (class_name))
+    return self.classes[class_name]
 
 #
 # class _wmi_watcher
@@ -934,7 +959,7 @@ def connect (
   #
   #if namespace is None:
   #  namespace = NAMESPACE
-    
+
   try:
     if wmi:
       obj = wmi
