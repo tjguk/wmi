@@ -179,8 +179,18 @@ http://www.opensource.org/licenses/mit-license.php
                      + better COM error-handling (handle_com_error)
  5th Jun 2003 0.1    Initial release by Tim Golden
 """
+try:
+  True, False
+except NameError:
+  True = 1
+  False = 0
 
-__VERSION__ = "1.1.1"
+try:
+  object
+except NameError:
+  class object: pass
+
+__VERSION__ = "1.2b"
 
 _DEBUG = False
 
@@ -381,7 +391,6 @@ class _wmi_method:
         else:
           results.append (value)
       return tuple (results)
-      # return tuple ([result.Properties_ (name) for name in [n for (n, is_array) in self.out_parameter_names]])
 
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
@@ -395,14 +404,34 @@ class _wmi_method:
 class _wmi_object:
   """A lightweight wrapper round an OLE WMI object"""
 
-  def __init__ (self, ole_object):
+  def __init__ (self, ole_object, instance_of=None, fields=[]):
     try:
       _set (self, "ole_object", ole_object)
-      _set (self, "_properties", [p.Name for p in self.ole_object.Properties_])
-      _set (self, "_methods", [p.Name for p in self.ole_object.Methods_])
+      _set (self, "_instance_of", instance_of)
+      _set (self, "properties", {})
+      _set (self, "methods", {})
+
+      if self._instance_of:
+        if fields:
+          for field in fields:
+            self.properties[field] = None
+        else:
+          _set (self, "properties", self._instance_of.properties.copy ())
+        _set (self, "methods", self._instance_of.methods)
+      else:
+        for p in ole_object.Properties_:
+          self.properties[p.Name] = None
+        for m in ole_object.Methods_:
+          self.methods[m.Name] = None
+
+      _set (self, "_properties", self.properties.keys ())
+      _set (self, "_methods", self.methods.keys ())
+
       _set (self, "qualifiers", {})
       for q in self.ole_object.Qualifiers_:
         self.qualifiers[q.Name] = q.Value
+      _set (self, "is_association", self.qualifiers.has_key ("Association"))
+
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -424,6 +453,16 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
+  def _cached_properties (self, attribute):
+    if self.properties[attribute] is None:
+      self.properties[attribute] = self.ole_object.Properties_ (attribute)
+    return self.properties[attribute]
+
+  def _cached_methods (self, attribute):
+    if self.methods[attribute] is None:
+      self.methods[attribute] = _wmi_method (self.ole_object, attribute)
+    return self.methods[attribute]
+
   def __getattr__ (self, attribute):
     """Attempt to pass attribute calls to the proxied COM object.
      If the attribute is recognised as a property, return its value;
@@ -432,20 +471,20 @@ class _wmi_object:
      on to the underlying object.
     """
     try:
-      if attribute in self._properties:
-        value = self.ole_object.Properties_ (attribute).Value
+      if self.properties.has_key (attribute):
+        value = self._cached_properties (attribute).Value
         #
         # If this is an association, its properties are
         #  actually the paths to the two aspects of the
         #  association, so translate them automatically
         #  into WMI objects.
         #
-        if self.qualifiers.get ("Association", False):
+        if self.is_association:
           return WMI (moniker=value)
         else:
           return value
-      elif attribute in self._methods:
-        return _wmi_method (self.ole_object, attribute)
+      elif self.methods.has_key (attribute):
+        return self._cached_methods (attribute)
       else:
         return getattr (self.ole_object, attribute)
     except pywintypes.com_error, error_info:
@@ -457,8 +496,8 @@ class _wmi_object:
      raise an exception.
     """
     try:
-      if attribute in self._properties:
-        self.ole_object.Properties_ (attribute).Value = value
+      if self.properties.has_key (attribute):
+        self._cached_properties (attribute).Value = value
         if self.ole_object.Path_.Path:
           self.ole_object.Put_ ()
       else:
@@ -493,8 +532,8 @@ class _wmi_object:
     if kwargs:
       try:
         for attribute, value in kwargs.items ():
-          if attribute in self._properties:
-            self.ole_object.Properties_ (attribute).Value = value
+          if self.properties.has_key (attribute):
+            self._cached_properties (attribute).Value = value
           else:
             raise AttributeError, attribute
         #
@@ -612,7 +651,7 @@ class _wmi_class (_wmi_object):
       wql = "SELECT " + field_list + " FROM " + self._class_name
       if where_clause:
         wql += " WHERE " + " AND ". join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])
-      return self._namespace.query (wql)
+      return self._namespace.query (wql, self, fields)
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -638,7 +677,7 @@ class _wmi_class (_wmi_object):
     """Return a list of instances of the WMI class
     """
     try:
-      return [_wmi_object (instance) for instance in self.Instances_ ()]
+      return [_wmi_object (instance, self) for instance in self.Instances_ ()]
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -673,7 +712,7 @@ class _wmi_class (_wmi_object):
     the example above.
     """
     try:
-      obj = _wmi_object (self.SpawnInstance_ ())
+      obj = _wmi_object (self.SpawnInstance_ (), self)
       obj.set (**kwargs)
       return obj
     except pywintypes.com_error, error_info:
@@ -712,7 +751,7 @@ class _wmi_namespace:
     #
     if find_classes:
       try:
-        _set (self, "classes", self.subclasses_of ())
+        self.classes.update (self.subclasses_of ())
       except AttributeError:
         pass
 
@@ -759,7 +798,7 @@ class _wmi_namespace:
 
   new_instance_of = new
 
-  def query (self, wql):
+  def query (self, wql, instance_of=None, fields=[]):
     """Perform an arbitrary query against a WMI object. Use the flags
      recommended by Microsoft to achieve a read-only, semi-synchronous
      query where the time is taken while looping through. Should really
@@ -771,7 +810,7 @@ class _wmi_namespace:
     if _DEBUG: print wql
     try:
       return [
-        _wmi_object (obj) for obj in \
+        _wmi_object (obj, instance_of, fields) for obj in \
          self._namespace.ExecQuery (
            strQuery=wql,
            iFlags=flags
@@ -854,7 +893,7 @@ class _wmi_namespace:
       if _DEBUG: print wql
 
     try:
-      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql))
+      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), self)
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -1038,8 +1077,6 @@ def construct_moniker (
     if parts[0] != 'root':
       parts.insert (0, "root")
     moniker.append ("/".join (parts))
-#  if namespace and not namespace.startswith ("root/"): moniker.append ("root/")
-#  if namespace: moniker.append (namespace)
   if suffix: moniker.append (":%s" % suffix)
   return "".join (moniker)
 
