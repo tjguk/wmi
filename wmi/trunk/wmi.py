@@ -411,19 +411,9 @@ class _wmi_object:
       _set (self, "properties", {})
       _set (self, "methods", {})
 
-      if self._instance_of:
-        if fields:
-          for field in fields:
-            self.properties[field] = None
-        else:
-          _set (self, "properties", self._instance_of.properties.copy ())
-        _set (self, "methods", self._instance_of.methods)
-      else:
-        for p in ole_object.Properties_:
-          self.properties[p.Name] = None
-        for m in ole_object.Methods_:
-          self.methods[m.Name] = None
-
+      self.set_properties ()
+      self.set_methods ()
+      
       _set (self, "_properties", self.properties.keys ())
       _set (self, "_methods", self.methods.keys ())
 
@@ -434,6 +424,14 @@ class _wmi_object:
 
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
+      
+  def set_properties (self):
+    for p in self.ole_object.Properties_:
+      self.properties[p.Name] = None
+    
+  def set_methods (self):
+    for m in self.ole_object.Methods_:
+      self.methods[m.Name] = None
 
   def __str__ (self):
     """For a call to print <object> return the OLE description
@@ -619,6 +617,23 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
+class _wmi_instance (_wmi_object):
+  
+  def __init__ (self, ole_object, instance_of, fields=[]):
+    _wmi_object.__init__ (self, ole_object, instance_of, fields)
+    _set (self, "instance_of", instance_of)
+    _set (self, "fields", fields)
+
+  def set_properties (self):
+    if self.fields:
+      for field in self.fields:
+        self.properties[field] = None
+    else:
+      _set (self, "properties", self._instance_of.properties.copy ())
+      
+  def set_methods (self):
+    _set (self, "methods", self._instance_of.methods)
+
 #
 # class _wmi_class
 #
@@ -677,7 +692,7 @@ class _wmi_class (_wmi_object):
     """Return a list of instances of the WMI class
     """
     try:
-      return [_wmi_object (instance, self) for instance in self.Instances_ ()]
+      return [_wmi_instance (instance, self) for instance in self.Instances_ ()]
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -712,7 +727,7 @@ class _wmi_class (_wmi_object):
     the example above.
     """
     try:
-      obj = _wmi_object (self.SpawnInstance_ (), self)
+      obj = _wmi_instance (self.SpawnInstance_ (), self)
       obj.set (**kwargs)
       return obj
     except pywintypes.com_error, error_info:
@@ -788,14 +803,13 @@ class _wmi_namespace:
     or system.Win32_LogicalDisk ()
     """
     try:
-      return [_wmi_object (obj) for obj in self._namespace.InstancesOf (class_name)]
+      return self._cached_classes (class_name).instances ()
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
   def new (self, wmi_class, **kwargs):
     """This is now implemented by a call to _wmi_namespace.new (qv)"""
-    return getattr (self, wmi_class).new (**kwargs)
-
+    return self._cached_classes (wmi_class).new (**kwargs)
   new_instance_of = new
 
   def query (self, wql, instance_of=None, fields=[]):
@@ -810,7 +824,7 @@ class _wmi_namespace:
     if _DEBUG: print wql
     try:
       return [
-        _wmi_object (obj, instance_of, fields) for obj in \
+        _wmi_instance (obj, instance_of, fields) for obj in \
          self._namespace.ExecQuery (
            strQuery=wql,
            iFlags=flags
