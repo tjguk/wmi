@@ -21,6 +21,24 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+8th Oct 2006  1.2    . Improved performance by lazy lookups and cached values
+                       for both properties and methods.
+                       Allow a list of fields to be selected instead of the
+                       entire class properties.
+                       Added code supplied by Paul Tiemann offers a lightweight
+                       data-only version of the wmi query. This is useful where
+                       real-time repeated data is required which should interfere
+                       as little as possible with the host machine.
+                       Code now compatible with Python v2.0.
+30th Sep 2006 1.2a   . Cosmetic changes
+                       _wmi_namespace.classes is now a dict, and acts as a cache
+                       for wrapper classes. If find_classes is True in the __init__,
+                       the names are populated but not the classes; if it is False,
+                       the names are not populated. In either case, a lookup against
+                       the namespace (eg for i in c.Win32_DiskDrive) will check the
+                       cache first.
+                       Additional user-callable subclasses_of to allow finer grained
+                       control over which classes are used.
 15th Aug 2006 1.1.1  . Fixed a small bug reported and patched by Jonas Bjering
 7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
                        qualifiers are held as a dictionary member of the class).
@@ -30,7 +48,7 @@ What's Changed?
                        of the associated classes: when the properties are requested,
                        automatically return the instantiated class.
 2nd Mar 2006  1.0    . Final release for v1.0
-                     . Corrected example in .new method of _wmi_namespace, 
+                     . Corrected example in .new method of _wmi_namespace,
                        deprecating the previous inappropriate example of
                        Win32_Process, and substituting Win32_ProcessStartup.
 11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless

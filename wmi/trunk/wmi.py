@@ -89,95 +89,14 @@ for disk in vodev1.Win32_LogicalDisk ():
 Many thanks, obviously to Mark Hammond for creating the win32all
  extensions, but also to Alex Martelli and Roger Upole, whose
  c.l.py postings pointed me in the right direction.
+Thanks especially in release 1.2 to Paul Tiemann for his code
+ contributions and robust testing.
 
 (c) Tim Golden <mail@timgolden.me.uk> 5th June 2003
 Licensed under the (GPL-compatible) MIT License:
 http://www.opensource.org/licenses/mit-license.php
 
-30th Sep 2006 1.2a   . Cosmetic changes
-                       _wmi_namespace.classes is now a dict, and acts as a cache
-                       for wrapper classes. If find_classes is True in the __init__,
-                       the names are populated but not the classes; if it is False,
-                       the names are not populated. In either case, a lookup against
-                       the namespace (eg for i in c.Win32_DiskDrive) will check the
-                       cache first.
-                       Additional user-callable subclasses_of to allow finer grained
-                       control over which classes are used.
-15th Aug 2006 1.1.1  . Fixed a small bug reported and patched by Jonas Bjering
-7th Apr 2006  1.1    . Removed redundant qualifiers method of _wmi_object (the
-                       qualifiers are held as a dictionary member of the class).
-                     . If a moniker is passed which doesn't start with winmgmts:
-                       then add it automatically (this helps with associations).
-                     . Special-cased associations, whose properties are the paths
-                       of the associated classes: when the properties are requested,
-                       automatically return the instantiated class.
-2nd Mar 2006  1.0    . Final release for v1.0
-                     . Corrected example in .new method of _wmi_namespace,
-                       deprecating the previous inappropriate example of
-                       Win32_Process, and substituting Win32_ProcessStartup.
-11th Feb 2006 1.0rc6 . Adjusted .set method so it won't try to .Put_ unless
-                       the instance has a path (ie has not been spawned).
-10th Feb 2006 1.0rc5 . Fixed small bug in .new method of _wmi_class
-10th Feb 2006 1.0rc4 . Added from_time function to convert Python times to WMI
-                     . Remove final Put_ from .new method as some classes are
-                       not intended to be created (eg Win32_ProcessStartup).
-                     . Add .put method to allow explicit instance creation.
-                     . Allow user to prevent the namespace from searching for
-                       valid classes at startup. This makes the startup
-                       much faster, but means you don't get a list of classes.
-29th Nov 2005 1.0rc3 . Small changes to allow array of output parameters
-                     . Added qualifiers to list of private attributes
-                     . Added details of required privs to method docstring
-                     . Fixed long-standing bug in Usage example
-                     . Added provenance to WMI methods from MappingStrings
-26th Oct 2005 1.0rc2 . Corrected __repr__ in _wmi_namespace
-18th Oct 2005 1.0rc1 . Refactored into namespace, class, object classes.
-                     . This makes it easier to use certain things, such
-                       as the StdRegProv's registry object, and the XP
-                       SystemRestore functionality.
-                     . Added CompareTo_ to support __eq__ functionality.
-                     . Added username/password support to WMI connection.
-                       Saves having to do separate connect_server call.
-                     . Added optional debug flag to WMI connection.
-                     . Switched to MIT license (GPL-compatible and
-                       not Python-specific).
-                     . Bumped version to 1.0
-25th May 2005 0.6b   . Removed late-dispatch code (EnsureDispatch)
-                       and replaced with dynamic dispatch, using
-                       Thomas Heller's ProvideConstants class to
-                       avoid hard-coding WMI constants. This is
-                       to help people using py2exe who would
-                       otherwise need to specify one or more
-                       typelibs.
-19th May 2004 0.6    . Added namespace support to wmi.__init__.
-                       This means you can now do, eg:
-                       wmi.WMI (namespace="MicrosoftIISv2")
-                     . _wmi_method parameters now check for array
-                       parameters, showing them on the __doc__ and
-                       raising an exception if the value passed in
-                       is not iterable.
-17th Jan 2004 0.5    . Added support for the WMI Registry interface. The new
-                       module-level Registry method returns a WMI registry
-                       object whose methods include EnumKeys, CreateValue &c.
-15th Dec 2003 0.4    . Added machines_in_domain (from a post to python-win32 by "Sean")
-                     . Factored out moniker construction to make it easier to support
-                       use of StdRegProv to update registry. (Coming soon).
-                     . Added support for a timeout on the event watcher; timeout is
-                       specified in milliseconds and raises x_wmi_timed_out on a
-                       call to the watcher object. This allows for the possibility
-                       of pumping for waiting messages to prevent eg, the PythonWin
-                       IDE locking up. See the docstring for the watch_for method.
-                     . Added connect_server function, making it slightly easier to
-                       construct a WMI object, eg with username and password.
-10th Jul 2003 0.3    . Changes by Paul Moore to allow a ready-made WMI Services
-                       object to be passed in (WMI.__init__).
-                     . This header and the __VERSION__ number added by Tim G.
- 9th Jul 2003 0.2    . Sundry changes by Tim G, including but not limited to:
-                     + support for moniker parts (WMI.__init__)
-                     + creating new instances of WMI classes (WMI.new)
-                     + passing return value back from wmi methods (_wmi_method.__call__)
-                     + better COM error-handling (handle_com_error)
- 5th Jun 2003 0.1    Initial release by Tim Golden
+For change history see CHANGELOG.TXT
 """
 try:
   True, False
@@ -190,7 +109,7 @@ try:
 except NameError:
   class object: pass
 
-__VERSION__ = "1.2b"
+__VERSION__ = "1.2"
 
 _DEBUG = False
 
@@ -411,9 +330,19 @@ class _wmi_object:
       _set (self, "properties", {})
       _set (self, "methods", {})
 
-      self.set_properties ()
-      self.set_methods ()
-      
+      if self._instance_of:
+        if fields:
+          for field in fields:
+            self.properties[field] = None
+        else:
+          _set (self, "properties", self._instance_of.properties.copy ())
+        _set (self, "methods", self._instance_of.methods)
+      else:
+        for p in ole_object.Properties_:
+          self.properties[p.Name] = None
+        for m in ole_object.Methods_:
+          self.methods[m.Name] = None
+
       _set (self, "_properties", self.properties.keys ())
       _set (self, "_methods", self.methods.keys ())
 
@@ -424,14 +353,6 @@ class _wmi_object:
 
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
-      
-  def set_properties (self):
-    for p in self.ole_object.Properties_:
-      self.properties[p.Name] = None
-    
-  def set_methods (self):
-    for m in self.ole_object.Methods_:
-      self.methods[m.Name] = None
 
   def __str__ (self):
     """For a call to print <object> return the OLE description
@@ -617,23 +538,6 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
-class _wmi_instance (_wmi_object):
-  
-  def __init__ (self, ole_object, instance_of, fields=[]):
-    _wmi_object.__init__ (self, ole_object, instance_of, fields)
-    _set (self, "instance_of", instance_of)
-    _set (self, "fields", fields)
-
-  def set_properties (self):
-    if self.fields:
-      for field in self.fields:
-        self.properties[field] = None
-    else:
-      _set (self, "properties", self._instance_of.properties.copy ())
-      
-  def set_methods (self):
-    _set (self, "methods", self._instance_of.methods)
-
 #
 # class _wmi_class
 #
@@ -692,7 +596,7 @@ class _wmi_class (_wmi_object):
     """Return a list of instances of the WMI class
     """
     try:
-      return [_wmi_instance (instance, self) for instance in self.Instances_ ()]
+      return [_wmi_object (instance, self) for instance in self.Instances_ ()]
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -727,11 +631,27 @@ class _wmi_class (_wmi_object):
     the example above.
     """
     try:
-      obj = _wmi_instance (self.SpawnInstance_ (), self)
+      obj = _wmi_object (self.SpawnInstance_ (), self)
       obj.set (**kwargs)
       return obj
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
+
+#
+# class _wmi_result
+#
+class _wmi_result:
+  """Simple, data only result for targeted WMI queries which request
+     data only result classes via fetch_as_classes.
+  """
+  def __init__(self, obj, attributes):
+    if attributes:
+      for attr in attributes:
+        self.__dict__[attr] = obj.Properties_ (attr).Value
+    else:
+      for p in obj.Properties_:
+        attr = p.Name
+        self.__dict__[attr] = obj.Properties_(attr).Value
 
 #
 # class WMI
@@ -803,17 +723,18 @@ class _wmi_namespace:
     or system.Win32_LogicalDisk ()
     """
     try:
-      return self._cached_classes (class_name).instances ()
+      return [_wmi_object (obj) for obj in self._namespace.InstancesOf (class_name)]
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
   def new (self, wmi_class, **kwargs):
     """This is now implemented by a call to _wmi_namespace.new (qv)"""
-    return self._cached_classes (wmi_class).new (**kwargs)
+    return getattr (self, wmi_class).new (**kwargs)
+
   new_instance_of = new
 
-  def query (self, wql, instance_of=None, fields=[]):
-    """Perform an arbitrary query against a WMI object. Use the flags
+  def _raw_query (self, wql):
+    """Execute a WQL query and return its raw results.  Use the flags
      recommended by Microsoft to achieve a read-only, semi-synchronous
      query where the time is taken while looping through. Should really
      be a generator, but ...
@@ -821,17 +742,43 @@ class _wmi_namespace:
     """
     flags = wbemFlagReturnImmediately | wbemFlagForwardOnly
     wql = wql.replace ("\\", "\\\\")
-    if _DEBUG: print wql
+    if _DEBUG: print "_raw_query(wql):", wql
     try:
-      return [
-        _wmi_instance (obj, instance_of, fields) for obj in \
-         self._namespace.ExecQuery (
-           strQuery=wql,
-           iFlags=flags
-         )
-      ]
+      return self._namespace.ExecQuery (strQuery=wql, iFlags=flags)
     except pywintypes.com_error, (hresult, hresult_text, additional, param_in_error):
       raise WMI_EXCEPTIONS.get (hresult, x_wmi (hresult))
+
+  def query (self, wql, instance_of=None, fields=[]):
+    """Perform an arbitrary query against a WMI object, and return
+       a list of _wmi_object representations of the results.
+    """
+    return [ _wmi_object (obj, instance_of, fields) for obj in self._raw_query(wql) ]
+
+  def fetch_as_classes (self, wmi_classname, fields=(), **where_clause):
+    """Build and execute a wql query to fetch the specified list of fields from
+       the specified wmi_classname + where_clause, then return the results as
+       a list of simple class instances with attributes matching fields_list.
+
+       If fields is left empty, select * and pre-load all class attributes for
+       each class returned.
+    """
+    wql = "SELECT %s FROM %s" % (fields and ", ".join (fields) or "*", wmi_classname)
+    if where_clause:
+      wql += " WHERE " + " AND ".join (["%s = '%s'" % (k, v) for k, v in where_clause.items()])
+    return [_wmi_result (obj, fields) for obj in self._raw_query(wql)]
+
+  def fetch_as_lists (self, wmi_classname, fields, **where_clause):
+    """Build and execute a wql query to fetch the specified list of fields from
+       the specified wmi_classname + where_clause, then return the results as
+       a list of lists whose values correspond fields_list.
+    """
+    wql = "SELECT %s FROM %s" % (", ".join (fields), wmi_classname)
+    if where_clause:
+      wql += " WHERE " + " AND ".join (["%s = '%s'" % (k, v) for k, v in where_clause.items()])
+    results = []
+    for obj in self._raw_query(wql):
+        results.append ([obj.Properties_ (field).Value for field in fields])
+    return results
 
   def watch_for (
     self,
