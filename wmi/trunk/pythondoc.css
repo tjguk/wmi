@@ -1,0 +1,13 @@
+p, ul {
+  width : 60%;
+}
+
+code {
+  display : block;
+  white-space : pre;
+  margin : 1em 0 0.5em 1.5em;
+  border : 1px solid black;
+  padding : 1em;
+  padding-top : 0;
+  width : 80%;
+}

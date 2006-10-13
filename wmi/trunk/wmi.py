@@ -1,103 +1,125 @@
-"""wmi - a lightweight Python wrapper around Microsoft's WMI interface
-
-Windows Management Instrumentation (WMI) is Microsoft's answer to
- the DMTF's Common Information Model. It allows you to query just
- about any conceivable piece of information from any computer which
- is running the necessary agent and over which have you the
- necessary authority.
-
-The implementation is by means of COM/DCOM and most of the examples
- assume you're running one of Microsoft's scripting technologies.
- Fortunately, Mark Hammond's pywin32 has pretty much all you need
- for a workable Python adaptation. I haven't tried any of the fancier
- stuff like Async calls and so on, so I don't know if they'd work.
-
-Since the COM implementation doesn't give much away to Python
- programmers, I've wrapped it in some lightweight classes with
- some getattr / setattr magic to ease the way. In particular:
-
-+ The _wmi_namespace object itself will determine its classes
-   and allow you to return all instances of any of them by
-   using its name as an attribute. As an additional shortcut,
-   you needn't specify the Win32_; if the first lookup fails
-   it will try again with a Win32_ on the front.
-
-   eg
-   disks = wmi.WMI ().Win32_LogicalDisk ()
-
-   or just
-
-   disks = wmi.WMI ().LogicalDisk ()
-
-  In addition, you can specify what would become the WHERE clause
-   as keyword parameters.
-
-   eg
-   fixed_disks = wmi.WMI ().Win32_LogicalDisk (DriveType = 3)
-
-+ The objects returned by a WMI lookup are wrapped in a Python
-   class which determines their methods and classes and allows
-   you to access them as though they were Python classes. The
-   methods only allow named parameters.
-
-   eg,
-   for p in wmi.WMI ().Win32_Process ():
-     if p.Name.lower () == 'notepad.exe':
-       p.Terminate (Result=1)
-
-+ Doing a print on one of the WMI objects will result in its
-   GetObjectText_ method being called, which usually produces
-   a meaningful printout of current values.
-  The repr of the object will include its full WMI path,
-   which lets you get directly to it if you need to.
-
-+ You can get the associators and references of an object as
-   a list of python objects by calling the associators () and
-   references () methods on a WMI Python object.
-   NB Don't do this on a Win32_ComputerSystem object; it will
-    take all day and kill your machine!
-
-   eg,
-   for p in wmi.WMI ().Win32_Process ():
-     if p.Name.lower () == 'notepad.exe':
-       for r in p.references ():
-         print r.Name
-
-+ WMI classes (as opposed to instances) are first-class
-  objects, so you can get hold of a class, and call
-  its methods or set up a watch against it.
-
-  eg
-    process = wmi.WMI ().Win32_Process
-    process.Create (CommandLine="notepad.exe")
-
-+ To make it easier to use in embedded systems and py2exe-style
-   executable wrappers, the module will not force early Dispatch.
-   To do this, it uses a handy hack by Thomas Heller for easy access
-   to constants.
-
-+ Typical usage will be:
-
-import wmi
-
-vodev1 = wmi.WMI ("vodev1")
-for disk in vodev1.Win32_LogicalDisk ():
-  if disk.DriveType == 3:
-    space = 100 * long (disk.FreeSpace) / long (disk.Size)
-    print "%s has %d%% free" % (disk.Name, space)
-
-Many thanks, obviously to Mark Hammond for creating the win32all
- extensions, but also to Alex Martelli and Roger Upole, whose
- c.l.py postings pointed me in the right direction.
-Thanks especially in release 1.2 to Paul Tiemann for his code
- contributions and robust testing.
-
-(c) Tim Golden <mail@timgolden.me.uk> 5th June 2003
-Licensed under the (GPL-compatible) MIT License:
-http://www.opensource.org/licenses/mit-license.php
-
-For change history see CHANGELOG.TXT
-"""
+##
+# wmi - a lightweight Python wrapper around Microsoft's WMI interface
+#
+# Windows Management Instrumentation (WMI) is Microsoft's answer to
+# the DMTF's Common Information Model. It allows you to query just
+# about any conceivable piece of information from any computer which
+# is running the necessary agent and over which have you the
+# necessary authority.
+#
+# The implementation is by means of COM/DCOM and most of the examples
+# assume you're running one of Microsoft's scripting technologies.
+# Fortunately, Mark Hammond's pywin32 has pretty much all you need
+# for a workable Python adaptation. I haven't tried any of the fancier
+# stuff like Async calls and so on, so I don't know if they'd work.
+#
+# Since the COM implementation doesn't give much away to Python
+# programmers, I've wrapped it in some lightweight classes with
+# some getattr / setattr magic to ease the way. In particular:
+#
+# <ul>
+# <li>
+# The _wmi_namespace object itself will determine its classes
+# and allow you to return all instances of any of them by
+# using its name as an attribute. As an additional shortcut,
+# you needn't specify the Win32_; if the first lookup fails
+# it will try again with a Win32_ on the front:
+#
+# <code>
+# disks = wmi.WMI ().Win32_LogicalDisk ()
+# </code>
+#
+# In addition, you can specify what would become the WHERE clause
+# as keyword parameters:
+#
+# <code>
+# fixed_disks = wmi.WMI ().Win32_LogicalDisk (DriveType = 3)
+# </code>
+# </li>
+#
+# <li>
+# The objects returned by a WMI lookup are wrapped in a Python
+# class which determines their methods and classes and allows
+# you to access them as though they were Python classes. The
+# methods only allow named parameters.
+#
+# <code>
+# for p in wmi.WMI ().Win32_Process ():
+#   if p.Name.lower () == 'notepad.exe':
+#     p.Terminate (Result=1)
+# </code>
+# </li>
+#
+# <li>
+#  Doing a print on one of the WMI objects will result in its
+#  GetObjectText_ method being called, which usually produces
+#  a meaningful printout of current values.
+#  The repr of the object will include its full WMI path,
+#  which lets you get directly to it if you need to.
+# </li>
+#
+# <li>
+# You can get the associators and references of an object as
+#  a list of python objects by calling the associators () and
+#  references () methods on a WMI Python object.
+#  NB Don't do this on a Win32_ComputerSystem object; it will
+#  take all day and kill your machine!
+#
+# <code>
+# for p in wmi.WMI ().Win32_Process ():
+#   if p.Name.lower () == 'notepad.exe':
+#     for r in p.references ():
+#       print r.Name
+# </code>
+# </li>
+#
+# <li>
+# WMI classes (as opposed to instances) are first-class
+# objects, so you can get hold of a class, and call
+# its methods or set up a watch against it.
+#
+# <code>
+# process = wmi.WMI ().Win32_Process
+# process.Create (CommandLine="notepad.exe")
+# </code>
+#
+# </li>
+#
+# <li>
+# To make it easier to use in embedded systems and py2exe-style
+# executable wrappers, the module will not force early Dispatch.
+# To do this, it uses a handy hack by Thomas Heller for easy access
+# to constants.
+# </li>
+#
+# <li>
+# Typical usage will be:
+#
+# <code>
+# import wmi
+#
+# vodev1 = wmi.WMI ("vodev1")
+# for disk in vodev1.Win32_LogicalDisk ():
+#   if disk.DriveType == 3:
+#     space = 100 * long (disk.FreeSpace) / long (disk.Size)
+#     print "%s has %d%% free" % (disk.Name, space)
+# </code>
+# </li>
+#
+# </ul>
+#
+# Many thanks, obviously to Mark Hammond for creating the win32all
+# extensions, but also to Alex Martelli and Roger Upole, whose
+# c.l.py postings pointed me in the right direction.
+# Thanks especially in release 1.2 to Paul Tiemann for his code
+# contributions and robust testing.
+#
+# (c) Tim Golden - mail at timgolden.me.uk 5th June 2003
+# Licensed under the (GPL-compatible) MIT License:
+# http://www.opensource.org/licenses/mit-license.php
+#
+# For change history see CHANGELOG.TXT
+##
 try:
   True, False
 except NameError:
@@ -109,7 +131,7 @@ try:
 except NameError:
   class object: pass
 
-__VERSION__ = "1.2"
+__VERSION__ = "1.2.1"
 
 _DEBUG = False
 
@@ -118,15 +140,16 @@ import re
 from win32com.client import GetObject, Dispatch
 import pywintypes
 
-#
-# This class provided by Thomas Heller on c.l.py
-#
 class ProvideConstants (object):
-   """A class which, when called on a win32com.client.Dispatch object,
+   """
+   A class which, when called on a win32com.client.Dispatch object,
    provides lazy access to constants defined in the typelib.
 
-   They can be accessed as attributes of the _constants property."""
+   They can be accessed as attributes of the _constants property.
+   From Thomas Heller on c.l.py
+   """
    def __init__(self, comobj):
+     "@param comobj A COM object whose typelib constants are to be exposed"
      comobj.__dict__["_constants"] = self
      # Get the typelibrary's typecomp interface
      self.__typecomp = \
@@ -151,6 +174,11 @@ wbemFlagReturnImmediately = obj._constants.wbemFlagReturnImmediately
 wbemFlagForwardOnly = obj._constants.wbemFlagForwardOnly
 
 def handle_com_error (error_info):
+  """Convenience wrapper for displaying all manner of COM errors.
+  Raises a x_wmi exception with more useful information attached
+  
+  @param error_info The structure attached to a pywintypes.com_error
+  """
   hresult_code, hresult_name, additional_info, parameter_in_error = error_info
   exception_string = ["%s - %s" % (hex (hresult_code), hresult_name)]
   if additional_info:
@@ -160,9 +188,22 @@ def handle_com_error (error_info):
   raise x_wmi, "\n".join (exception_string)
 
 def from_time (year=None, month=None, day=None, hours=None, minutes=None, seconds=None, microseconds=None, timezone=None):
-  """Returns a WMI time string of the form yyyymmddHHMMSS.mmmmmm+UUU
-  replacing each placeholder by its respective integer value, or
-  stars if None is supplied
+  """
+  Convenience wrapper to take a series of date/time elements and return a WMI time
+  of the form yyyymmddHHMMSS.mmmmmm+UUU. All elements may be int, string or
+  omitted altogether. If omitted, they will be replaced in the output string
+  by a series of stars of the appropriate length.
+  
+  @param year The year element of the date/time
+  @param month The month element of the date/time
+  @param day The day element of the date/time
+  @param hours The hours element of the date/time
+  @param minutes The minutes element of the date/time
+  @param seconds The seconds element of the date/time
+  @param microseconds The microseconds element of the date/time
+  @param timezone The timeezone element of the date/time
+  
+  @return A WMI datetime string of the form: yyyymmddHHMMSS.mmmmmm+UUU
   """
   def str_or_stars (i, length):
     if i is None:
@@ -184,12 +225,15 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   return wmi_time
 
 def to_time (wmi_time):
-  """Expects a WMI time string of the form yyyymmddHHMMSS.mmmmmm+UUU
-  and returns:
-
-  year, month, day, hours, minutes, seconds, microseconds, timezone
-
-  If any part of the string is "*", returns None
+  """
+  Convenience wrapper to take a WMI datetime string of the form 
+  yyyymmddHHMMSS.mmmmmm+UUU and return a 9-tuple containing the
+  individual elements, or None where string contains placeholder
+  stars.
+  
+  @param wmi_time The WMI datetime string in yyyymmddHHMMSS.mmmmmm+UUU format
+  
+  @return A 9-tuple of (year, month, day, hours, minutes, seconds, microseconds, timezone)
   """
   def int_or_none (s, start, end):
     try:
@@ -229,18 +273,34 @@ WMI_EXCEPTIONS = {
 }
 
 def _set (obj, attribute, value):
-  """Helper function to add an attribute directly into the instance
-   dictionary, bypassing possible __getattr__ calls
+  """
+  Helper function to add an attribute directly into the instance
+  dictionary, bypassing possible __getattr__ calls
+  
+  @param obj Any python object
+  @param attribute String containing attribute name
+  @param value Any python object
   """
   obj.__dict__[attribute] = value
 
-#
-# class _wmi_method
-#
 class _wmi_method:
-  """A wrapper round a WMI COM object method"""
+  """
+  A currying sort of wrapper around a WMI method name. It
+  abstract's the method's parameters and can be called like
+  a normal Python object passing in the parameter values.
+  
+  Output parameters are returned from the call as a tuple.
+  In addition, the docstring is set up as the method's
+  signature, including an indication as to whether any
+  given parameter is expecting an array, and what
+  special privileges are required to call the method.
+  """
 
   def __init__ (self, ole_object, method_name):
+    """
+    @param ole_object The WMI class/instance whose method is to be called
+    @param method_name The name of the method to be called
+    """
     try:
       self.ole_object = Dispatch (ole_object)
       self.method = ole_object.Methods_ (method_name)
@@ -273,9 +333,10 @@ class _wmi_method:
       handle_com_error (error_info)
 
   def __call__ (self, **kwargs):
-    """Execute the call to a WMI method, returning
-     a tuple (even if is of only one value) containing
-     the out and return parameters.
+    """
+    Execute the call to a WMI method, returning
+    a tuple (even if is of only one value) containing
+    the out and return parameters.
     """
     try:
       if self.in_parameters:
@@ -321,7 +382,7 @@ class _wmi_method:
 # class _wmi_object
 #
 class _wmi_object:
-  """A lightweight wrapper round an OLE WMI object"""
+  "A lightweight wrapper round an OLE WMI object"
 
   def __init__ (self, ole_object, instance_of=None, fields=[]):
     try:
@@ -355,8 +416,9 @@ class _wmi_object:
       handle_com_error (error_info)
 
   def __str__ (self):
-    """For a call to print <object> return the OLE description
-     of the properties / values of the object
+    """
+    For a call to print [object] return the OLE description
+    of the properties / values of the object
     """
     try:
       return self.ole_object.GetObjectText_ ()
@@ -364,8 +426,9 @@ class _wmi_object:
       handle_com_error (error_info)
 
   def __repr__ (self):
-    """Indicate both the fact that this is a wrapped WMI object
-     and the WMI object's own identifying class.
+    """
+    Indicate both the fact that this is a wrapped WMI object
+    and the WMI object's own identifying class.
     """
     try:
       return "<%s: %s>" % (self.__class__.__name__, str (self.Path_.Path))
@@ -383,11 +446,12 @@ class _wmi_object:
     return self.methods[attribute]
 
   def __getattr__ (self, attribute):
-    """Attempt to pass attribute calls to the proxied COM object.
-     If the attribute is recognised as a property, return its value;
-     if it is recognised as a method, return a method wrapper which
-     can then be called with parameters; otherwise pass the lookup
-     on to the underlying object.
+    """
+    Attempt to pass attribute calls to the proxied COM object.
+    If the attribute is recognised as a property, return its value;
+    if it is recognised as a method, return a method wrapper which
+    can then be called with parameters; otherwise pass the lookup
+    on to the underlying object.
     """
     try:
       if self.properties.has_key (attribute):
@@ -410,9 +474,10 @@ class _wmi_object:
       handle_com_error (error_info)
 
   def __setattr__ (self, attribute, value):
-    """If the attribute to be set is valid for the proxied
-     COM object, set that objects's parameter value; if not,
-     raise an exception.
+    """
+    If the attribute to be set is valid for the proxied
+    COM object, set that objects's parameter value; if not,
+    raise an exception.
     """
     try:
       if self.properties.has_key (attribute):
@@ -425,12 +490,13 @@ class _wmi_object:
       handle_com_error (error_info)
 
   def __eq__ (self, other):
-    """Use WMI's CompareTo_ to compare this object with
-     another. Don't try to do anything if the other
-     object is not a wmi object. It might be possible
-     to compare this object's unique key with a string
-     or something, but this doesn't seem to be universal
-     enough to merit a special case.
+    """
+    Use WMI's CompareTo_ to compare this object with
+    another. Don't try to do anything if the other
+    object is not a wmi object. It might be possible
+    to compare this object's unique key with a string
+    or something, but this doesn't seem to be universal
+    enough to merit a special case.
     """
     if isinstance (other, self.__class__):
       return self.ole_object.CompareTo_ (other.ole_object)
@@ -441,12 +507,13 @@ class _wmi_object:
     self.ole_object.Put_ ()
 
   def set (self, **kwargs):
-    """Set several properties of the underlying object
-     at one go. This is particularly useful in combination
-     with the new () method below. However, an instance
-     which has been spawned in this way won't have enough
-     information to write pack, so only try if the
-     instance has a path.
+    """
+    Set several properties of the underlying object
+    at one go. This is particularly useful in combination
+    with the new () method below. However, an instance
+    which has been spawned in this way won't have enough
+    information to write pack, so only try if the
+    instance has a path.
     """
     if kwargs:
       try:
@@ -465,11 +532,14 @@ class _wmi_object:
         handle_com_error (error_info)
 
   def path (self):
-    """Return the WMI URI to this object. Can be used to
-     determine the path relative to the parent namespace. eg,
+    """
+    Return the WMI URI to this object. Can be used to
+    determine the path relative to the parent namespace. eg,
 
+    <code>
     pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
     print pp0.path ().RelPath
+    </code>
     """
     try:
       return self.ole_object.Path_
