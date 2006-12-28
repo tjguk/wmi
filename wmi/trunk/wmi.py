@@ -25,16 +25,16 @@
 # you needn't specify the Win32_; if the first lookup fails
 # it will try again with a Win32_ on the front:
 #
-# <code>
+# <pre class="code">
 # disks = wmi.WMI ().Win32_LogicalDisk ()
-# </code>
+# </pre>
 #
 # In addition, you can specify what would become the WHERE clause
 # as keyword parameters:
 #
-# <code>
+# <pre class="code">
 # fixed_disks = wmi.WMI ().Win32_LogicalDisk (DriveType = 3)
-# </code>
+# </pre>
 # </li>
 #
 # <li>
@@ -43,11 +43,11 @@
 # you to access them as though they were Python classes. The
 # methods only allow named parameters.
 #
-# <code>
+# <pre class="code">
 # for p in wmi.WMI ().Win32_Process ():
 #   if p.Name.lower () == 'notepad.exe':
 #     p.Terminate (Result=1)
-# </code>
+# </pre>
 # </li>
 #
 # <li>
@@ -65,12 +65,12 @@
 #  NB Don't do this on a Win32_ComputerSystem object; it will
 #  take all day and kill your machine!
 #
-# <code>
+# <pre class="code">
 # for p in wmi.WMI ().Win32_Process ():
 #   if p.Name.lower () == 'notepad.exe':
 #     for r in p.references ():
 #       print r.Name
-# </code>
+# </pre>
 # </li>
 #
 # <li>
@@ -78,10 +78,10 @@
 # objects, so you can get hold of a class, and call
 # its methods or set up a watch against it.
 #
-# <code>
+# <pre class="code">
 # process = wmi.WMI ().Win32_Process
 # process.Create (CommandLine="notepad.exe")
-# </code>
+# </pre>
 #
 # </li>
 #
@@ -95,7 +95,7 @@
 # <li>
 # Typical usage will be:
 #
-# <code>
+# <pre class="code">
 # import wmi
 #
 # vodev1 = wmi.WMI ("vodev1")
@@ -103,7 +103,7 @@
 #   if disk.DriveType == 3:
 #     space = 100 * long (disk.FreeSpace) / long (disk.Size)
 #     print "%s has %d%% free" % (disk.Name, space)
-# </code>
+# </pre>
 # </li>
 #
 # </ul>
@@ -536,10 +536,10 @@ class _wmi_object:
     Return the WMI URI to this object. Can be used to
     determine the path relative to the parent namespace. eg,
 
-    <code>
+    <pre class="code">
     pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
     print pp0.path ().RelPath
-    </code>
+    </pre>
     """
     try:
       return self.ole_object.Path_
@@ -564,15 +564,16 @@ class _wmi_object:
      them) or by result class (ie the name of the class which would be
      retrieved)
 
-    eg
-      c = wmi.WMI ()
-      pp = c.Win32_ParallelPort ()[0]
+    <pre class="code">
+c = wmi.WMI ()
+pp = c.Win32_ParallelPort ()[0]
 
-      for i in pp.associators (wmi_association_class="Win32_PortResource"):
-        print i
+for i in pp.associators (wmi_association_class="Win32_PortResource"):
+  print i
 
-      for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
-        print i
+for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
+  print i
+    </pre>
     """
     try:
       return [
@@ -593,15 +594,16 @@ class _wmi_object:
      the string corresponding to the instance of each associated object,
      this module will automatically convert that to the object itself.
 
-    eg,
-      c =  wmi.WMI ()
-      sp = c.Win32_SerialPort ()[0]
+    <pre class="code">
+    c =  wmi.WMI ()
+    sp = c.Win32_SerialPort ()[0]
 
-      for i in sp.references ():
-        print i
+    for i in sp.references ():
+      print i
 
-      for i in sp.references (wmi_class="Win32_SerialPortSetting"):
-        print i
+    for i in sp.references (wmi_class="Win32_SerialPortSetting"):
+      print i
+    </pre>
     """
     try:
       return [_wmi_object (i) for i in self.ole_object.References_ (strResultClass=wmi_class)]
@@ -619,8 +621,10 @@ class _wmi_class (_wmi_object):
    returned which may then be called with one or more params
    which will form the WHERE clause. eg,
 
-   c = wmi.WMI ()
-   c_drive = c.Win32_LogicalDisk (Name='C:')
+  <pre class="code">
+  c = wmi.WMI ()
+  c_drive = c.Win32_LogicalDisk (Name='C:')
+  </pre>
   """
   def __init__ (self, namespace, wmi_class):
     _wmi_object.__init__ (self, wmi_class)
@@ -686,6 +690,7 @@ class _wmi_class (_wmi_object):
     controls the shown/hidden state etc. of a new
     Win32_Process instance.
 
+    <pre class="code">
     import win32con
     import wmi
     c = wmi.WMI ()
@@ -694,6 +699,7 @@ class _wmi_class (_wmi_object):
       CommandLine="notepad.exe",
       ProcessStartupInformation=startup
     )
+    </pre>
 
     NB previous versions of this module, used this function
     to create new process. This is *not* a good example
@@ -712,7 +718,7 @@ class _wmi_class (_wmi_object):
 #
 class _wmi_result:
   """Simple, data only result for targeted WMI queries which request
-     data only result classes via fetch_as_classes.
+  data only result classes via fetch_as_classes.
   """
   def __init__(self, obj, attributes):
     if attributes:
@@ -728,13 +734,15 @@ class _wmi_result:
 #
 class _wmi_namespace:
   """A WMI root of a computer system. The classes attribute holds a list
-   of the classes on offer. This means you can explore a bit with
-   things like this:
+  of the classes on offer. This means you can explore a bit with
+  things like this:
 
-   c = wmi.WMI ()
-   for i in c.classes:
-     if "user" in i.lower ():
-       print i
+  <pre class="code">
+  c = wmi.WMI ()
+  for i in c.classes:
+    if "user" in i.lower ():
+      print i
+  </pre>
   """
   def __init__ (self, namespace, find_classes):
     _set (self, "_namespace", namespace)
@@ -788,9 +796,11 @@ class _wmi_namespace:
     """Return a list of instances of the WMI class. This is
      (probably) equivalent to querying with no qualifiers.
 
-    eg system.instances ("Win32_LogicalDisk")
-
-    or system.Win32_LogicalDisk ()
+    <pre class="code">
+    system.instances ("Win32_LogicalDisk")
+    # should be the same as
+    system.Win32_LogicalDisk ()
+    </pre>
     """
     try:
       return [_wmi_object (obj) for obj in self._namespace.InstancesOf (class_name)]
@@ -826,11 +836,11 @@ class _wmi_namespace:
 
   def fetch_as_classes (self, wmi_classname, fields=(), **where_clause):
     """Build and execute a wql query to fetch the specified list of fields from
-       the specified wmi_classname + where_clause, then return the results as
-       a list of simple class instances with attributes matching fields_list.
+    the specified wmi_classname + where_clause, then return the results as
+    a list of simple class instances with attributes matching fields_list.
 
-       If fields is left empty, select * and pre-load all class attributes for
-       each class returned.
+    If fields is left empty, select * and pre-load all class attributes for
+    each class returned.
     """
     wql = "SELECT %s FROM %s" % (fields and ", ".join (fields) or "*", wmi_classname)
     if where_clause:
@@ -839,8 +849,8 @@ class _wmi_namespace:
 
   def fetch_as_lists (self, wmi_classname, fields, **where_clause):
     """Build and execute a wql query to fetch the specified list of fields from
-       the specified wmi_classname + where_clause, then return the results as
-       a list of lists whose values correspond fields_list.
+    the specified wmi_classname + where_clause, then return the results as
+    a list of lists whose values correspond fields_list.
     """
     wql = "SELECT %s FROM %s" % (", ".join (fields), wmi_classname)
     if where_clause:
@@ -859,27 +869,32 @@ class _wmi_namespace:
     **where_clause
   ):
     """Set up an event tracker on a WMI event. This function
-     returns an wmi_watcher which can be called to get the
-     next event. eg,
+    returns an wmi_watcher which can be called to get the
+    next event. eg,
 
-     c = wmi.WMI ()
+    <pre class="code">
+    c = wmi.WMI ()
+    
+    raw_wql = "SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'"
+    watcher = c.watch_for (raw_wql=raw_wql)
+    while 1:
+      process_created = watcher ()
+      print process_created.Name
 
-     watcher = c.watch_for (raw_wql="SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'")
-     while 1:
-       process_created = watcher ()
-       print process_created.Name
-
-     or,
-     watcher = c.watch_for (
-       notification_type="Creation",
-       wmi_class="Win32_Process",
-       delay_secs=2,
-       Name='calc.exe'
-     )
-     calc_created = watcher ()
+    # or
+     
+    watcher = c.watch_for (
+      notification_type="Creation",
+      wmi_class="Win32_Process",
+      delay_secs=2,
+      Name='calc.exe'
+    )
+    calc_created = watcher ()
+    </pre>
 
     Now supports timeout on the call to watcher, eg:
 
+    <pre class="code">
     import pythoncom
     import wmi
     c = wmi.WMI (privileges=["Security"])
@@ -908,6 +923,7 @@ class _wmi_namespace:
         pythoncom.PumpWaitingMessages ()
       else:
         print warning_log
+    </pre>
     """
     class_name = wmi_class
     if raw_wql:
@@ -924,18 +940,20 @@ class _wmi_namespace:
       if _DEBUG: print wql
 
     try:
-      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), self)
+      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql))
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
   def __getattr__ (self, attribute):
-    """Don't try to match against known classes, as the list may
-    not have been requested (find_classes=False). Attempt to get
-    the attribute as a class; if that fails, try getting it with
-    Win32_ prepended. Failing that, assume it's a normal attribute
-    and pass through.
+    """Offer WMI classes as simple attributes. Pass through any untrapped 
+    unattribute to the underlying OLE object. This means that new or 
+    unmapped functionality is still available to the module user.
     """
-
+    #
+    # Don't try to match against known classes as was previously
+    # done since the list may not have been requested 
+    # (find_classes=False).
+    #
     try:
       return self._cached_classes (attribute)
     except pywintypes.com_error, error_info:
@@ -945,6 +963,11 @@ class _wmi_namespace:
         return getattr (self._namespace, attribute)
 
   def _cached_classes (self, class_name):
+    """Standard caching helper which keeps track of classes
+    already retrieved by name and returns the existing object
+    if found. If this is the first retrieval, store it and
+    pass it back
+    """
     if self.classes.get (class_name) is None:
       self.classes[class_name] = _wmi_class (self, self._namespace.Get (class_name))
     return self.classes[class_name]
@@ -996,11 +1019,13 @@ def connect (
   """The WMI constructor can either take a ready-made moniker or as many
    parts of one as are necessary. Eg,
 
+   <pre class="code">
    c = wmi.WMI (moniker="winmgmts:{impersonationLevel=Delegate}//remote")
 
-   or
+   # or
 
    c = wmi.WMI (computer="remote", privileges=["!RemoteShutdown", "Security"])
+   </pre>
 
    I daren't link to a Microsoft URL; they change so often. Try Googling for
    WMI construct moniker and see what it comes back with.
@@ -1008,16 +1033,17 @@ def connect (
    For complete control, a named argument "wmi" can be supplied, which
    should be a SWbemServices object, which you create yourself. Eg,
 
+   <pre class="code">
    loc = win32com.client.Dispatch("WbemScripting.SWbemLocator")
    svc = loc.ConnectServer(...)
    c = wmi.WMI(wmi=svc)
+   </pre>
 
    This is the only way of connecting to a remote computer with a different
    username, as the moniker syntax does not allow specification of a user
    name.
 
    If the "wmi" parameter is supplied, all other parameters are ignored.
-
   """
   global _DEBUG
   _DEBUG = debug
@@ -1143,8 +1169,9 @@ def connect_server (
   security_flags: if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins
   named_value_set: typically empty, otherwise a context-specific SWbemNamedValueSet
 
-  eg
-    c = wmi.WMI (wmi=wmi.connect_server (server="remote_machine", user="myname", password="mypassword"))
+  <pre class="code">
+  c = wmi.WMI (wmi=wmi.connect_server (server="remote_machine", user="myname", password="mypassword"))
+  </pre>
   """
   if _DEBUG:
     print server
