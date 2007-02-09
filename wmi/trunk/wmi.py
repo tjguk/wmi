@@ -131,7 +131,7 @@ try:
 except NameError:
   class object: pass
 
-__VERSION__ = "1.2.1"
+__VERSION__ = "1.3"
 
 _DEBUG = False
 
@@ -661,7 +661,7 @@ class _wmi_class (_wmi_object):
 
     return self._namespace.watch_for (
       notification_type=notification_type,
-      wmi_class=self._class_name,
+      wmi_class=self,
       delay_secs=delay_secs,
       **where_clause
     )
@@ -925,22 +925,34 @@ class _wmi_namespace:
         print warning_log
     </pre>
     """
-    class_name = wmi_class
+    if isinstance (wmi_class, _wmi_class):
+      class_name = wmi_class._class_name
+    else:
+      class_name = wmi_class
+      wmi_class = getattr (self, class_name)
+    is_extrinsic = "__ExtrinsicEvent" in wmi_class.derivation ()
     if raw_wql:
       wql = raw_wql
     else:
-      if where_clause:
-        where = " AND " + " AND ".join (["TargetInstance.%s = '%s'" % (k, v) for k, v in where_clause.items ()])
+      if is_extrinsic:
+        if where_clause:
+          where = " WHERE " + " AND ".join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])
+        else:
+          where = ""
+        wql = "SELECT * FROM " + class_name + where
       else:
-        where = ""
-      wql = \
-        "SELECT * FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
-        (notification_type, delay_secs, class_name, where)
+        if where_clause:
+          where = " AND " + " AND ".join (["TargetInstance.%s = '%s'" % (k, v) for k, v in where_clause.items ()])
+        else:
+          where = ""
+        wql = \
+          "SELECT * FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
+          (notification_type, delay_secs, class_name, where)
 
       if _DEBUG: print wql
 
     try:
-      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql))
+      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic)
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -978,8 +990,9 @@ class _wmi_namespace:
 class _wmi_watcher:
   """Helper class for WMI.watch_for below (qv)"""
 
-  def __init__ (self, wmi_event):
+  def __init__ (self, wmi_event, is_extrinsic):
     self.wmi_event = wmi_event
+    self.is_extrinsic = is_extrinsic
 
   def __call__ (self, timeout_ms=-1):
     """When called, return the instance which caused the event. Supports
@@ -988,7 +1001,11 @@ class _wmi_watcher:
      watching for multiple objects.
     """
     try:
-      return _wmi_object (self.wmi_event.NextEvent (timeout_ms).Properties_ ("TargetInstance").Value)
+      event = self.wmi_event.NextEvent (timeout_ms)
+      if self.is_extrinsic:
+        return _wmi_object (event)
+      else:
+        return _wmi_object (event.Properties_ ("TargetInstance").Value)
     except pywintypes.com_error, error_info:
       hresult_code, hresult_name, additional_info, parameter_in_error = error_info
       if additional_info:
