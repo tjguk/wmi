@@ -131,7 +131,7 @@ try:
 except NameError:
   class object: pass
 
-__VERSION__ = "1.3"
+__VERSION__ = "1.3.1"
 
 _DEBUG = False
 
@@ -332,7 +332,7 @@ class _wmi_method:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
-  def __call__ (self, **kwargs):
+  def __call__ (self, *args, **kwargs):
     """
     Execute the call to a WMI method, returning
     a tuple (even if is of only one value) containing
@@ -345,6 +345,22 @@ class _wmi_method:
           parameter_names[name] = is_array
 
         parameters = self.in_parameters
+        
+        #
+        # Check positional parameters first
+        #
+        for n_arg in range (len (args)):
+          arg = args[n_arg]
+          parameter = parameters.Properties_[n_arg]
+          if parameter.IsArray:
+            try: list (arg)
+            except TypeError: raise TypeError, "parameter %d must be iterable" % n_arg
+          parameter.Value = arg
+
+        #
+        # If any keyword param supersedes a positional one,
+        # it'll simply overwrite it.
+        #
         for k, v in kwargs.items ():
           is_array = parameter_names.get (k)
           if is_array is None:
@@ -353,7 +369,6 @@ class _wmi_method:
             if is_array:
               try: list (v)
               except TypeError: raise TypeError, "%s must be iterable" % k
-
           parameters.Properties_ (k).Value = v
 
         result = self.ole_object.ExecMethod_ (self.method.Name, self.in_parameters)
@@ -365,7 +380,7 @@ class _wmi_method:
         value = result.Properties_ (name).Value
         if is_array:
           #
-          # Thanks to Jonas Bjering for bug report and path
+          # Thanks to Jonas Bjering for bug report and patch
           #
           results.append (list (value or []))
         else:
@@ -384,12 +399,13 @@ class _wmi_method:
 class _wmi_object:
   "A lightweight wrapper round an OLE WMI object"
 
-  def __init__ (self, ole_object, instance_of=None, fields=[]):
+  def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
     try:
       _set (self, "ole_object", ole_object)
       _set (self, "_instance_of", instance_of)
       _set (self, "properties", {})
       _set (self, "methods", {})
+      _set (self, "property_map", property_map)
 
       if self._instance_of:
         if fields:
@@ -455,7 +471,8 @@ class _wmi_object:
     """
     try:
       if self.properties.has_key (attribute):
-        value = self._cached_properties (attribute).Value
+        factory = self.property_map.get (attribute, lambda x: x)
+        value = factory (self._cached_properties (attribute).Value)
         #
         # If this is an association, its properties are
         #  actually the paths to the two aspects of the
@@ -611,6 +628,18 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
       handle_com_error (error_info)
 
 #
+# class _wmi_event
+#
+class _wmi_event (_wmi_object):
+  """Slight extension of the _wmi_object class to allow
+  objects which are the result of events firing to return
+  extra information such as the type of event.
+  """
+  def __init__ (self, event_info, *args, **kwargs):
+    _wmi_object.__init__ (self, *args, **kwargs)
+    _set (self, "event_info", event_info)
+
+#
 # class _wmi_class
 #
 class _wmi_class (_wmi_object):
@@ -628,8 +657,14 @@ class _wmi_class (_wmi_object):
   """
   def __init__ (self, namespace, wmi_class):
     _wmi_object.__init__ (self, wmi_class)
-    _set (self, "_namespace", namespace)
     _set (self, "_class_name", wmi_class.Path_.Class)
+    if namespace:
+      _set (self, "_namespace", namespace)
+    else:
+      class_moniker = wmi_class.Path_.DisplayName
+      winmgmts, namespace_moniker, class_name = class_moniker.split (":")
+      namespace = _wmi_namespace (GetObject (winmgmts + ":" + namespace_moniker), False)
+      _set (self, "_namespace", namespace)
 
   def query (self, fields=[], **where_clause):
     """Make it slightly easier to query against the class,
@@ -652,7 +687,7 @@ class _wmi_class (_wmi_object):
 
   def watch_for (
     self,
-    notification_type=None,
+    notification_type="modification",
     delay_secs=1,
     **where_clause
   ):
@@ -863,7 +898,7 @@ class _wmi_namespace:
   def watch_for (
     self,
     raw_wql=None,
-    notification_type=None,
+    notification_type="modification",
     wmi_class=None,
     delay_secs=1,
     **where_clause
@@ -990,6 +1025,10 @@ class _wmi_namespace:
 class _wmi_watcher:
   """Helper class for WMI.watch_for below (qv)"""
 
+  _event_property_map = {
+    "TargetInstance" : _wmi_object,
+    "PreviousInstance" : _wmi_object
+  }
   def __init__ (self, wmi_event, is_extrinsic):
     self.wmi_event = wmi_event
     self.is_extrinsic = is_extrinsic
@@ -1003,9 +1042,12 @@ class _wmi_watcher:
     try:
       event = self.wmi_event.NextEvent (timeout_ms)
       if self.is_extrinsic:
-        return _wmi_object (event)
+        return _wmi_event (None, event)
       else:
-        return _wmi_object (event.Properties_ ("TargetInstance").Value)
+        return _wmi_event (
+          _wmi_object (event, property_map=self._event_property_map), 
+          event.Properties_ ("TargetInstance").Value
+        )
     except pywintypes.com_error, error_info:
       hresult_code, hresult_name, additional_info, parameter_in_error = error_info
       if additional_info:
