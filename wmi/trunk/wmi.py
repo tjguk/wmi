@@ -137,6 +137,7 @@ _DEBUG = False
 
 import sys
 import re
+import datetime
 from win32com.client import GetObject, Dispatch
 import pywintypes
 
@@ -186,6 +187,10 @@ def handle_com_error (error_info):
     exception_string.append ("  Error in: %s" % source_of_error)
     exception_string.append ("  %s - %s" % (hex (scode), error_description.strip ()))
   raise x_wmi, "\n".join (exception_string)
+
+BASE = datetime.datetime (1601, 1, 1)
+def from_1601 (ns100):
+  return BASE + datetime.timedelta (microseconds=int (ns100) / 10)
 
 def from_time (year=None, month=None, day=None, hours=None, minutes=None, seconds=None, microseconds=None, timezone=None):
   """
@@ -635,9 +640,20 @@ class _wmi_event (_wmi_object):
   objects which are the result of events firing to return
   extra information such as the type of event.
   """
-  def __init__ (self, event_info, *args, **kwargs):
-    _wmi_object.__init__ (self, *args, **kwargs)
-    _set (self, "event_info", event_info)
+  event_type_re = re.compile ("__Instance(Creation|Modification|Deletion)Event")
+  def __init__ (self, event, event_info):
+    _wmi_object.__init__ (self, event)
+    _set (self, "event_type", None)
+    _set (self, "timestamp", None)
+    _set (self, "previous", None)
+    
+    if event_info:
+      event_type = self.event_type_re.match (event_info.Path_.Class).group (1).lower ()
+      _set (self, "event_type", event_type)
+      if hasattr (event_info, "TIME_CREATED"):
+        _set (self, "timestamp", from_1601 (event_info.TIME_CREATED))
+      if hasattr (event_info, "PreviousInstance"):
+        _set (self, "previous", event_info.PreviousInstance)
 
 #
 # class _wmi_class
@@ -687,7 +703,7 @@ class _wmi_class (_wmi_object):
 
   def watch_for (
     self,
-    notification_type="modification",
+    notification_type="operation",
     delay_secs=1,
     **where_clause
   ):
@@ -898,7 +914,7 @@ class _wmi_namespace:
   def watch_for (
     self,
     raw_wql=None,
-    notification_type="modification",
+    notification_type="operation",
     wmi_class=None,
     delay_secs=1,
     **where_clause
@@ -1042,11 +1058,11 @@ class _wmi_watcher:
     try:
       event = self.wmi_event.NextEvent (timeout_ms)
       if self.is_extrinsic:
-        return _wmi_event (None, event)
+        return _wmi_event (event, None)
       else:
         return _wmi_event (
-          _wmi_object (event, property_map=self._event_property_map), 
-          event.Properties_ ("TargetInstance").Value
+          event.Properties_ ("TargetInstance").Value,
+          _wmi_object (event, property_map=self._event_property_map)
         )
     except pywintypes.com_error, error_info:
       hresult_code, hresult_name, additional_info, parameter_in_error = error_info
