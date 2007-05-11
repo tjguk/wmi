@@ -40,6 +40,35 @@ who like setup programs:
 python setup.py install
 
 
+How do I use it?
+================
+
+There's a tutorial here: http://timgolden.me.uk/python/wmi-tutorial.html,
+and some examples at: http://timgolden.me.uk/python/wmi_cookbook.html
+but as a quick taster, try this, to show all stopped services:
+
+import wmi
+
+c = wmi.WMI ()
+for s in c.Win32_Service ():
+  if s.State == 'Stopped':
+    print s.Caption, s.State
+
+
+What's New in 1.3/1.3.1?
+========================
+
+- Improved event handling:
+  + Extrinsic events now handled
+  + Watchers return a _wmi_event object which behaves like a returned object
+    but includes additional attributes: event_type, timestamp and previous.
+  
+- Methods now allow positional parameters
+
+- A class created directly from a moniker is now fully usable as
+  it determines its own namespace.
+
+
 Prerequisites
 =============
 
@@ -80,28 +109,3 @@ up-and-running already. Otherwise...
   click [OK].
 
 
-How do I use it?
-================
-
-There are examples at: http://timgolden.me.uk/python/wmi_cookbook.html
-but as a quick taster, try this, to show all stopped services:
-
-import wmi
-
-c = wmi.WMI ()
-for s in c.Win32_Service ():
-  if s.State == 'Stopped':
-    print s.Caption, s.State
-
-What's New in 1.3/1.3.1?
-========================
-
-- Improved event handling:
-  + Extrinsic events now handled
-  + Watchers return a _wmi_event object which behaves like a returned object
-    but includes additional attributes: event_type, timestamp and previous.
-  
-- Methods now allow positional parameters
-
-- A class created directly from a moniker is now fully usable as
-  it determines its own namespace.
