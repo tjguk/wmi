@@ -13,12 +13,12 @@ classifiers = [
 
 setup (
   name = "WMI",
-  version = "1.1.1",
+  version = "2.0",
   description = "Windows Management Instrumentation",
   author = "Tim Golden",
   author_email = "mail@timgolden.me.uk",
   url = "http://timgolden.me.uk/python/wmi.html",
   license = "http://www.opensource.org/licenses/mit-license.php",
-  py_modules = ["wmi"]
+  py_modules = ["wmi2"]
 )
 
