@@ -185,7 +185,7 @@ def handle_com_error (error_info):
   if additional_info:
     wcode, source_of_error, error_description, whlp_file, whlp_context, scode = additional_info
     exception_string.append ("  Error in: %s" % source_of_error)
-    exception_string.append ("  %s - %s" % (hex (scode), error_description.strip ()))
+    exception_string.append ("  %s - %s" % (hex (scode), (error_description or "").strip ()))
   raise x_wmi, "\n".join (exception_string)
 
 BASE = datetime.datetime (1601, 1, 1)
