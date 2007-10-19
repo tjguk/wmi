@@ -1270,45 +1270,6 @@ def connect_server (
       named_value_set
     )
 
-def Registry (
-  computer=None,
-  impersonation_level="Impersonate",
-  authentication_level="Default",
-  authority=None,
-  privileges=None,
-  moniker=None
-):
-
-  if not moniker:
-    moniker = construct_moniker (
-      computer=computer,
-      impersonation_level=impersonation_level,
-      authentication_level=authentication_level,
-      authority=authority,
-      privileges=privileges,
-      namespace="default",
-      suffix="StdRegProv"
-    )
-
-  try:
-    return _wmi_object (GetObject (moniker))
-
-  except pywintypes.com_error, error_info:
-    handle_com_error (error_info)
-
-#
-# From a post to python-win32 by Sean
-#
-def machines_in_domain (domain_name):
-  adsi = Dispatch ("ADsNameSpaces")
-  nt = adsi.GetObject ("","WinNT:")
-  result = nt.OpenDSObject ("WinNT://%s" % domain_name, "", "", 0)
-  result.Filter = ["computer"]
-  domain = []
-  for machine in result:
-    domain.append (machine.Name)
-  return domain
-
 #
 # Typical use test
 #
