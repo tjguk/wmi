@@ -21,6 +21,11 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+27th Dec 2007 1.3.2  . Squashed long-standing cached method bug which had 
+                       resulted in an instance-level method being called even
+                       after that instance had died.
+                     . Added code from Igor Dvorkin to support IPython's
+                       getAttribute protocol.
 11th Apr 2007 1.3.1  . Added positional params for methods
                      . Intrinsic event watchers default to "modification"
                      . New _wmi_event object returned from event watchers
