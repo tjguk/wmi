@@ -412,18 +412,15 @@ class _wmi_object:
       _set (self, "methods", {})
       _set (self, "property_map", property_map)
 
-      if self._instance_of:
-        if fields:
-          for field in fields:
-            self.properties[field] = None
-        else:
-          _set (self, "properties", self._instance_of.properties.copy ())
-        _set (self, "methods", self._instance_of.methods)
+      if fields:
+        for field in fields:
+          self.properties[field] = None
       else:
         for p in ole_object.Properties_:
-          self.properties[p.Name] = None
-        for m in ole_object.Methods_:
-          self.methods[m.Name] = None
+          self.properties[p.Name] = None      
+      
+      for m in ole_object.Methods_:
+        self.methods[m.Name] = None
 
       _set (self, "_properties", self.properties.keys ())
       _set (self, "_methods", self.methods.keys ())
