@@ -522,6 +522,12 @@ class _wmi_object:
     else:
       raise x_wmi, "Can't compare a WMI object with something else"
 
+  def _getAttributeNames (self):
+     """Return list of methods/properties for IPython completion"""
+     attribs = [str (x) for x in self.methods.keys ()] 
+     attribs.extend ([str (x) for x in self.properties.keys ()])
+     return attribs
+  
   def put (self):
     self.ole_object.Put_ ()
 
@@ -1031,6 +1037,11 @@ class _wmi_namespace:
     if self.classes.get (class_name) is None:
       self.classes[class_name] = _wmi_class (self, self._namespace.Get (class_name))
     return self.classes[class_name]
+
+  def _getAttributeNames (self):
+    """Return list of classes for IPython completion engine"""
+    classes = [str (x) for x in self.classes.keys () if not x.startswith ('__')]
+    return classes
 
 #
 # class _wmi_watcher
