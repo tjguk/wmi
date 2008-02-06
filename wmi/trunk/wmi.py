@@ -1150,6 +1150,12 @@ def connect (
       obj = GetObject (moniker)
 
     else:
+      if namespace:
+        parts = re.split (r"[/\\]", namespace)
+        if parts[0] != 'root':
+          parts.insert (0, "root")
+        namespace = "/".join (parts)
+      
       if user:
         if impersonation_level or authentication_level or privileges or suffix:
           raise x_wmi, "You can't specify an impersonation, authentication or privilege as well as a username"
@@ -1213,10 +1219,7 @@ def construct_moniker (
   if security: moniker.append ("{%s}/" % ",".join (security))
   if computer: moniker.append ("/%s/" % computer)
   if namespace:
-    parts = re.split (r"[/\\]", namespace)
-    if parts[0] != 'root':
-      parts.insert (0, "root")
-    moniker.append ("/".join (parts))
+    moniker.append (namespace)
   if suffix: moniker.append (":%s" % suffix)
   return "".join (moniker)
 
