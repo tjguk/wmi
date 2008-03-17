@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # WMI documentation build configuration file, created by
-# sphinx-quickstart.py on Sun Mar 16 20:18:09 2008.
+# sphinx-quickstart.py on Mon Mar 17 13:47:19 2008.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -79,7 +79,7 @@ html_style = 'default.css'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['docs/.static']
+html_static_path = ['.static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.

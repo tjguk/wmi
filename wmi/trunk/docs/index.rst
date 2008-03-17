@@ -1,4 +1,4 @@
-.. WMI documentation master file, created by sphinx-quickstart.py on Sun Mar 16 20:18:09 2008.
+.. WMI documentation master file, created by sphinx-quickstart.py on Mon Mar 17 13:47:19 2008.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
