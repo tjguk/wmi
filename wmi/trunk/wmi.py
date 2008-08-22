@@ -411,14 +411,17 @@ class _wmi_object:
       _set (self, "properties", {})
       _set (self, "methods", {})
       _set (self, "property_map", property_map)
+      _set (self, "keys", [])
 
       if fields:
         for field in fields:
           self.properties[field] = None
       else:
         for p in ole_object.Properties_:
-          self.properties[p.Name] = None      
-      
+          self.properties[p.Name] = None
+          #~ if p.Qualifiers_ ("key"):
+            #~ self.keys.append (p.Name)
+
       for m in ole_object.Methods_:
         self.methods[m.Name] = None
 
@@ -583,6 +586,21 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
+  def associated_classes (self, wmi_association_class="", wmi_result_class=""):
+    namespace = getattr (self, "_namespace", getattr (self._instance_of, "_namespace", None))
+    params = {
+      "strAssocClass" : wmi_association_class,
+      "strResultClass" : wmi_result_class
+    }
+    if isinstance (self, _wmi_class):
+      params['bSchemaOnly'] = True
+    else:
+      params['bClassesOnly'] = True
+    try:
+      return [_wmi_class (namespace, i) for i in self.ole_object.Associators_ (**params)]
+    except pywintypes.com_error, error_info:
+      handle_com_error (error_info)
+
   def associators (self, wmi_association_class="", wmi_result_class=""):
     """Return a list of objects related to this one, optionally limited
      either by association class (ie the name of the class which relates
@@ -608,6 +626,20 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
            strResultClass=wmi_result_class
          )
       ]
+    except pywintypes.com_error, error_info:
+      handle_com_error (error_info)
+
+  def referenced_classes (self, wmi_class=""):
+    namespace = getattr (self, "_namespace", getattr (self._instance_of, "_namespace", None))
+    params = {
+      "strResultClass" : wmi_class
+    }
+    if isinstance (self, _wmi_class):
+      params['bSchemaOnly'] = True
+    else:
+      params['bClassesOnly'] = True
+    try:
+      return [_wmi_class (namespace, i) for i in self.ole_object.References_ (**params)]
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -1201,13 +1233,13 @@ def connect (
 WMI = connect
 
 def construct_moniker (
-    computer=None,
-    impersonation_level="Impersonate",
-    authentication_level="Default",
-    authority=None,
-    privileges=None,
-    namespace=None,
-    suffix=None
+  computer=None,
+  impersonation_level="Impersonate",
+  authentication_level="Default",
+  authority=None,
+  privileges=None,
+  namespace=None,
+  suffix=None
 ):
   security = []
   if impersonation_level: security.append ("impersonationLevel=%s" % impersonation_level)
@@ -1322,6 +1354,16 @@ def machines_in_domain (domain_name):
   for machine in result:
     domain.append (machine.Name)
   return domain
+
+def walk_related_classes (wmi_class, level=0, visited=None):
+  if visited is None: 
+    visited = []
+  yield wmi_class, level
+  visited.append (wmi_class)
+  for assoc_class in wmi_class.associated_classes ():
+    if assoc_class not in visited:
+      for related in walk_related_classes (assoc_class, level+1, visited):
+        yield related
 
 #
 # Typical use test
