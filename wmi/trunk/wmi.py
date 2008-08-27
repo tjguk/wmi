@@ -288,7 +288,7 @@ def _set (obj, attribute, value):
   """
   obj.__dict__[attribute] = value
 
-class _wmi_method:
+class _wmi_method (object):
   """
   A currying sort of wrapper around a WMI method name. It
   abstract's the method's parameters and can be called like
@@ -306,6 +306,20 @@ class _wmi_method:
     @param ole_object The WMI class/instance whose method is to be called
     @param method_name The name of the method to be called
     """
+    
+    def parameter_names (method_parameters):
+      parameter_names = []
+      for param in method_parameters.Properties_:
+        name, is_array = param.Name, param.IsArray
+        datatype = bitmap = None
+        for qualifier in param.Qualifiers_:
+          if qualifier.Name == "CIMTYPE":
+            datatype = qualifier.Value
+          elif qualifier.Name == "BitMap":
+            bitmap = [int (b) for b in qualifier.Value]
+        parameter_names.append ((name, is_array, datatype, bitmap))
+      return parameter_names
+      
     try:
       self.ole_object = Dispatch (ole_object)
       self.method = ole_object.Methods_ (method_name)
@@ -316,19 +330,21 @@ class _wmi_method:
 
       self.in_parameters = self.method.InParameters
       self.out_parameters = self.method.OutParameters
-      if self.in_parameters is None:
+      
+      if self.in_parameters:
+        self.in_parameter_names = parameter_names (self.in_parameters)
+      else:
         self.in_parameter_names = []
+        
+      if self.out_parameters:
+        self.out_parameter_names = parameter_names (self.out_parameters)
       else:
-        self.in_parameter_names = [(i.Name, i.IsArray) for i in self.in_parameters.Properties_]
-      if self.out_parameters is None:
         self.out_parameter_names = []
-      else:
-        self.out_parameter_names = [(i.Name, i.IsArray) for i in self.out_parameters.Properties_]
-
+      
       doc = u"%s (%s) => (%s)" % (
         method_name,
-        ", ".join ([name + (u"", u"[]")[is_array] for (name, is_array) in self.in_parameter_names]),
-        ", ".join ([name + (u"", u"[]")[is_array] for (name, is_array) in self.out_parameter_names])
+        ", ".join ([name + " " + datatype + (u"", u"[]")[is_array] for (name, is_array, datatype, bitmap) in self.in_parameter_names]),
+        ", ".join ([name + " " + datatype + (u"", u"[]")[is_array] for (name, is_array, datatype, bitmap) in self.out_parameter_names])
       )
       privileges = self.qualifiers.get ("Privileges", [])
       if privileges:
@@ -401,7 +417,7 @@ class _wmi_method:
 #
 # class _wmi_object
 #
-class _wmi_object:
+class _wmi_object (object):
   "A lightweight wrapper round an OLE WMI object"
 
   def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
@@ -410,8 +426,9 @@ class _wmi_object:
       _set (self, "_instance_of", instance_of)
       _set (self, "properties", {})
       _set (self, "methods", {})
+      _set (self, "_associated_classes", None)
       _set (self, "property_map", property_map)
-      _set (self, "keys", [])
+      _set (self, "_keys", None)
 
       if fields:
         for field in fields:
@@ -419,8 +436,6 @@ class _wmi_object:
       else:
         for p in ole_object.Properties_:
           self.properties[p.Name] = None
-          #~ if p.Qualifiers_ ("key"):
-            #~ self.keys.append (p.Name)
 
       for m in ole_object.Methods_:
         self.methods[m.Name] = None
@@ -490,6 +505,8 @@ class _wmi_object:
           return value
       elif self.methods.has_key (attribute):
         return self._cached_methods (attribute)
+      elif attribute in self.associated_classes:
+        return _wmi_associator (self, self.associated_classes[attribute])
       else:
         return getattr (self.ole_object, attribute)
     except pywintypes.com_error, error_info:
@@ -533,6 +550,16 @@ class _wmi_object:
   
   def put (self):
     self.ole_object.Put_ ()
+
+  def get_keys (self):
+    if self._keys is None:
+      _set (self, "_keys", [])
+      for property in self.ole_object.Properties_:
+        for qualifier in property.Qualifiers_:
+          if qualifier.Name == "key" and qualifier.Value:
+            self._keys.append (property.Name)
+    return self._keys
+  keys = property (get_keys)
 
   def set (self, **kwargs):
     """
@@ -586,20 +613,21 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
-  def associated_classes (self, wmi_association_class="", wmi_result_class=""):
-    namespace = getattr (self, "_namespace", getattr (self._instance_of, "_namespace", None))
-    params = {
-      "strAssocClass" : wmi_association_class,
-      "strResultClass" : wmi_result_class
-    }
-    if isinstance (self, _wmi_class):
-      params['bSchemaOnly'] = True
-    else:
-      params['bClassesOnly'] = True
-    try:
-      return [_wmi_class (namespace, i) for i in self.ole_object.Associators_ (**params)]
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+  def _cached_associated_classes (self):
+    if self._associated_classes is None:
+      namespace = getattr (self, "_namespace", getattr (self._instance_of, "_namespace", None))
+      if isinstance (self, _wmi_class):
+        params = {'bSchemaOnly' : True}
+      else:
+        params = {'bClassesOnly' : True}
+      try:
+        associated_classes = dict ((assoc.Path_.Class, _wmi_class (namespace, assoc)) for assoc in self.ole_object.Associators_ (**params))
+        _set (self, "_associated_classes", associated_classes)
+      except pywintypes.com_error, error_info:
+        handle_com_error (error_info)
+        
+    return self._associated_classes
+  associated_classes = property (_cached_associated_classes)
 
   def associators (self, wmi_association_class="", wmi_result_class=""):
     """Return a list of objects related to this one, optionally limited
@@ -714,7 +742,7 @@ class _wmi_class (_wmi_object):
     else:
       class_moniker = wmi_class.Path_.DisplayName
       winmgmts, namespace_moniker, class_name = class_moniker.split (":")
-      namespace = _wmi_namespace (GetObject (winmgmts + ":" + namespace_moniker), False)
+      namespace = _wmi_namespace (GetObject (winmgmts + ":" + namespace_moniker))
       _set (self, "_namespace", namespace)
 
   def query (self, fields=[], **where_clause):
@@ -802,7 +830,7 @@ class _wmi_class (_wmi_object):
 #
 # class _wmi_result
 #
-class _wmi_result:
+class _wmi_result (object):
   """Simple, data only result for targeted WMI queries which request
   data only result classes via fetch_as_classes.
   """
@@ -818,7 +846,7 @@ class _wmi_result:
 #
 # class WMI
 #
-class _wmi_namespace:
+class _wmi_namespace (object):
   """A WMI root of a computer system. The classes attribute holds a list
   of the classes on offer. This means you can explore a bit with
   things like this:
@@ -830,7 +858,7 @@ class _wmi_namespace:
       print i
   </pre>
   """
-  def __init__ (self, namespace, find_classes):
+  def __init__ (self, namespace, find_classes=None):
     _set (self, "_namespace", namespace)
     #
     # wmi attribute preserved for backwards compatibility
@@ -839,20 +867,8 @@ class _wmi_namespace:
 
     # Initialise the "classes" attribute, to avoid infinite recursion in the
     # __getattr__ method (which uses it).
-    self.classes = {}
-    #
-    # Pick up the list of classes under this namespace
-    #  so that they can be queried, and used as though
-    #  properties of the namespace by means of the __getattr__
-    #  hook below.
-    # If the namespace does not support SubclassesOf, carry on
-    #  regardless
-    #
-    if find_classes:
-      try:
-        self.classes.update (self.subclasses_of ())
-      except AttributeError:
-        pass
+    self._classes_map = {}
+    self._classes = None
 
   def __repr__ (self):
     return u"<_wmi_namespace: %s>" % self.wmi
@@ -870,6 +886,15 @@ class _wmi_namespace:
     """The raw OLE object representing the WMI namespace"""
     return self._namespace
 
+  def get_classes (self):
+    if self._classes is None:
+      try:
+        self._classes = self.subclasses_of ().keys ()
+      except AttributeError:
+        pass
+    return self._classes
+  classes = property (get_classes)
+  
   def subclasses_of (self, root="", regex=r".*"):
     classes = {}
     for c in self._namespace.SubclassesOf (root):
@@ -1069,19 +1094,19 @@ class _wmi_namespace:
     if found. If this is the first retrieval, store it and
     pass it back
     """
-    if self.classes.get (class_name) is None:
-      self.classes[class_name] = _wmi_class (self, self._namespace.Get (class_name))
-    return self.classes[class_name]
+    if self._classes_map.get (class_name) is None:
+      self._classes_map[class_name] = _wmi_class (self, self._namespace.Get (class_name))
+    return self._classes_map[class_name]
 
   def _getAttributeNames (self):
     """Return list of classes for IPython completion engine"""
-    classes = [str (x) for x in self.classes.keys () if not x.startswith ('__')]
+    classes = [str (x) for x in self.classes if not x.startswith ('__')]
     return classes
 
 #
 # class _wmi_watcher
 #
-class _wmi_watcher:
+class _wmi_watcher (object):
   """Helper class for WMI.watch_for below (qv)"""
 
   _event_property_map = {
@@ -1114,6 +1139,16 @@ class _wmi_watcher:
         if scode == wbemErrTimedout:
           raise x_wmi_timed_out
       handle_com_error (error_info)
+
+class _wmi_associator (object):
+  
+  def __init__ (self, originating_class, associated_class):
+    print originating_class
+    print associated_class
+    
+  def __call__ (self, *args, **kwargs):
+    pass
+    
 
 PROTOCOL = "winmgmts:"
 IMPERSONATION_LEVEL = "impersonate"
@@ -1216,16 +1251,7 @@ def connect (
         if _DEBUG: print moniker
         obj = GetObject (moniker)
 
-    wmi_type = get_wmi_type (obj)
-
-    if wmi_type == "namespace":
-      return _wmi_namespace (obj, find_classes)
-    elif wmi_type == "class":
-      return _wmi_class (None, obj)
-    elif wmi_type == "instance":
-      return _wmi_object (obj)
-    else:
-      raise x_wmi, u"Unknown moniker type"
+    return wmi_object (obj)
 
   except pywintypes.com_error, error_info:
     handle_com_error (error_info)
@@ -1258,16 +1284,16 @@ def construct_moniker (
   if suffix: moniker.append (":%s" % suffix)
   return "".join (moniker)
 
-def get_wmi_type (obj):
+def wmi_object (obj):
   try:
     path = obj.Path_
   except AttributeError:
-    return "namespace"
+    return _wmi_namespace (obj)
   else:
     if path.IsClass:
-      return "class"
+      return _wmi_class (None, obj)
     else:
-      return "instance"
+      return _wmi_object (obj)
 
 def connect_server (
   server,

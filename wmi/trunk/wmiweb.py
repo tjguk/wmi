@@ -23,6 +23,7 @@ def start_doc (title):
   <title>%(title)s</title>
   <style>
   body {font-family : Verdana, sans-serif; font-size : 84%%; margin : 3em;}
+  table.items {padding-left : 30px;}
   li, td {font-family : "Courier New", monospace;}
   td {padding-right : 1em; font-size : 84%%;}
   h1, h2, h3 {font-family : Tahoma, sans-serif;} 
@@ -40,7 +41,7 @@ def finish_doc ():
 
 def doc_table (items, n_cols=3):
   n_rows, n_spare_cols = divmod (len (items), n_cols)
-  doc.append ("<table cellspacing=0>")
+  doc.append ('<table cellspacing=0 class="items">')
   
   for n_row in range (n_rows):
     doc.append ("<tr>")
@@ -70,20 +71,6 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
   klass = getattr (wmi_connection, wmi_class)
   
   doc.append ("<hr>")
-  doc.append ("<h3>Sample instances</h3>")
-  if wmi_class == "CIM_LogicalFile" or "CIM_LogicalFile" in klass.derivation ():
-    doc.append ("<p><b>Not going to try enumerating CIM_LogicalFile</b></p>")
-  else:
-    instances = klass ()[:5]
-    if instances:
-      doc.append ("<ul>")
-      for instance in instances:
-        doc.append ("<li>%s</li>" % escape (str (instance.path ())))
-      doc.append ("</ul>")
-    else:
-      doc.append ("<p>No instances</p>")
-  
-  doc.append ("<hr>")
   doc.append ("<h3>Ancestors</h3>")
   ancestors = klass.derivation ()
   if ancestors:
@@ -104,7 +91,7 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     
   doc.append ("<hr>")
   doc.append ("<h3>Associated classes</h3>")
-  associations = sorted (k._class_name for k in klass.associated_classes ())
+  associations = sorted (klass.associated_classes)
   if associations:
     doc.append ("<ul>")
     for association in associations:
@@ -128,6 +115,17 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
   else:
     doc_table (properties, 4)
 
+  doc.append ("<hr>")
+  doc.append ("<h3>Keys</h3>")
+  keys = sorted (klass.keys)
+  if keys:
+    doc.append ("<ul>")
+    for key in keys:
+      doc.append ("<li>%s</li>" % key)
+    doc.append ("</ul>")
+  else:
+    doc.append ("<p>No keys</p>")
+  
   doc.append ("<hr>")
   doc.append ("<h3>Methods</h3>")
   methods = sorted (klass._methods)
@@ -204,5 +202,7 @@ def app (environ, start_response):
     return ["Redirected to /localhost"]
 
 if __name__ == '__main__':
+  import win32api
+  print win32api.GetCommandLine ()
   httpd = make_server ('', 8000, app)
   httpd.serve_forever ()
