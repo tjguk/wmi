@@ -193,7 +193,10 @@ def handle_computer (environ, computer):
 
 def app (environ, start_response):
   computer = shift_path_info (environ)
-  if computer:
+  if computer == "favicon.ico":
+    start_response ("404 Not Found", [("Content-Type", "text/plain")])
+    return []
+  elif computer:
     start_response ("200 OK", [("Content-Type", "text/html; charset=utf-8")])
     handle_computer (environ, computer)
     return (unicode (d).encode ("utf8") + "\n" for d in doc)
