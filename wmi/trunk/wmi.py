@@ -362,7 +362,7 @@ class _wmi_method (object):
     try:
       if self.in_parameters:
         parameter_names = {}
-        for name, is_array in self.in_parameter_names:
+        for name, is_array, datatype, bitmap in self.in_parameter_names:
           parameter_names[name] = is_array
 
         parameters = self.in_parameters
@@ -397,7 +397,7 @@ class _wmi_method (object):
         result = self.ole_object.ExecMethod_ (self.method.Name)
 
       results = []
-      for name, is_array in self.out_parameter_names:
+      for name, is_array, datatype, bitmap in self.out_parameter_names:
         value = result.Properties_ (name).Value
         if is_array:
           #
