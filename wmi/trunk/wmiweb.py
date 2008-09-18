@@ -1,4 +1,5 @@
 from cgi import escape
+import threading
 from urllib import quote
 from wsgiref.simple_server import make_server
 from wsgiref.util import request_uri, application_uri, shift_path_info
@@ -204,8 +205,11 @@ def app (environ, start_response):
     start_response ("301 Moved Permanently", [("Location", "/localhost"), ("Content-Type", "text/plain")])
     return ["Redirected to /localhost"]
 
+def run_browser ():
+  import os
+  os.startfile ("http://localhost:8000")
+
 if __name__ == '__main__':
-  import win32api
-  print win32api.GetCommandLine ()
+  threading.Timer (3.0, run_browser).start ()
   httpd = make_server ('', 8000, app)
   httpd.serve_forever ()
