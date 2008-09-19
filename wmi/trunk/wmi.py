@@ -181,11 +181,22 @@ def handle_com_error (error_info):
   @param error_info The structure attached to a pywintypes.com_error
   """
   hresult_code, hresult_name, additional_info, parameter_in_error = error_info
+  print "hresult_code:", repr (hresult_code)
+  print "hresult_name:", repr (hresult_name)
+  print "additional_info:", repr (additional_info)
+  print "parameter_in_error:", repr (parameter_in_error)
   exception_string = [u"%s - %s" % (hex (hresult_code), hresult_name.decode ("mbcs"))]
   if additional_info:
     wcode, source_of_error, error_description, whlp_file, whlp_context, scode = additional_info
+    print "wcode:", repr (wcode)
+    print "source_of_error:", repr (source_of_error)
+    print "error_description:", repr (error_description)
+    print "whlp_file:", repr (whlp_file)
+    print "whlp_context:", repr (whlp_context)
+    print "scode:", repr (scode)
     exception_string.append (u"  Error in: %s" % source_of_error.decode ("mbcs"))
-    exception_string.append (u"  %s - %s" % (hex (scode), (error_description or u"").decode ("mbcs").strip ()))
+    print "error_description decoded:", error_description.decode ("mbcs")
+    exception_string.append (u"  %s - %s" % (hex (scode), (error_description or "").decode ("mbcs").strip ()))
   raise x_wmi, u"\n".join (exception_string)
 
 BASE = datetime.datetime (1601, 1, 1)
