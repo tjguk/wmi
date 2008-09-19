@@ -1,125 +1,3 @@
-##
-# wmi - a lightweight Python wrapper around Microsoft's WMI interface
-#
-# Windows Management Instrumentation (WMI) is Microsoft's answer to
-# the DMTF's Common Information Model. It allows you to query just
-# about any conceivable piece of information from any computer which
-# is running the necessary agent and over which have you the
-# necessary authority.
-#
-# The implementation is by means of COM/DCOM and most of the examples
-# assume you're running one of Microsoft's scripting technologies.
-# Fortunately, Mark Hammond's pywin32 has pretty much all you need
-# for a workable Python adaptation. I haven't tried any of the fancier
-# stuff like Async calls and so on, so I don't know if they'd work.
-#
-# Since the COM implementation doesn't give much away to Python
-# programmers, I've wrapped it in some lightweight classes with
-# some getattr / setattr magic to ease the way. In particular:
-#
-# <ul>
-# <li>
-# The _wmi_namespace object itself will determine its classes
-# and allow you to return all instances of any of them by
-# using its name as an attribute. As an additional shortcut,
-# you needn't specify the Win32_; if the first lookup fails
-# it will try again with a Win32_ on the front:
-#
-# <pre class="code">
-# disks = wmi.WMI ().Win32_LogicalDisk ()
-# </pre>
-#
-# In addition, you can specify what would become the WHERE clause
-# as keyword parameters:
-#
-# <pre class="code">
-# fixed_disks = wmi.WMI ().Win32_LogicalDisk (DriveType = 3)
-# </pre>
-# </li>
-#
-# <li>
-# The objects returned by a WMI lookup are wrapped in a Python
-# class which determines their methods and classes and allows
-# you to access them as though they were Python classes. The
-# methods only allow named parameters.
-#
-# <pre class="code">
-# for p in wmi.WMI ().Win32_Process ():
-#   if p.Name.lower () == 'notepad.exe':
-#     p.Terminate (Result=1)
-# </pre>
-# </li>
-#
-# <li>
-#  Doing a print on one of the WMI objects will result in its
-#  GetObjectText_ method being called, which usually produces
-#  a meaningful printout of current values.
-#  The repr of the object will include its full WMI path,
-#  which lets you get directly to it if you need to.
-# </li>
-#
-# <li>
-# You can get the associators and references of an object as
-#  a list of python objects by calling the associators () and
-#  references () methods on a WMI Python object.
-#  NB Don't do this on a Win32_ComputerSystem object; it will
-#  take all day and kill your machine!
-#
-# <pre class="code">
-# for p in wmi.WMI ().Win32_Process ():
-#   if p.Name.lower () == 'notepad.exe':
-#     for r in p.references ():
-#       print r.Name
-# </pre>
-# </li>
-#
-# <li>
-# WMI classes (as opposed to instances) are first-class
-# objects, so you can get hold of a class, and call
-# its methods or set up a watch against it.
-#
-# <pre class="code">
-# process = wmi.WMI ().Win32_Process
-# process.Create (CommandLine="notepad.exe")
-# </pre>
-#
-# </li>
-#
-# <li>
-# To make it easier to use in embedded systems and py2exe-style
-# executable wrappers, the module will not force early Dispatch.
-# To do this, it uses a handy hack by Thomas Heller for easy access
-# to constants.
-# </li>
-#
-# <li>
-# Typical usage will be:
-#
-# <pre class="code">
-# import wmi
-#
-# vodev1 = wmi.WMI ("vodev1")
-# for disk in vodev1.Win32_LogicalDisk ():
-#   if disk.DriveType == 3:
-#     space = 100 * long (disk.FreeSpace) / long (disk.Size)
-#     print "%s has %d%% free" % (disk.Name, space)
-# </pre>
-# </li>
-#
-# </ul>
-#
-# Many thanks, obviously to Mark Hammond for creating the win32all
-# extensions, but also to Alex Martelli and Roger Upole, whose
-# c.l.py postings pointed me in the right direction.
-# Thanks especially in release 1.2 to Paul Tiemann for his code
-# contributions and robust testing.
-#
-# (c) Tim Golden - mail at timgolden.me.uk 5th June 2003
-# Licensed under the (GPL-compatible) MIT License:
-# http://www.opensource.org/licenses/mit-license.php
-#
-# For change history see CHANGELOG.TXT
-##
 try:
   True, False
 except NameError:
@@ -131,9 +9,10 @@ try:
 except NameError:
   class object: pass
 
-__VERSION__ = "1.3.3"
+__VERSION__ = "2.0"
 
 _DEBUG = False
+_LIGHTWEIGHT = False
 
 import sys
 import re
@@ -282,6 +161,9 @@ class x_wmi_timed_out (x_wmi):
 
 class x_wmi_no_namespace (x_wmi):
   pass
+  
+class x_wmi_attribute_error (x_wmi):
+  pass
 
 WMI_EXCEPTIONS = {
   wbemErrInvalidQuery : x_wmi_invalid_query,
@@ -299,7 +181,7 @@ def _set (obj, attribute, value):
   """
   obj.__dict__[attribute] = value
 
-class _wmi_method (object):
+class x_wmi_method (object):
   """
   A currying sort of wrapper around a WMI method name. It
   abstract's the method's parameters and can be called like
@@ -428,7 +310,7 @@ class _wmi_method (object):
 #
 # class _wmi_object
 #
-class _wmi_object (object):
+class x_wmi_object (object):
   "A lightweight wrapper round an OLE WMI object"
 
   def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
@@ -710,7 +592,7 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
 #
 # class _wmi_event
 #
-class _wmi_event (_wmi_object):
+class x_wmi_event (x_wmi_object):
   """Slight extension of the _wmi_object class to allow
   objects which are the result of events firing to return
   extra information such as the type of event.
@@ -733,7 +615,7 @@ class _wmi_event (_wmi_object):
 #
 # class _wmi_class
 #
-class _wmi_class (_wmi_object):
+class x_wmi_class (x_wmi_object):
   """Currying class to assist in issuing queries against
    a WMI namespace. The idea is that when someone issues
    an otherwise unknown method against the WMI object, if
@@ -842,7 +724,7 @@ class _wmi_class (_wmi_object):
 #
 # class _wmi_result
 #
-class _wmi_result (object):
+class x_wmi_result (object):
   """Simple, data only result for targeted WMI queries which request
   data only result classes via fetch_as_classes.
   """
@@ -858,7 +740,7 @@ class _wmi_result (object):
 #
 # class WMI
 #
-class _wmi_namespace (object):
+class x_wmi_namespace (object):
   """A WMI root of a computer system. The classes attribute holds a list
   of the classes on offer. This means you can explore a bit with
   things like this:
@@ -1118,12 +1000,12 @@ class _wmi_namespace (object):
 #
 # class _wmi_watcher
 #
-class _wmi_watcher (object):
+class x_wmi_watcher (object):
   """Helper class for WMI.watch_for below (qv)"""
 
   _event_property_map = {
-    "TargetInstance" : _wmi_object,
-    "PreviousInstance" : _wmi_object
+    "TargetInstance" : x_wmi_object,
+    "PreviousInstance" : x_wmi_object
   }
   def __init__ (self, wmi_event, is_extrinsic):
     self.wmi_event = wmi_event
@@ -1152,7 +1034,7 @@ class _wmi_watcher (object):
           raise x_wmi_timed_out
       handle_com_error (error_info)
 
-class _wmi_associator (object):
+class x_wmi_associator (object):
   
   def __init__ (self, originating_class, associated_class):
     print originating_class
@@ -1166,7 +1048,7 @@ PROTOCOL = "winmgmts:"
 IMPERSONATION_LEVEL = "impersonate"
 AUTHENTICATION_LEVEL = "default"
 NAMESPACE = "root/cimv2"
-def connect (
+def WMI (
   computer=".",
   impersonation_level="",
   authentication_level="",
@@ -1178,7 +1060,6 @@ def connect (
   suffix="",
   user="",
   password="",
-  find_classes=True,
   debug=False
 ):
   """The WMI constructor can either take a ready-made moniker or as many
@@ -1212,7 +1093,7 @@ def connect (
   """
   global _DEBUG
   _DEBUG = debug
-
+  
   #
   # If namespace is a blank string, leave
   # it unaltered as it might to trying to
@@ -1267,8 +1148,6 @@ def connect (
 
   except pywintypes.com_error, error_info:
     handle_com_error (error_info)
-
-WMI = connect
 
 def construct_moniker (
   computer=None,
@@ -1380,28 +1259,75 @@ def Registry (
   except pywintypes.com_error, error_info:
     handle_com_error (error_info)
 
-#
-# From a post to python-win32 by Sean
-#
-def machines_in_domain (domain_name):
-  adsi = Dispatch ("ADsNameSpaces")
-  nt = adsi.GetObject ("","WinNT:")
-  result = nt.OpenDSObject ("WinNT://%s" % domain_name, "", "", 0)
-  result.Filter = ["computer"]
-  domain = []
-  for machine in result:
-    domain.append (machine.Name)
-  return domain
+class _wmi_object (object):
+  def __init__ (self, ole_object):
+    _set (self, "ole_object", ole_object)
+  
+  @staticmethod
+  def _get_collection_item (collection, item):
+    try:
+      return collection (item)
+    except pywintypes.com_error, error_info:
+      hresult_code, hresult_name, additional_info, parameter_in_error = error_info
+      if additional_info:
+        wcode, source_of_error, error_description, whlp_file, whlp_context, scode = additional_info
+      else:
+        wcode, source_of_error, error_description, whlp_file, whlp_context, scode = [None] * 5
+      
+      if scode == -2147217406:
+        raise x_wmi_attribute_error
+      else:
+        raise
 
-def walk_related_classes (wmi_class, level=0, visited=None):
-  if visited is None: 
-    visited = []
-  yield wmi_class, level
-  visited.append (wmi_class)
-  for assoc_class in wmi_class.associated_classes ():
-    if assoc_class not in visited:
-      for related in walk_related_classes (assoc_class, level+1, visited):
-        yield related
+class _wmi_class_light (_wmi_object):
+  
+  def __getattr__ (self, attr):
+    try:
+      return getattr (self.ole_object, attr)
+    except AttributeError:
+      try:
+        return self._get_collection_item (self.ole_object.Properties_, attr).Value
+      except x_wmi_attribute_error:
+        return _wmi_method_light (self.ole_object, self._get_collection_item (self.ole_object.Methods_, attr))
+
+class _wmi_method_light (object):
+  
+  def __init__ (self, wmi_class, wmi_method):
+    self.wmi_class = wmi_class
+    self.wmi_method = wmi_method
+    
+  def __call__ (self, *args, **kwargs):
+    in_parameters = self.wmi_method.InParameters
+    if in_parameters:
+      for n, arg in enumerate (args):
+        self.wmi_method.InParameters.Properties_[n].Value = arg
+      for key, arg in kwargs.items ():
+        self.wmi_method.InParameters.Properties_ (key).Value = arg
+      print dict ((p.Name, p.Value) for p in self.wmi_method.InParameters.Properties_)
+      result = self.wmi_class.ExecMethod_ (self.wmi_method.Name, self.wmi_method.InParameters)
+    else:
+      result = self.wmi_class.ExecMethod_ (self.wmi_method.Name)
+    return dict ((arg.Name, arg.Value) for arg in result.Properties_)
+
+class _wmi_class (_wmi_object):
+  pass
+  
+class _wmi_instance (_wmi_object):
+  pass
+  
+class _wmi_event (object):
+  pass
+  
+class _wmi_watcher (object):
+  pass
+  
+class _wmi_namespace (object):
+  pass
+  
+class _wmi_method (object):
+  def __init__ (self, method):
+    self.method = method
+
 
 #
 # Typical use test
