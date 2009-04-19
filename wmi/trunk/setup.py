@@ -1,3 +1,4 @@
+import wmi
 from distutils.core import setup
 
 classifiers = [
@@ -13,7 +14,7 @@ classifiers = [
 
 setup (
   name = "WMI",
-  version = "1.3.2",
+  version = wmi.__VERSION__,
   description = "Windows Management Instrumentation",
   author = "Tim Golden",
   author_email = "mail@timgolden.me.uk",

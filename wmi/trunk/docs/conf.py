@@ -11,17 +11,18 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 
-import sys
+import os, sys
 
 # If your extensions are in another directory, add it here.
-#sys.path.append('some/directory')
+sys.path.append (os.path.abspath (".."))
+import wmi
 
 # General configuration
 # ---------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.addons.*') or your custom ones.
-#extensions = []
+extensions = ["sphinx.ext.autodoc"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
@@ -34,15 +35,15 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'WMI'
-copyright = '2008, Tim Golden'
+copyright = '2009, Tim Golden'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.3'
+version = ".".join (wmi.__VERSION__.split ("."))[:2]
 # The full version, including alpha/beta/rc tags.
-release = '1.3.2'
+release = wmi.__VERSION__
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -79,7 +80,7 @@ html_style = 'default.css'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['.static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
