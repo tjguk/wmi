@@ -644,8 +644,8 @@ class _wmi_event (_wmi_object):
   extra information such as the type of event.
   """
   event_type_re = re.compile ("__Instance(Creation|Modification|Deletion)Event")
-  def __init__ (self, event, event_info):
-    _wmi_object.__init__ (self, event)
+  def __init__ (self, event, event_info, fields=[]):
+    _wmi_object.__init__ (self, event, fields=fields)
     _set (self, "event_type", None)
     _set (self, "timestamp", None)
     _set (self, "previous", None)
@@ -708,6 +708,7 @@ class _wmi_class (_wmi_object):
     self,
     notification_type="operation",
     delay_secs=1,
+    fields=[],
     **where_clause
   ):
     if self._namespace is None:
@@ -717,6 +718,7 @@ class _wmi_class (_wmi_object):
       notification_type=notification_type,
       wmi_class=self,
       delay_secs=delay_secs,
+      fields=fields,
       **where_clause
     )
 
@@ -891,7 +893,7 @@ class _wmi_namespace:
   def fetch_as_classes (self, wmi_classname, fields=(), **where_clause):
     """Build and execute a wql query to fetch the specified list of fields from
     the specified wmi_classname + where_clause, then return the results as
-    a list of simple class instances with attributes matching fields_list.
+    a list of simple class instances with attributes matching field_list.
 
     If fields is left empty, select * and pre-load all class attributes for
     each class returned.
@@ -904,7 +906,7 @@ class _wmi_namespace:
   def fetch_as_lists (self, wmi_classname, fields, **where_clause):
     """Build and execute a wql query to fetch the specified list of fields from
     the specified wmi_classname + where_clause, then return the results as
-    a list of lists whose values correspond fields_list.
+    a list of lists whose values correspond to field_list.
     """
     wql = "SELECT %s FROM %s" % (", ".join (fields), wmi_classname)
     if where_clause:
@@ -920,6 +922,7 @@ class _wmi_namespace:
     notification_type="operation",
     wmi_class=None,
     delay_secs=1,
+    fields=[],
     **where_clause
   ):
     """Set up an event tracker on a WMI event. This function
@@ -988,25 +991,27 @@ class _wmi_namespace:
     if raw_wql:
       wql = raw_wql
     else:
+      fields = set (['TargetInstance'] + fields)
+      field_list = ", ".join (fields) or "*"
       if is_extrinsic:
         if where_clause:
           where = " WHERE " + " AND ".join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])
         else:
           where = ""
-        wql = "SELECT * FROM " + class_name + where
+        wql = "SELECT " + field_list + " FROM " + class_name + where
       else:
         if where_clause:
           where = " AND " + " AND ".join (["TargetInstance.%s = '%s'" % (k, v) for k, v in where_clause.items ()])
         else:
           where = ""
         wql = \
-          "SELECT * FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
-          (notification_type, delay_secs, class_name, where)
+          "SELECT %s FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
+          (field_list, notification_type, delay_secs, class_name, where)
 
       if _DEBUG: print wql
 
     try:
-      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic)
+      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic, fields=fields)
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
@@ -1053,9 +1058,10 @@ class _wmi_watcher:
     "TargetInstance" : _wmi_object,
     "PreviousInstance" : _wmi_object
   }
-  def __init__ (self, wmi_event, is_extrinsic):
+  def __init__ (self, wmi_event, is_extrinsic, fields=[]):
     self.wmi_event = wmi_event
     self.is_extrinsic = is_extrinsic
+    self.fields = fields
 
   def __call__ (self, timeout_ms=-1):
     """When called, return the instance which caused the event. Supports
@@ -1066,11 +1072,13 @@ class _wmi_watcher:
     try:
       event = self.wmi_event.NextEvent (timeout_ms)
       if self.is_extrinsic:
-        return _wmi_event (event, None)
+        return _wmi_event (event, None, self.fields)
       else:
+        print "target-instance", event.Properties_ ("TargetInstance").Value
         return _wmi_event (
           event.Properties_ ("TargetInstance").Value,
-          _wmi_object (event, property_map=self._event_property_map)
+          _wmi_object (event, property_map=self._event_property_map),
+          self.fields
         )
     except pywintypes.com_error, error_info:
       hresult_code, hresult_name, additional_info, parameter_in_error = error_info

@@ -763,6 +763,7 @@ class _wmi_class (_wmi_object):
     self,
     notification_type=u"operation",
     delay_secs=1,
+    fields=[],
     **where_clause
   ):
     if self._namespace is None:
@@ -772,6 +773,7 @@ class _wmi_class (_wmi_object):
       notification_type=notification_type,
       wmi_class=self,
       delay_secs=delay_secs,
+      fields=fields,
       **where_clause
     )
 
@@ -977,6 +979,7 @@ class _wmi_namespace (object):
     notification_type=u"operation",
     wmi_class=None,
     delay_secs=1,
+    fields=[],
     **where_clause
   ):
     ur"""Set up an event tracker on a WMI event. This function
@@ -1044,20 +1047,21 @@ class _wmi_namespace (object):
     if raw_wql:
       wql = raw_wql
     else:
+      field_list = u", ".join (fields) or u"*"
       if is_extrinsic:
         if where_clause:
           where = u" WHERE " + u" AND ".join ([u"%s = '%s'" % (k, v) for k, v in where_clause.items ()])
         else:
           where = u""
-        wql = u"SELECT * FROM " + class_name + where
+        wql = u"SELECT " + field_list + " FROM " + class_name + where
       else:
         if where_clause:
           where = u" AND " + u" AND ".join ([u"TargetInstance.%s = '%s'" % (k, v) for k, v in where_clause.items ()])
         else:
           where = u""
         wql = \
-          u"SELECT * FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
-          (notification_type, delay_secs, class_name, where)
+          u"SELECT %s FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
+          (field_list, notification_type, delay_secs, class_name, where)
 
       if _DEBUG: print wql
 
