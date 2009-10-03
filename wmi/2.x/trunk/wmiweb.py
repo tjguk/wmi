@@ -205,11 +205,16 @@ def app (environ, start_response):
     start_response ("301 Moved Permanently", [("Location", "/localhost"), ("Content-Type", "text/plain")])
     return ["Redirected to /localhost"]
 
+PORT = 8010
+
 def run_browser ():
   import os
-  os.startfile ("http://localhost:8000")
+  os.startfile ("http://localhost:%d" % PORT)
 
 if __name__ == '__main__':
   threading.Timer (3.0, run_browser).start ()
-  httpd = make_server ('', 8000, app)
-  httpd.serve_forever ()
+  httpd = make_server ('', PORT, app)
+  try:
+    httpd.serve_forever ()
+  except KeyboardInterrupt:
+    print "Shutting down gracefully..."
