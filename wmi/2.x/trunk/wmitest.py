@@ -1,8 +1,8 @@
-import wmi
-
 import ConfigParser
 import unittest
 import warnings
+
+import wmi
 
 ini = ConfigParser.SafeConfigParser ()
 ini.read ("wmitest.ini")
@@ -40,12 +40,17 @@ class TestBasicConnections (unittest.TestCase):
       self.assert_ (c0 == c1)
       
     def test_impersonation_levels (self):
-      for impersonation in ["anonymous", "identify", "impersonate", "delegate"]:
+      for impersonation in ["identify", "impersonate", "delegate"]:
         self.assert_ (wmi.WMI (impersonation_level=impersonation))
       
     def test_authentication_levels (self):
       for authentication in ["default", "none", "connect", "call", "pkt", "pktintegrity", "pktprivacy"]:
-        self.assert_ (wmi.WMI (authentication_level=authentication))
+        try:
+          c = wmi.WMI (authentication_level=authentication)
+        except wmi.x_access_denied:
+          warnings.warn ("Access denied for authentication level %s" % authentication)
+        else:
+          self.assert_ (c)
       
     def test_authority (self):
       if "authority" in excludes:
@@ -70,6 +75,7 @@ class TestBasicConnections (unittest.TestCase):
         self.assert_ (wmi.WMI (computer=settings['remote'], user=settings['user'], password=settings['password']))
     
     def test_find_classes (self):
+      self.assert_ (wmi.WMI (find_classes=True).classes)
       self.assertFalse (wmi.WMI (find_classes=False).classes)
 
 if __name__ == '__main__':

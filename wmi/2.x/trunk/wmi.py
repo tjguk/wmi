@@ -120,26 +120,22 @@
 #
 # For change history see CHANGELOG.TXT
 ##
-try:
-  True, False
-except NameError:
-  True = 1
-  False = 0
-
-try:
-  object
-except NameError:
-  class object: pass
-
-__VERSION__ = "1.3.2"
+__VERSION__ = __version__ = "1.4.0"
 
 _DEBUG = False
 
 import sys
-import re
 import datetime
+import re
+import struct
+
 from win32com.client import GetObject, Dispatch
 import pywintypes
+
+def signed_to_unsigned (signed):
+  ur"""Convert a (possibly signed) long to unsigned hex"""
+  unsigned, = struct.unpack ("L", struct.pack ("l", signed))
+  return unsigned
 
 class ProvideConstants (object):
    """
@@ -174,6 +170,30 @@ wbemErrTimedout = obj._constants.wbemErrTimedout
 wbemFlagReturnImmediately = obj._constants.wbemFlagReturnImmediately
 wbemFlagForwardOnly = obj._constants.wbemFlagForwardOnly
 
+#
+# Exceptions
+#
+class x_wmi (Exception):
+  pass
+
+class x_wmi_invalid_query (x_wmi):
+  pass
+
+class x_wmi_timed_out (x_wmi):
+  pass
+
+class x_wmi_no_namespace (x_wmi):
+  pass
+  
+class x_access_denied (x_wmi):
+  pass
+
+WMI_EXCEPTIONS = {
+  wbemErrInvalidQuery : x_wmi_invalid_query,
+  wbemErrTimedout : x_wmi_timed_out,
+  0x80070005 : x_access_denied
+}
+
 def handle_com_error (error_info):
   """Convenience wrapper for displaying all manner of COM errors.
   Raises a x_wmi exception with more useful information attached
@@ -181,12 +201,20 @@ def handle_com_error (error_info):
   @param error_info The structure attached to a pywintypes.com_error
   """
   hresult_code, hresult_name, additional_info, parameter_in_error = error_info
+  hresult_code = signed_to_unsigned (hresult_code)
   exception_string = ["%s - %s" % (hex (hresult_code), hresult_name)]
   if additional_info:
     wcode, source_of_error, error_description, whlp_file, whlp_context, scode = additional_info
+    scode = signed_to_unsigned (scode)
     exception_string.append ("  Error in: %s" % source_of_error)
     exception_string.append ("  %s - %s" % (hex (scode), (error_description or "").strip ()))
-  raise x_wmi, "\n".join (exception_string)
+  for error_code, klass in WMI_EXCEPTIONS.items ():
+    if error_code in (hresult_code, scode):
+      break
+  else:
+    klass = x_wmi
+  raise klass ("\n".join (exception_string))
+
 
 BASE = datetime.datetime (1601, 1, 1)
 def from_1601 (ns100):
@@ -256,26 +284,6 @@ def to_time (wmi_time):
   timezone = wmi_time[21:]
 
   return year, month, day, hours, minutes, seconds, microseconds, timezone
-
-#
-# Exceptions
-#
-class x_wmi (Exception):
-  pass
-
-class x_wmi_invalid_query (x_wmi):
-  pass
-
-class x_wmi_timed_out (x_wmi):
-  pass
-
-class x_wmi_no_namespace (x_wmi):
-  pass
-
-WMI_EXCEPTIONS = {
-  wbemErrInvalidQuery : x_wmi_invalid_query,
-  wbemErrTimedout : x_wmi_timed_out
-}
 
 def _set (obj, attribute, value):
   """
