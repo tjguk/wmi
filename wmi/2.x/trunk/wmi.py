@@ -187,11 +187,15 @@ class x_wmi_no_namespace (x_wmi):
   
 class x_access_denied (x_wmi):
   pass
+  
+class x_wmi_authentication (x_wmi):
+  pass
 
 WMI_EXCEPTIONS = {
   wbemErrInvalidQuery : x_wmi_invalid_query,
   wbemErrTimedout : x_wmi_timed_out,
-  0x80070005 : x_access_denied
+  0x80070005 : x_access_denied,
+  0x80041003 : x_access_denied,
 }
 
 def handle_com_error (error_info):
@@ -203,6 +207,7 @@ def handle_com_error (error_info):
   hresult_code, hresult_name, additional_info, parameter_in_error = error_info
   hresult_code = signed_to_unsigned (hresult_code)
   exception_string = ["%s - %s" % (hex (hresult_code), hresult_name)]
+  scode = None
   if additional_info:
     wcode, source_of_error, error_description, whlp_file, whlp_context, scode = additional_info
     scode = signed_to_unsigned (scode)
@@ -528,7 +533,7 @@ class _wmi_object:
     if isinstance (other, self.__class__):
       return self.ole_object.CompareTo_ (other.ole_object)
     else:
-      raise x_wmi, "Can't compare a WMI object with something else"
+      raise x_wmi ("Can't compare a WMI object with something else")
 
   def _getAttributeNames (self):
      """Return list of methods/properties for IPython completion"""
@@ -699,7 +704,7 @@ class _wmi_class (_wmi_object):
      Won't work if the class has been instantiated directly.
     """
     if self._namespace is None:
-      raise x_wmi_no_namespace, "You cannot query directly from a WMI class"
+      raise x_wmi_no_namespace ("You cannot query directly from a WMI class")
 
     try:
       field_list = ", ".join (fields) or "*"
@@ -720,7 +725,7 @@ class _wmi_class (_wmi_object):
     **where_clause
   ):
     if self._namespace is None:
-      raise x_wmi_no_namespace, "You cannot watch directly from a WMI class"
+      raise x_wmi_no_namespace ("You cannot watch directly from a WMI class")
 
     return self._namespace.watch_for (
       notification_type=notification_type,
@@ -1101,7 +1106,7 @@ IMPERSONATION_LEVEL = "impersonate"
 AUTHENTICATION_LEVEL = "default"
 NAMESPACE = "root/cimv2"
 def connect (
-  computer=".",
+  computer="",
   impersonation_level="",
   authentication_level="",
   authority="",
@@ -1112,7 +1117,7 @@ def connect (
   suffix="",
   user="",
   password="",
-  find_classes=True,
+  find_classes=False,
   debug=False
 ):
   """The WMI constructor can either take a ready-made moniker or as many
@@ -1168,7 +1173,9 @@ def connect (
     else:
       if user:
         if impersonation_level or authentication_level or privileges or suffix:
-          raise x_wmi, "You can't specify an impersonation, authentication or privilege as well as a username"
+          raise x_wmi_authentication ("You can't specify an impersonation, authentication or privilege as well as a username")
+        elif not computer:
+          raise x_wmi_authentication ("You can only specify user/password for a remote connection")
         else:
           obj = connect_server (
             server=computer,
@@ -1181,8 +1188,8 @@ def connect (
       else:
         moniker = construct_moniker (
           computer=computer,
-          impersonation_level=impersonation_level or IMPERSONATION_LEVEL,
-          authentication_level=authentication_level or AUTHENTICATION_LEVEL,
+          impersonation_level=impersonation_level,
+          authentication_level=authentication_level,
           authority=authority,
           privileges=privileges,
           namespace=namespace,
@@ -1209,8 +1216,8 @@ WMI = connect
 
 def construct_moniker (
     computer=None,
-    impersonation_level="Impersonate",
-    authentication_level="Default",
+    impersonation_level=None,
+    authentication_level=None,
     authority=None,
     privileges=None,
     namespace=None,
@@ -1226,8 +1233,8 @@ def construct_moniker (
   if privileges: security.append ("(%s)" % ", ".join (privileges))
 
   moniker = [PROTOCOL]
-  if security: moniker.append ("{%s}/" % ",".join (security))
-  if computer: moniker.append ("/%s/" % computer)
+  if security: moniker.append ("{%s}" % ",".join (security))
+  if computer: moniker.append ("//%s/" % computer)
   if namespace:
     parts = re.split (r"[/\\]", namespace)
     if parts[0] != 'root':
@@ -1319,19 +1326,6 @@ def Registry (
 
   except pywintypes.com_error, error_info:
     handle_com_error (error_info)
-
-#
-# From a post to python-win32 by Sean
-#
-def machines_in_domain (domain_name):
-  adsi = Dispatch ("ADsNameSpaces")
-  nt = adsi.GetObject ("","WinNT:")
-  result = nt.OpenDSObject ("WinNT://%s" % domain_name, "", "", 0)
-  result.Filter = ["computer"]
-  domain = []
-  for machine in result:
-    domain.append (machine.Name)
-  return domain
 
 #
 # Typical use test

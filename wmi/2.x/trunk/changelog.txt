@@ -21,6 +21,10 @@ http://timgolden.me.uk/python/wmi.html
 What's Changed?
 ===============
 
+4th Oct 2009  1.4.0  . Now requires Python 2.4
+                     . Added unittest-based test suite (wmitest.py)
+                     . find_classes now defaults to False
+                     . Removed machines_in_domain code
 27th Dec 2007 1.3.2  . Squashed long-standing cached method bug which had 
                        resulted in an instance-level method being called even
                        after that instance had died.
