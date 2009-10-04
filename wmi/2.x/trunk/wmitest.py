@@ -202,7 +202,7 @@ class TestFunctions (unittest.TestCase):
 class TestNamespace (unittest.TestCase):
   
   def setUp (self):
-    self.connection = wmi.WMI (namespace="root/cimv2")
+    self.connection = wmi.WMI (namespace="root/cimv2", find_classes=False)
     self.logical_disks = set (self.connection.Win32_LogicalDisk ())
   
   def test_subclasses_of_simple (self):
@@ -223,6 +223,77 @@ class TestNamespace (unittest.TestCase):
     
   def test_query (self):
     self.assertEquals (self.logical_disks, set (self.connection.query ("SELECT * FROM Win32_LogicalDisk")))
+    
+  def test_ipython_attributes (self):
+    connection = wmi.WMI (find_classes=True)
+    self.assertEquals (connection._getAttributeNames (), [i for i in connection.classes if not i.startswith ("__")])
+    
+  def test_getattr (self):
+    "Check that WMI classes are returned by attribute access on their namespace"
+    connection = wmi.WMI (find_classes=True)
+    for c in list (connection.classes)[:5]:
+      wmi_class = getattr (connection, c)
+      self.assert_ (isinstance (wmi_class, wmi._wmi_class))
+      self.assertEquals (wmi_class._class_name, c)
+      
+  def test_watch_for (self):
+    """Check that the watch_for method returns a watcher. The watcher itself
+    will be tested elsewhere.
+    """
+    watcher = self.connection.watch_for (
+      wmi_class="Win32_Process"
+    )
+    self.assert_ (isinstance (watcher, wmi._wmi_watcher))
+    
+class TestClass (unittest.TestCase):
+  
+  def setUp (self):
+    self.connection = wmi.WMI (namespace="root/cimv2", find_classes=False)
+    
+  def test_class_from_namespace (self):
+    self.assert_ (self.connection.Win32_ComputerSystem._namespace is self.connection)
+      
+  def test_class_without_namespace (self):
+    wmi_class = wmi.GetObject ("winmgmts:Win32_ComputerSystem")
+    self.assert_ (wmi._wmi_class (None, wmi_class)._namespace)
+    
+  def test_query (self):
+    self.assertEquals (
+      set (self.connection.Win32_ComputerSystem.query ()), 
+      set (self.connection.query ("SELECT * FROM Win32_ComputerSystem"))
+    )
+    
+  def test_query_with_where (self):
+    this_drive = os.getcwd ()[:2]
+    for drive in self.connection.Win32_LogicalDisk (Name=this_drive):
+      self.assertEquals (drive.Name, this_drive)
+
+  def test_query_with_fields (self):
+    this_drive = os.getcwd ()[:2]
+    properties = set (["MediaType"])
+    self.assert_ ("Name" not in properties)
+    for drive in self.connection.Win32_LogicalDisk (properties, Name=this_drive):
+      self.assertEquals (set (drive.properties), set (properties))
+      self.assert_ (drive.MediaType)
+      self.assertRaises (AttributeError, getattr, drive, "Name")
+      
+  def test_watch_for (self):
+    """Check that the watch_for method returns a watcher. The watcher itself
+    will be tested elsewhere.
+    """
+    watcher = self.connection.Win32_Process.watch_for ()
+    self.assert_ (isinstance (watcher, wmi._wmi_watcher))
+    
+  def test_instances (self):
+    self.assertEquals (
+      set (self.connection.Win32_LogicalDisk ()), 
+      set (self.connection.Win32_LogicalDisk.instances ())
+    )
+    
+  def test_new (self):
+    process = self.connection.Win32_Process.new ()
+    self.assertEquals (wmi.get_wmi_type (process), "instance")
+    self.assertEquals (process._instance_of, self.connection.Win32_process)
 
 if __name__ == '__main__':
   unittest.main ()

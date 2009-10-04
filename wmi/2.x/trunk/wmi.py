@@ -423,7 +423,7 @@ class _wmi_object:
   def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
     try:
       _set (self, "ole_object", ole_object)
-      _set (self, "id", hash (str (ole_object.Path_)))
+      _set (self, "id", hash (ole_object.Path_.DisplayName))
       _set (self, "_instance_of", instance_of)
       _set (self, "properties", {})
       _set (self, "methods", {})
@@ -450,6 +450,9 @@ class _wmi_object:
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
 
+  def __lt__ (self, other):
+    return self.id < other.id
+  
   def __str__ (self):
     """
     For a call to print [object] return the OLE description
@@ -526,18 +529,7 @@ class _wmi_object:
       handle_com_error (error_info)
 
   def __eq__ (self, other):
-    """
-    Use WMI's CompareTo_ to compare this object with
-    another. Don't try to do anything if the other
-    object is not a wmi object. It might be possible
-    to compare this object's unique key with a string
-    or something, but this doesn't seem to be universal
-    enough to merit a special case.
-    """
-    if isinstance (other, self.__class__):
-      return self.ole_object.CompareTo_ (other.ole_object)
-    else:
-      raise x_wmi ("Can't compare a WMI object with something else")
+    return self.id == other.id
       
   def __hash__ (self):
     return self.id
@@ -710,6 +702,9 @@ class _wmi_class (_wmi_object):
      by calling the namespace's query with the class preset.
      Won't work if the class has been instantiated directly.
     """
+    #
+    # FIXME: Not clear if this can ever happen
+    #
     if self._namespace is None:
       raise x_wmi_no_namespace ("You cannot query directly from a WMI class")
 
