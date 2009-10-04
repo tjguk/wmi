@@ -110,28 +110,28 @@ from win32com.client import GetObject, Dispatch
 import pywintypes
 
 class _ProvideConstants (object):
-   ur"""A class which, when called on a win32com.client.Dispatch object,
-   provides lazy access to constants defined in the typelib.
+  ur"""A class which, when called on a win32com.client.Dispatch object,
+  provides lazy access to constants defined in the typelib.
 
-   They can be accessed as attributes of the _constants property.
-   From Thomas Heller on c.l.py
-   """
-   def __init__(self, comobj):
-     comobj.__dict__["_constants"] = self
-     self.__typecomp = \
-      comobj._oleobj_.GetTypeInfo().GetContainingTypeLib()[0].GetTypeComp()
+  They can be accessed as attributes of the _constants property.
+  From Thomas Heller on c.l.py
+  """
+  def __init__(self, comobj):
+    comobj.__dict__["_constants"] = self
+    self.__typecomp = \
+    comobj._oleobj_.GetTypeInfo().GetContainingTypeLib()[0].GetTypeComp()
 
-   def __getattr__(self, name):
-     if name.startswith("__") and name.endswith("__"):
-       raise AttributeError, name
-     result = self.__typecomp.Bind(name)
-     #
-     # Bind returns a 2-tuple, first item is TYPEKIND,
-     # the second item has the value
-     #
-     if not result[0]:
-       raise AttributeError, name
-     return result[1].value
+  def __getattr__(self, name):
+    if name.startswith("__") and name.endswith("__"):
+      raise AttributeError, name
+    result = self.__typecomp.Bind(name)
+    #
+    # Bind returns a 2-tuple, first item is TYPEKIND,
+    # the second item has the value
+    #
+    if not result[0]:
+      raise AttributeError, name
+    return result[1].value
 
 obj = GetObject ("winmgmts:")
 _ProvideConstants (obj)

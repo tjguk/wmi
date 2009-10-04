@@ -1,6 +1,7 @@
 from distutils.core import setup
 
 classifiers = [
+  'PYTHON 3.x',
   'Development Status :: 5 - Production/Stable',
   'Environment :: Win32 (MS Windows)',
   'Intended Audience :: Developers',
@@ -13,7 +14,7 @@ classifiers = [
 
 setup (
   name = "WMI",
-  version = "1.1.1",
+  version = "1.3.2-py3.x",
   description = "Windows Management Instrumentation",
   author = "Tim Golden",
   author_email = "mail@timgolden.me.uk",
