@@ -138,29 +138,29 @@ def signed_to_unsigned (signed):
   return unsigned
 
 class ProvideConstants (object):
-   """
-   A class which, when called on a win32com.client.Dispatch object,
-   provides lazy access to constants defined in the typelib.
+  """
+  A class which, when called on a win32com.client.Dispatch object,
+  provides lazy access to constants defined in the typelib.
 
-   They can be accessed as attributes of the _constants property.
-   From Thomas Heller on c.l.py
-   """
-   def __init__(self, comobj):
-     "@param comobj A COM object whose typelib constants are to be exposed"
-     comobj.__dict__["_constants"] = self
-     # Get the typelibrary's typecomp interface
-     self.__typecomp = \
-      comobj._oleobj_.GetTypeInfo().GetContainingTypeLib()[0].GetTypeComp()
+  They can be accessed as attributes of the _constants property.
+  From Thomas Heller on c.l.py
+  """
+  def __init__(self, comobj):
+    "@param comobj A COM object whose typelib constants are to be exposed"
+    comobj.__dict__["_constants"] = self
+    # Get the typelibrary's typecomp interface
+    self.__typecomp = \
+    comobj._oleobj_.GetTypeInfo().GetContainingTypeLib()[0].GetTypeComp()
 
-   def __getattr__(self, name):
-     if name.startswith("__") and name.endswith("__"):
-       raise AttributeError, name
-     result = self.__typecomp.Bind(name)
-     # Bind returns a 2-tuple, first item is TYPEKIND,
-     # the second item has the value
-     if not result[0]:
-       raise AttributeError, name
-     return result[1].value
+  def __getattr__(self, name):
+    if name.startswith("__") and name.endswith("__"):
+     raise AttributeError, name
+    result = self.__typecomp.Bind(name)
+    # Bind returns a 2-tuple, first item is TYPEKIND,
+    # the second item has the value
+    if not result[0]:
+     raise AttributeError, name
+    return result[1].value
 
 obj = GetObject ("winmgmts:")
 ProvideConstants (obj)
@@ -258,7 +258,8 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   wmi_time += str_or_stars (seconds, 2)
   wmi_time += "."
   wmi_time += str_or_stars (microseconds, 6)
-  wmi_time += str_or_stars (timezone, 4)
+  wmi_time += "+"
+  wmi_time += str_or_stars (timezone, 3)
 
   return wmi_time
 
@@ -286,7 +287,9 @@ def to_time (wmi_time):
   minutes = int_or_none (wmi_time, 10, 12)
   seconds = int_or_none (wmi_time, 12, 14)
   microseconds = int_or_none (wmi_time, 15, 21)
-  timezone = wmi_time[21:]
+  timezone = wmi_time[22:]
+  if timezone == "***":
+    timezone = None
 
   return year, month, day, hours, minutes, seconds, microseconds, timezone
 
@@ -420,6 +423,7 @@ class _wmi_object:
   def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
     try:
       _set (self, "ole_object", ole_object)
+      _set (self, "id", hash (str (ole_object.Path_)))
       _set (self, "_instance_of", instance_of)
       _set (self, "properties", {})
       _set (self, "methods", {})
@@ -534,6 +538,9 @@ class _wmi_object:
       return self.ole_object.CompareTo_ (other.ole_object)
     else:
       raise x_wmi ("Can't compare a WMI object with something else")
+      
+  def __hash__ (self):
+    return self.id
 
   def _getAttributeNames (self):
      """Return list of methods/properties for IPython completion"""
@@ -877,7 +884,7 @@ class _wmi_namespace:
       handle_com_error (error_info)
 
   def new (self, wmi_class, **kwargs):
-    """This is now implemented by a call to _wmi_namespace.new (qv)"""
+    """This is now implemented by a call to _wmi_class.new (qv)"""
     return getattr (self, wmi_class).new (**kwargs)
 
   new_instance_of = new
@@ -1102,9 +1109,6 @@ class _wmi_watcher:
       handle_com_error (error_info)
 
 PROTOCOL = "winmgmts:"
-IMPERSONATION_LEVEL = "impersonate"
-AUTHENTICATION_LEVEL = "default"
-NAMESPACE = "root/cimv2"
 def connect (
   computer="",
   impersonation_level="",
@@ -1151,14 +1155,6 @@ def connect (
   """
   global _DEBUG
   _DEBUG = debug
-
-  #
-  # If namespace is a blank string, leave
-  # it unaltered as it might to trying to
-  # access the root namespace
-  #
-  #if namespace is None:
-  #  namespace = NAMESPACE
 
   try:
     if wmi:

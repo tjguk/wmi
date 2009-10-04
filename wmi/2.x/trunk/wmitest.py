@@ -1,3 +1,5 @@
+import os, sys
+import datetime
 import ConfigParser
 import unittest
 import warnings
@@ -120,6 +122,9 @@ class TestBasicConnections (unittest.TestCase):
 class TestMoniker (unittest.TestCase):
   
   def test_moniker (self):
+    """Look at all possible options for moniker construction and pass
+    them through to a WMI connector
+    """
     if "authority" in excludes:
       warnings.warn ("Skipping authorities in test_moniker")
       authorities = [None]
@@ -140,6 +145,84 @@ class TestMoniker (unittest.TestCase):
                   namespace=namespace
                 )
                 self.assert_ (wmi.WMI (moniker=moniker), "Moniker failed: %s" % moniker)
+  
+  def test_moniker_root_namespace (self):
+    "Check that namespace is prefixed by root if needed"
+    self.assertEquals (wmi.construct_moniker (namespace="default"), "winmgmts:root/default")
+    self.assertEquals (wmi.construct_moniker (namespace="root/default"), "winmgmts:root/default")
+                
+class TestFunctions (unittest.TestCase):
+  
+  times = [
+    ((2000, 1, 1), "20000101******.******+***"),
+    ((2000, 1, 1, 10, 0, 0), "20000101100000.******+***"),
+    ((2000, 1, 1, 10, 0, 0, 100), "20000101100000.000100+***"),
+    ((2000, 1, 1, 10, 0, 0, 100, "GMT"), "20000101100000.000100+GMT")
+  ]
+  
+  def test_signed_to_unsigned (self):
+    tests = [
+      (0, 0),
+      (-1, 0xffffffff),
+      (+1, 1),
+      (sys.maxint, 0x7fffffff),
+      (-sys.maxint, 0x80000001)
+    ]
+    for signed, unsigned in tests:
+      self.assertEquals (wmi.signed_to_unsigned (signed), unsigned)
+      
+  def test_from_1601 (self):
+    "Check conversion from 100-ns intervals since 1601 (!)"
+    self.assertEquals (wmi.from_1601 (0), datetime.datetime (1601, 1, 1))
+    self.assertEquals (wmi.from_1601 (24 * 60 * 60 * 10 * 1000 * 1000), datetime.datetime (1601, 1, 2))
+    
+  def test_from_time (self):
+    "Check conversion from time-tuple to time-string"
+    for t, s in self.times:
+      self.assertEquals (wmi.from_time (*t), s)
+    
+  def test_to_time (self):
+    "Check conversion from time-string to time-tuple"
+    for t, s in self.times:
+      t = tuple (list (t) + ([None] * 8))[:8]
+      self.assertEquals (wmi.to_time (s), t)
+  
+  def test_get_wmi_type (self):
+    "Check that namespace, class & instance are identified correctly"
+    self.assertEquals (wmi.get_wmi_type (wmi.WMI ()), "namespace")
+    self.assertEquals (wmi.get_wmi_type (wmi.WMI ().Win32_ComputerSystem), "class")
+    for i in wmi.WMI ().Win32_ComputerSystem ():
+      self.assertEquals (wmi.get_wmi_type (i), "instance")
+    
+  def test_registry (self):
+    """Convenience Registry function is identical to picking 
+    the StdRegProv class out of the DEFAULT namespace"""
+    self.assertEquals (wmi.Registry (), wmi.WMI (namespace="DEFAULT").StdRegProv)
+
+class TestNamespace (unittest.TestCase):
+  
+  def setUp (self):
+    self.connection = wmi.WMI (namespace="root/cimv2")
+    self.logical_disks = set (self.connection.Win32_LogicalDisk ())
+  
+  def test_subclasses_of_simple (self):
+    self.assert_ ("Win32_ComputerSystem" in self.connection.subclasses_of ())
+
+  def test_subclasses_of_subtree (self):
+    self.assert_ ("Win32_Desktop" in self.connection.subclasses_of ("CIM_Setting"))
+  
+  def test_subclasses_of_pattern (self):
+    self.assert_ (set (["Win32_LogicalDisk", "Win32_MappedLogicalDisk"]) <= set (self.connection.subclasses_of ("CIM_LogicalDevice", "Win32_.*Disk")))
+
+  def test_instances (self):
+    self.assertEquals (self.logical_disks, set (self.connection.instances ("Win32_LogicalDisk")))
+    
+  def test_new (self):
+    "Check this is an alias for the new method of the equivalent class"
+    self.assertEquals (self.connection.new ("Win32_Process")._instance_of, self.connection.Win32_Process)
+    
+  def test_query (self):
+    self.assertEquals (self.logical_disks, set (self.connection.query ("SELECT * FROM Win32_LogicalDisk")))
 
 if __name__ == '__main__':
   unittest.main ()
