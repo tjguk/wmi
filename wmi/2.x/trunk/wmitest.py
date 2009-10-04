@@ -1,6 +1,9 @@
 import os, sys
 import datetime
 import ConfigParser
+import Queue
+import subprocess
+import threading
 import unittest
 import warnings
 
@@ -294,6 +297,31 @@ class TestClass (unittest.TestCase):
     process = self.connection.Win32_Process.new ()
     self.assertEquals (wmi.get_wmi_type (process), "instance")
     self.assertEquals (process._instance_of, self.connection.Win32_process)
+
+
+class TestWatcher (unittest.TestCase):
+  
+  def setUp (self):
+    self.connection = wmi.WMI ()
+    
+  def test_creation (self):
+    
+    def _create_notepad (queue):
+      queue.put (subprocess.Popen (["notepad.exe"]))
+    
+    watcher = self.connection.Win32_Process.watch_for (
+      notification_type="creation", 
+    )
+    q = Queue.Queue ()
+    t = threading.Timer (0.5, _create_notepad, (q,))
+    try:
+      t.start ()
+      found_process = watcher (timeout_ms=2000.0)
+      spawned_process = q.get_nowait ()
+      self.assertEqual (int (found_process.Handle), spawned_process.pid)
+      found_process.Terminate ()      
+    finally:
+      t.cancel ()
 
 if __name__ == '__main__':
   unittest.main ()
