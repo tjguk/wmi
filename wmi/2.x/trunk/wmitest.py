@@ -306,22 +306,42 @@ class TestWatcher (unittest.TestCase):
     
   def test_creation (self):
     
-    def _create_notepad (queue):
-      queue.put (subprocess.Popen (["notepad.exe"]))
+    def _create (queue):
+      queue.put (subprocess.Popen ([sys.executable, "-c", "pass"]))
     
     watcher = self.connection.Win32_Process.watch_for (
-      notification_type="creation", 
+      notification_type="creation"
     )
     q = Queue.Queue ()
-    t = threading.Timer (0.5, _create_notepad, (q,))
+    t = threading.Timer (1, _create, (q,))
     try:
       t.start ()
       found_process = watcher (timeout_ms=2000.0)
       spawned_process = q.get_nowait ()
       self.assertEqual (int (found_process.Handle), spawned_process.pid)
-      found_process.Terminate ()      
     finally:
       t.cancel ()
+
+  def test_extrinsic_event (self):
+    
+    def _create (queue):
+      queue.put (subprocess.Popen ([sys.executable, "-c", "pass"]))
+    
+    watcher = self.connection.Win32_ProcessStartTrace.watch_for (
+      fields=["*"], 
+      ProcessName=os.path.basename (sys.executable)
+    )
+    q = Queue.Queue ()
+    t = threading.Timer (0.5, _create, (q,))
+    try:
+      t.start ()
+      found_process = watcher (timeout_ms=2000.0)
+      spawned_process = q.get_nowait ()
+      self.assert_ (isinstance (found_process, wmi._wmi_event))
+      self.assertEqual (int (found_process.ProcessID), spawned_process.pid)
+    finally:
+      t.cancel ()
+      
 
 if __name__ == '__main__':
   unittest.main ()

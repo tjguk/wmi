@@ -1089,7 +1089,6 @@ class _wmi_watcher:
       if self.is_extrinsic:
         return _wmi_event (event, None, self.fields)
       else:
-        print "target-instance", event.Properties_ ("TargetInstance").Value
         return _wmi_event (
           event.Properties_ ("TargetInstance").Value,
           _wmi_object (event, property_map=self._event_property_map),
