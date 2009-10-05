@@ -184,10 +184,10 @@ class x_wmi_timed_out (x_wmi):
 
 class x_wmi_no_namespace (x_wmi):
   pass
-  
+
 class x_access_denied (x_wmi):
   pass
-  
+
 class x_wmi_authentication (x_wmi):
   pass
 
@@ -201,7 +201,7 @@ WMI_EXCEPTIONS = {
 def handle_com_error (error_info):
   """Convenience wrapper for displaying all manner of COM errors.
   Raises a x_wmi exception with more useful information attached
-  
+
   @param error_info The structure attached to a pywintypes.com_error
   """
   hresult_code, hresult_name, additional_info, parameter_in_error = error_info
@@ -231,7 +231,7 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   of the form yyyymmddHHMMSS.mmmmmm+UUU. All elements may be int, string or
   omitted altogether. If omitted, they will be replaced in the output string
   by a series of stars of the appropriate length.
-  
+
   @param year The year element of the date/time
   @param month The month element of the date/time
   @param day The day element of the date/time
@@ -240,7 +240,7 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   @param seconds The seconds element of the date/time
   @param microseconds The microseconds element of the date/time
   @param timezone The timeezone element of the date/time
-  
+
   @return A WMI datetime string of the form: yyyymmddHHMMSS.mmmmmm+UUU
   """
   def str_or_stars (i, length):
@@ -265,13 +265,13 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
 
 def to_time (wmi_time):
   """
-  Convenience wrapper to take a WMI datetime string of the form 
+  Convenience wrapper to take a WMI datetime string of the form
   yyyymmddHHMMSS.mmmmmm+UUU and return a 9-tuple containing the
   individual elements, or None where string contains placeholder
   stars.
-  
+
   @param wmi_time The WMI datetime string in yyyymmddHHMMSS.mmmmmm+UUU format
-  
+
   @return A 9-tuple of (year, month, day, hours, minutes, seconds, microseconds, timezone)
   """
   def int_or_none (s, start, end):
@@ -297,7 +297,7 @@ def _set (obj, attribute, value):
   """
   Helper function to add an attribute directly into the instance
   dictionary, bypassing possible __getattr__ calls
-  
+
   @param obj Any python object
   @param attribute String containing attribute name
   @param value Any python object
@@ -309,7 +309,7 @@ class _wmi_method:
   A currying sort of wrapper around a WMI method name. It
   abstract's the method's parameters and can be called like
   a normal Python object passing in the parameter values.
-  
+
   Output parameters are returned from the call as a tuple.
   In addition, the docstring is set up as the method's
   signature, including an indication as to whether any
@@ -366,7 +366,7 @@ class _wmi_method:
           parameter_names[name] = is_array
 
         parameters = self.in_parameters
-        
+
         #
         # Check positional parameters first
         #
@@ -434,8 +434,8 @@ class _wmi_object:
           self.properties[field] = None
       else:
         for p in ole_object.Properties_:
-          self.properties[p.Name] = None      
-      
+          self.properties[p.Name] = None
+
       for m in ole_object.Methods_:
         self.methods[m.Name] = None
 
@@ -452,7 +452,7 @@ class _wmi_object:
 
   def __lt__ (self, other):
     return self.id < other.id
-  
+
   def __str__ (self):
     """
     For a call to print [object] return the OLE description
@@ -530,16 +530,16 @@ class _wmi_object:
 
   def __eq__ (self, other):
     return self.id == other.id
-      
+
   def __hash__ (self):
     return self.id
 
   def _getAttributeNames (self):
      """Return list of methods/properties for IPython completion"""
-     attribs = [str (x) for x in self.methods.keys ()] 
+     attribs = [str (x) for x in self.methods.keys ()]
      attribs.extend ([str (x) for x in self.properties.keys ()])
      return attribs
-  
+
   def put (self):
     self.ole_object.Put_ ()
 
@@ -661,7 +661,7 @@ class _wmi_event (_wmi_object):
     _set (self, "event_type", None)
     _set (self, "timestamp", None)
     _set (self, "previous", None)
-    
+
     if event_info:
       event_type = self.event_type_re.match (event_info.Path_.Class).group (1).lower ()
       _set (self, "event_type", event_type)
@@ -946,7 +946,7 @@ class _wmi_namespace:
 
     <pre class="code">
     c = wmi.WMI ()
-    
+
     raw_wql = "SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'"
     watcher = c.watch_for (raw_wql=raw_wql)
     while 1:
@@ -954,7 +954,7 @@ class _wmi_namespace:
       print process_created.Name
 
     # or
-     
+
     watcher = c.watch_for (
       notification_type="Creation",
       wmi_class="Win32_Process",
@@ -1031,13 +1031,13 @@ class _wmi_namespace:
       handle_com_error (error_info)
 
   def __getattr__ (self, attribute):
-    """Offer WMI classes as simple attributes. Pass through any untrapped 
-    unattribute to the underlying OLE object. This means that new or 
+    """Offer WMI classes as simple attributes. Pass through any untrapped
+    unattribute to the underlying OLE object. This means that new or
     unmapped functionality is still available to the module user.
     """
     #
     # Don't try to match against known classes as was previously
-    # done since the list may not have been requested 
+    # done since the list may not have been requested
     # (find_classes=False).
     #
     try:
@@ -1223,7 +1223,7 @@ def construct_moniker (
   if privileges: security.append ("(%s)" % ", ".join (privileges))
 
   moniker = [PROTOCOL]
-  if security: moniker.append ("{%s}" % ",".join (security))
+  if security: moniker.append ("{%s}!" % ",".join (security))
   if computer: moniker.append ("//%s/" % computer)
   if namespace:
     parts = re.split (r"[/\\]", namespace)
