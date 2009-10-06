@@ -27,13 +27,13 @@ def start_doc (title):
   table.items {padding-left : 30px;}
   li, td {font-family : "Courier New", monospace;}
   td {padding-right : 1em; font-size : 84%%;}
-  h1, h2, h3 {font-family : Tahoma, sans-serif;} 
+  h1, h2, h3 {font-family : Tahoma, sans-serif;}
   h2 a {text-decoration : none;}
   </style>
   </head>
   <body>
   """ % locals ())
-  
+
 def finish_doc ():
   doc.append ("""
   </body>
@@ -43,19 +43,19 @@ def finish_doc ():
 def doc_table (items, n_cols=3):
   n_rows, n_spare_cols = divmod (len (items), n_cols)
   doc.append ('<table cellspacing=0 class="items">')
-  
+
   for n_row in range (n_rows):
     doc.append ("<tr>")
     for n_col in range (n_cols):
       doc.append ("<td><li>%s</li></td>" % items[n_cols * n_col + n_row])
     doc.append ("</tr>")
-  
+
   if n_spare_cols:
     doc.append ("<tr>")
     for n_col in reversed (range (n_spare_cols)):
       doc.append ("<td><li>%s</li></td>" % items[len (items) - 1 - n_col])
     doc.append ("</tr>")
-  
+
   doc.append ("</table>")
 
 def doc_breadcrumbs (computer, namespace, wmi_class=None):
@@ -70,7 +70,7 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
   doc_breadcrumbs (computer, namespace, wmi_class)
   doc.append ("<h2>%(wmi_class)s</h2>" % locals ())
   klass = getattr (wmi_connection, wmi_class)
-  
+
   doc.append ("<hr>")
   doc.append ("<h3>Ancestors</h3>")
   ancestors = klass.derivation ()
@@ -78,7 +78,7 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     doc.append (" <b>:</b> ".join (link (ancestor, computer, namespace, ancestor) for ancestor in reversed (ancestors)))
   else:
     doc.append ("<p>No ancestors</p>")
-    
+
   doc.append ("<hr>")
   doc.append ("<h3>Children</h3>")
   children = sorted (c.Path_.Class for c in klass._namespace.SubclassesOf (wmi_class))
@@ -89,7 +89,7 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     doc.append ('</ul>')
   else:
     doc.append ('<p>No children</p>')
-    
+
   doc.append ("<hr>")
   doc.append ("<h3>Associated classes</h3>")
   associations = sorted (klass.associated_classes)
@@ -100,7 +100,7 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     doc.append ("</ul>")
   else:
     doc.append ("<p>No associated classes</p>")
-  
+
   doc.append ("<hr>")
   doc.append ("<h3>Properties</h3>")
   properties = sorted (klass._properties)
@@ -126,7 +126,7 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     doc.append ("</ul>")
   else:
     doc.append ("<p>No keys</p>")
-  
+
   doc.append ("<hr>")
   doc.append ("<h3>Methods</h3>")
   methods = sorted (klass._methods)
@@ -137,19 +137,19 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     doc.append ("</ul>")
   else:
     doc.append ("<p>No methods</p>")
-  
+
   finish_doc ()
 
 def doc_namespace (computer, namespace, wmi_connection):
   start_doc ("WMI: Namespace %(namespace)s on %(computer)s" % locals ())
   doc_breadcrumbs (computer, namespace)
-  
+
   namespaces = namespace.split ("\\")
   namespace_links = []
   for i, n in enumerate (namespaces):
     namespace_links.append (link (n, computer, "\\".join (namespaces[:i+1])))
   doc.append ("<h2>%s</h2>" % "\\".join (namespace_links))
-  
+
   doc.append ("<hr>")
   subnamespaces = sorted (wmi_connection.__NAMESPACE ())
   doc.append ("<h3>Namespaces:</h3>")
@@ -161,7 +161,7 @@ def doc_namespace (computer, namespace, wmi_connection):
     doc.append ("</ul>")
   else:
     doc.append ("<p>No namespaces</p>")
-    
+
   doc.append ("<hr>")
   subclasses = sorted (wmi_connection.classes)
   doc.append ("<h3>Classes:</h3>")
@@ -174,15 +174,15 @@ def doc_namespace (computer, namespace, wmi_connection):
     doc.append ("<p>No classes</p>")
 
   finish_doc ()
-    
+
 def handle_namespace (environ, computer, namespace):
   if not namespace:
     wmi_connection = wmi.WMI (computer, namespace="root/cimv2")
     for setting in wmi_connection.Win32_WMISetting ():
       namespace=setting.ASPScriptDefaultNamespace
       break
-  
-  wmi_connection = wmi.WMI (computer, namespace=namespace)
+
+  wmi_connection = wmi.WMI (computer, namespace=namespace, find_classes=True)
   wmi_class = shift_path_info (environ)
   if wmi_class:
     doc_wmi_class (computer, namespace, wmi_class, wmi_connection)
