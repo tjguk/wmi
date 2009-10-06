@@ -191,11 +191,15 @@ class x_access_denied (x_wmi):
 class x_wmi_authentication (x_wmi):
   pass
 
+class x_wmi_uninitialised_thread (x_wmi):
+  pass
+
 WMI_EXCEPTIONS = {
-  wbemErrInvalidQuery : x_wmi_invalid_query,
-  wbemErrTimedout : x_wmi_timed_out,
+  signed_to_unsigned (wbemErrInvalidQuery) : x_wmi_invalid_query,
+  signed_to_unsigned (wbemErrTimedout) : x_wmi_timed_out,
   0x80070005 : x_access_denied,
   0x80041003 : x_access_denied,
+  0x800401E4 : x_wmi_uninitialised_thread,
 }
 
 def handle_com_error (error_info):
@@ -428,6 +432,8 @@ class _wmi_object:
       _set (self, "properties", {})
       _set (self, "methods", {})
       _set (self, "property_map", property_map)
+      _set (self, "_associated_classes", None)
+      _set (self, "_keys", None)
 
       if fields:
         for field in fields:
@@ -540,6 +546,22 @@ class _wmi_object:
      attribs.extend ([str (x) for x in self.properties.keys ()])
      return attribs
 
+  def get_keys (self):
+    ur"""A WMI object is uniquely defined by a set of properties
+    which constitute its keys. Lazily retrieves the keys for this
+    instance or class.
+
+    :returns: list of key property names
+    """
+    if self._keys is None:
+      _set (self, "_keys", [])
+      for property in self.ole_object.Properties_:
+        for qualifier in property.Qualifiers_:
+          if qualifier.Name == "key" and qualifier.Value:
+            self._keys.append (property.Name)
+    return self._keys
+  keys = property (get_keys)
+
   def put (self):
     self.ole_object.Put_ ()
 
@@ -594,6 +616,21 @@ class _wmi_object:
       return self.ole_object.Derivation_
     except pywintypes.com_error, error_info:
       handle_com_error (error_info)
+
+  def _cached_associated_classes (self):
+    if self._associated_classes is None:
+      if isinstance (self, _wmi_class):
+        params = {'bSchemaOnly' : True}
+      else:
+        params = {'bClassesOnly' : True}
+      try:
+        associated_classes = dict ((assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for assoc in self.ole_object.Associators_ (**params))
+        _set (self, "_associated_classes", associated_classes)
+      except pywintypes.com_error, error_info:
+        handle_com_error (error_info)
+
+    return self._associated_classes
+  associated_classes = property (_cached_associated_classes)
 
   def associators (self, wmi_association_class="", wmi_result_class=""):
     """Return a list of objects related to this one, optionally limited
@@ -1023,8 +1060,6 @@ class _wmi_namespace:
           "SELECT %s FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
           (field_list, notification_type, delay_secs, class_name, where)
 
-      if _DEBUG: print wql
-
     try:
       return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic, fields=fields)
     except pywintypes.com_error, error_info:
@@ -1095,11 +1130,6 @@ class _wmi_watcher:
           self.fields
         )
     except pywintypes.com_error, error_info:
-      hresult_code, hresult_name, additional_info, parameter_in_error = error_info
-      if additional_info:
-        wcode, source_of_error, error_description, whlp_file, whlp_context, scode = additional_info
-        if scode == wbemErrTimedout:
-          raise x_wmi_timed_out
       handle_com_error (error_info)
 
 PROTOCOL = "winmgmts:"
@@ -1151,67 +1181,71 @@ def connect (
   _DEBUG = debug
 
   try:
-    if wmi:
-      obj = wmi
+    try:
+      if wmi:
+        obj = wmi
 
-    elif moniker:
-      if not moniker.startswith (PROTOCOL):
-        moniker = PROTOCOL + moniker
-      if _DEBUG: print moniker
-      obj = GetObject (moniker)
-
-    else:
-      if user:
-        if impersonation_level or authentication_level or privileges or suffix:
-          raise x_wmi_authentication ("You can't specify an impersonation, authentication or privilege as well as a username")
-        elif not computer:
-          raise x_wmi_authentication ("You can only specify user/password for a remote connection")
-        else:
-          obj = connect_server (
-            server=computer,
-            namespace=namespace,
-            user=user,
-            password=password,
-            authority=authority
-          )
-
-      else:
-        moniker = construct_moniker (
-          computer=computer,
-          impersonation_level=impersonation_level,
-          authentication_level=authentication_level,
-          authority=authority,
-          privileges=privileges,
-          namespace=namespace,
-          suffix=suffix
-        )
+      elif moniker:
+        if not moniker.startswith (PROTOCOL):
+          moniker = PROTOCOL + moniker
         if _DEBUG: print moniker
         obj = GetObject (moniker)
 
-    wmi_type = get_wmi_type (obj)
+      else:
+        if user:
+          if impersonation_level or authentication_level or privileges or suffix:
+            raise x_wmi_authentication ("You can't specify an impersonation, authentication or privilege as well as a username")
+          elif computer in (None, '', '.'):
+            raise x_wmi_authentication ("You can only specify user/password for a remote connection")
+          else:
+            obj = connect_server (
+              server=computer,
+              namespace=namespace,
+              user=user,
+              password=password,
+              authority=authority
+            )
 
-    if wmi_type == "namespace":
-      return _wmi_namespace (obj, find_classes)
-    elif wmi_type == "class":
-      return _wmi_class (None, obj)
-    elif wmi_type == "instance":
-      return _wmi_object (obj)
-    else:
-      raise x_wmi, "Unknown moniker type"
+        else:
+          moniker = construct_moniker (
+            computer=computer,
+            impersonation_level=impersonation_level,
+            authentication_level=authentication_level,
+            authority=authority,
+            privileges=privileges,
+            namespace=namespace,
+            suffix=suffix
+          )
+          if _DEBUG: print moniker
+          obj = GetObject (moniker)
 
-  except pywintypes.com_error, error_info:
-    handle_com_error (error_info)
+      wmi_type = get_wmi_type (obj)
+
+      if wmi_type == "namespace":
+        return _wmi_namespace (obj, find_classes)
+      elif wmi_type == "class":
+        return _wmi_class (None, obj)
+      elif wmi_type == "instance":
+        return _wmi_object (obj)
+      else:
+        raise x_wmi, "Unknown moniker type"
+
+    except pywintypes.com_error, error_info:
+      handle_com_error (error_info)
+
+  except x_wmi_uninitialised_thread:
+    raise x_wmi_uninitialised_thread ("WMI returned a syntax error: you're probably running inside a thread without first calling pythoncom.CoInitialize[Ex]")
 
 WMI = connect
 
 def construct_moniker (
-    computer=None,
-    impersonation_level=None,
-    authentication_level=None,
-    authority=None,
-    privileges=None,
-    namespace=None,
-    suffix=None
+  computer=None,
+  impersonation_level=None,
+  authentication_level=None,
+  authority=None,
+  privileges=None,
+  namespace=None,
+  suffix=None
 ):
   security = []
   if impersonation_level: security.append ("impersonationLevel=%s" % impersonation_level)
