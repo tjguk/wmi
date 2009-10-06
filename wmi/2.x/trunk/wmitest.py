@@ -17,11 +17,13 @@ if ini.has_section ("settings"):
 excludes = [i.strip () for i in settings.get ("excludes", "").split (",")]
 
 COMPUTERS = [None, "."]
-if not "remote_connection" in excludes:
-  COMPUTERS.append (settings['remote'])
+if "machine" in settings:
+  COMPUTERS.append (settings['machine'])
 IMPERSONATION_LEVELS = [None, "identify", "impersonate", "delegate"]
 AUTHENTICATION_LEVELS = [None, "default", "none", "connect", "call", "pkt", "pktintegrity", "pktprivacy"]
-AUTHORITIES = [None, "ntlmdomain:%s" % settings['domain']]
+AUTHORITIES = [None]
+if set (["domain", "machine"]) <= set (settings):
+  AUTHORITIES.append (["ntlmdomain:%s" % settings['domain']])
 PRIVILEGES = [None, ['security', '!shutdown']]
 NAMESPACES = [None, "root/cimv2", "default"]
 
@@ -33,13 +35,10 @@ class TestBasicConnections (unittest.TestCase):
 
   def test_remote_connection (self):
     "Check that a remote connection works, if specified"
-    if "remote_connection" in excludes:
-      warnings.warn ("Skipping test_remote_connection")
+    if "machine" in settings:
+      self.assert_ (wmi.WMI (settings['machine']))
     else:
-      if "remote" in settings:
-        self.assert_ (wmi.WMI (settings['remote']))
-      else:
-        raise RuntimeError ("No value for settings.remote")
+      warnings.warn ("Skipping test_remote_connection")
 
   def test_simple_moniker (self):
     "Check that a simple moniker works"
@@ -75,11 +74,8 @@ class TestBasicConnections (unittest.TestCase):
 
   def test_authority (self):
     "Check that specifying an authority works"
-    if "authority" in excludes:
-      warnings.warn ("Skipping test_authority")
-    else:
-      for authority in AUTHORITIES:
-        self.assert_ (wmi.WMI (authority=authority))
+    for authority in AUTHORITIES:
+      self.assert_ (wmi.WMI (authority=authority))
 
   def test_privileges (self):
     "Check that specifying privileges works"
@@ -97,10 +93,10 @@ class TestBasicConnections (unittest.TestCase):
 
   def test_user_password (self):
     "Check that username & password are passed through for a remote connection"
-    if "remote_connection" in excludes:
-      warnings.warn ("Skipping test_user_password because remote_connection excluded")
+    if set (["machine", "user", "password"]) <= set (settings):
+      self.assert_ (wmi.WMI (computer=settings['machine'], user=settings['user'], password=settings['password']))
     else:
-      self.assert_ (wmi.WMI (computer=settings['remote'], user=settings['user'], password=settings['password']))
+      warnings.warn ("Skipping test_user_password because not machine, user or password")
 
   def test_too_much_authentication (self):
     "Check that user/password plus any other authentication raises exception"
@@ -128,17 +124,11 @@ class TestMoniker (unittest.TestCase):
     """Look at all possible options for moniker construction and pass
     them through to a WMI connector
     """
-    if "authority" in excludes:
-      warnings.warn ("Skipping authorities in test_moniker")
-      authorities = [None]
-    else:
-      authorities = AUTHORITIES
-
     for computer in COMPUTERS:
       if computer in (None, "."):
         local_authorities = [None]
       else:
-        local_authorities = authorities
+        local_authorities = AUTHORITIES
       for impersonation_level in IMPERSONATION_LEVELS:
         for authentication_level in AUTHENTICATION_LEVELS:
           for authority in local_authorities:
@@ -151,7 +141,6 @@ class TestMoniker (unittest.TestCase):
                   privileges=privileges,
                   namespace=namespace
                 )
-                print moniker
                 self.assert_ (wmi.WMI (moniker=moniker), "Moniker failed: %s" % moniker)
 
   def test_moniker_root_namespace (self):
@@ -322,6 +311,7 @@ class TestWatcher (unittest.TestCase):
     try:
       t.start ()
       found_process = watcher (timeout_ms=2000.0)
+      self.assert_ (isinstance (found_process, wmi._wmi_object))
       spawned_process = q.get_nowait ()
       self.assertEqual (int (found_process.Handle), spawned_process.pid)
     finally:
