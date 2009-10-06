@@ -133,7 +133,7 @@ from win32com.client import GetObject, Dispatch
 import pywintypes
 
 def signed_to_unsigned (signed):
-  ur"""Convert a (possibly signed) long to unsigned hex"""
+  """Convert a (possibly signed) long to unsigned hex"""
   unsigned, = struct.unpack ("L", struct.pack ("l", signed))
   return unsigned
 
@@ -154,12 +154,12 @@ class ProvideConstants (object):
 
   def __getattr__(self, name):
     if name.startswith("__") and name.endswith("__"):
-     raise AttributeError, name
+     raise AttributeError (name)
     result = self.__typecomp.Bind(name)
     # Bind returns a 2-tuple, first item is TYPEKIND,
     # the second item has the value
     if not result[0]:
-     raise AttributeError, name
+     raise AttributeError (name)
     return result[1].value
 
 obj = GetObject ("winmgmts:")
@@ -202,13 +202,15 @@ WMI_EXCEPTIONS = {
   0x800401E4 : x_wmi_uninitialised_thread,
 }
 
-def handle_com_error (error_info):
+def handle_com_error (err=None):
   """Convenience wrapper for displaying all manner of COM errors.
   Raises a x_wmi exception with more useful information attached
 
   @param error_info The structure attached to a pywintypes.com_error
   """
-  hresult_code, hresult_name, additional_info, parameter_in_error = error_info
+  if err is None:
+    _, err, _ = sys.exc_info ()
+  hresult_code, hresult_name, additional_info, parameter_in_error = err.args
   hresult_code = signed_to_unsigned (hresult_code)
   exception_string = ["%s - %s" % (hex (hresult_code), hresult_name)]
   scode = None
@@ -354,8 +356,8 @@ class _wmi_method:
       if privileges:
         doc += " | Needs: " + ", ".join (privileges)
       self.__doc__ = doc
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __call__ (self, *args, **kwargs):
     """
@@ -379,7 +381,7 @@ class _wmi_method:
           parameter = parameters.Properties_[n_arg]
           if parameter.IsArray:
             try: list (arg)
-            except TypeError: raise TypeError, "parameter %d must be iterable" % n_arg
+            except TypeError: raise TypeError ("parameter %d must be iterable" % n_arg)
           parameter.Value = arg
 
         #
@@ -389,11 +391,11 @@ class _wmi_method:
         for k, v in kwargs.items ():
           is_array = parameter_names.get (k)
           if is_array is None:
-            raise AttributeError, "%s is not a valid parameter for %s" % (k, self.__doc__)
+            raise AttributeError ("%s is not a valid parameter for %s" % (k, self.__doc__))
           else:
             if is_array:
               try: list (v)
-              except TypeError: raise TypeError, "%s must be iterable" % k
+              except TypeError: raise TypeError ("%s must be iterable" % k)
           parameters.Properties_ (k).Value = v
 
         result = self.ole_object.ExecMethod_ (self.method.Name, self.in_parameters)
@@ -412,8 +414,8 @@ class _wmi_method:
           results.append (value)
       return tuple (results)
 
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __repr__ (self):
     return "<function %s>" % self.__doc__
@@ -451,10 +453,10 @@ class _wmi_object:
       _set (self, "qualifiers", {})
       for q in self.ole_object.Qualifiers_:
         self.qualifiers[q.Name] = q.Value
-      _set (self, "is_association", self.qualifiers.has_key ("Association"))
+      _set (self, "is_association", "Association" in self.qualifiers)
 
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __lt__ (self, other):
     return self.id < other.id
@@ -466,8 +468,8 @@ class _wmi_object:
     """
     try:
       return self.ole_object.GetObjectText_ ()
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __repr__ (self):
     """
@@ -476,8 +478,8 @@ class _wmi_object:
     """
     try:
       return "<%s: %s>" % (self.__class__.__name__, str (self.Path_.Path))
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def _cached_properties (self, attribute):
     if self.properties[attribute] is None:
@@ -498,7 +500,7 @@ class _wmi_object:
     on to the underlying object.
     """
     try:
-      if self.properties.has_key (attribute):
+      if attribute in self.properties:
         factory = self.property_map.get (attribute, lambda x: x)
         value = factory (self._cached_properties (attribute).Value)
         #
@@ -511,12 +513,12 @@ class _wmi_object:
           return WMI (moniker=value)
         else:
           return value
-      elif self.methods.has_key (attribute):
+      elif attribute in self.methods:
         return self._cached_methods (attribute)
       else:
         return getattr (self.ole_object, attribute)
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __setattr__ (self, attribute, value):
     """
@@ -525,14 +527,14 @@ class _wmi_object:
     raise an exception.
     """
     try:
-      if self.properties.has_key (attribute):
+      if attribute in self.properties:
         self._cached_properties (attribute).Value = value
         if self.ole_object.Path_.Path:
           self.ole_object.Put_ ()
       else:
-        raise AttributeError, attribute
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+        raise AttributeError (attribute)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __eq__ (self, other):
     return self.id == other.id
@@ -547,7 +549,7 @@ class _wmi_object:
      return attribs
 
   def get_keys (self):
-    ur"""A WMI object is uniquely defined by a set of properties
+    """A WMI object is uniquely defined by a set of properties
     which constitute its keys. Lazily retrieves the keys for this
     instance or class.
 
@@ -577,18 +579,18 @@ class _wmi_object:
     if kwargs:
       try:
         for attribute, value in kwargs.items ():
-          if self.properties.has_key (attribute):
+          if attribute in self.properties:
             self._cached_properties (attribute).Value = value
           else:
-            raise AttributeError, attribute
+            raise AttributeError (attribute)
         #
         # Only try to write the attributes
         #  back if the object exists.
         #
         if self.ole_object.Path_.Path:
           self.ole_object.Put_ ()
-      except pywintypes.com_error, error_info:
-        handle_com_error (error_info)
+      except pywintypes.com_error:
+        handle_com_error ()
 
   def path (self):
     """
@@ -602,8 +604,8 @@ class _wmi_object:
     """
     try:
       return self.ole_object.Path_
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def derivation (self):
     """Return a tuple representing the object derivation for
@@ -614,8 +616,8 @@ class _wmi_object:
     """
     try:
       return self.ole_object.Derivation_
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def _cached_associated_classes (self):
     if self._associated_classes is None:
@@ -626,8 +628,8 @@ class _wmi_object:
       try:
         associated_classes = dict ((assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for assoc in self.ole_object.Associators_ (**params))
         _set (self, "_associated_classes", associated_classes)
-      except pywintypes.com_error, error_info:
-        handle_com_error (error_info)
+      except pywintypes.com_error:
+        handle_com_error ()
 
     return self._associated_classes
   associated_classes = property (_cached_associated_classes)
@@ -657,8 +659,8 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
            strResultClass=wmi_result_class
          )
       ]
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def references (self, wmi_class=""):
     """Return a list of associations involving this object, optionally
@@ -681,8 +683,8 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
     """
     try:
       return [_wmi_object (i) for i in self.ole_object.References_ (strResultClass=wmi_class)]
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
 #
 # class _wmi_event
@@ -751,8 +753,8 @@ class _wmi_class (_wmi_object):
       if where_clause:
         wql += " WHERE " + " AND ". join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])
       return self._namespace.query (wql, self, fields)
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   __call__ = query
 
@@ -779,8 +781,8 @@ class _wmi_class (_wmi_object):
     """
     try:
       return [_wmi_object (instance, self) for instance in self.Instances_ ()]
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def new (self, **kwargs):
     """This is the equivalent to the raw-WMI SpawnInstance_
@@ -818,8 +820,8 @@ class _wmi_class (_wmi_object):
       obj = _wmi_object (self.SpawnInstance_ (), self)
       obj.set (**kwargs)
       return obj
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
 #
 # class _wmi_result
@@ -885,8 +887,8 @@ class _wmi_namespace:
   def get (self, moniker):
     try:
       return _wmi_object (self.wmi.Get (moniker))
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def handle (self):
     """The raw OLE object representing the WMI namespace"""
@@ -912,8 +914,8 @@ class _wmi_namespace:
     """
     try:
       return [_wmi_object (obj) for obj in self._namespace.InstancesOf (class_name)]
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def new (self, wmi_class, **kwargs):
     """This is now implemented by a call to _wmi_class.new (qv)"""
@@ -930,11 +932,10 @@ class _wmi_namespace:
     """
     flags = wbemFlagReturnImmediately | wbemFlagForwardOnly
     wql = wql.replace ("\\", "\\\\")
-    if _DEBUG: print "_raw_query(wql):", wql
     try:
       return self._namespace.ExecQuery (strQuery=wql, iFlags=flags)
-    except pywintypes.com_error, (hresult, hresult_text, additional, param_in_error):
-      raise WMI_EXCEPTIONS.get (hresult, x_wmi (hresult))
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def query (self, wql, instance_of=None, fields=[]):
     """Perform an arbitrary query against a WMI object, and return
@@ -1062,8 +1063,8 @@ class _wmi_namespace:
 
     try:
       return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic, fields=fields)
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   def __getattr__ (self, attribute):
     """Offer WMI classes as simple attributes. Pass through any untrapped
@@ -1077,10 +1078,10 @@ class _wmi_namespace:
     #
     try:
       return self._cached_classes (attribute)
-    except pywintypes.com_error, error_info:
+    except pywintypes.com_error:
       try:
         return self._cached_classes ("Win32_" + attribute)
-      except pywintypes.com_error, error_info:
+      except pywintypes.com_error:
         return getattr (self._namespace, attribute)
 
   def _cached_classes (self, class_name):
@@ -1129,8 +1130,8 @@ class _wmi_watcher:
           _wmi_object (event, property_map=self._event_property_map),
           self.fields
         )
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
 PROTOCOL = "winmgmts:"
 def connect (
@@ -1188,7 +1189,6 @@ def connect (
       elif moniker:
         if not moniker.startswith (PROTOCOL):
           moniker = PROTOCOL + moniker
-        if _DEBUG: print moniker
         obj = GetObject (moniker)
 
       else:
@@ -1216,7 +1216,6 @@ def connect (
             namespace=namespace,
             suffix=suffix
           )
-          if _DEBUG: print moniker
           obj = GetObject (moniker)
 
       wmi_type = get_wmi_type (obj)
@@ -1228,10 +1227,10 @@ def connect (
       elif wmi_type == "instance":
         return _wmi_object (obj)
       else:
-        raise x_wmi, "Unknown moniker type"
+        raise x_wmi ("Unknown moniker type")
 
-    except pywintypes.com_error, error_info:
-      handle_com_error (error_info)
+    except pywintypes.com_error:
+      handle_com_error ()
 
   except x_wmi_uninitialised_thread:
     raise x_wmi_uninitialised_thread ("WMI returned a syntax error: you're probably running inside a thread without first calling pythoncom.CoInitialize[Ex]")
@@ -1303,16 +1302,6 @@ def connect_server (
   c = wmi.WMI (wmi=wmi.connect_server (server="remote_machine", user="myname", password="mypassword"))
   </pre>
   """
-  if _DEBUG:
-    print server
-    print namespace
-    print user
-    print password
-    print locale
-    print authority
-    print security_flags
-    print named_value_set
-
   return Dispatch ("WbemScripting.SWbemLocator").\
     ConnectServer (
       server,
@@ -1348,8 +1337,8 @@ def Registry (
   try:
     return _wmi_object (GetObject (moniker))
 
-  except pywintypes.com_error, error_info:
-    handle_com_error (error_info)
+  except pywintypes.com_error:
+    handle_com_error ()
 
 #
 # Typical use test
@@ -1357,7 +1346,7 @@ def Registry (
 if __name__ == '__main__':
   system = WMI ()
   for my_computer in system.Win32_ComputerSystem ():
-    print "Disks on", my_computer.Name
+    print ("Disks on", my_computer.Name)
     for disk in system.Win32_LogicalDisk ():
-      print disk.Caption, disk.Description, disk.ProviderName or ""
+      print (disk.Caption, disk.Description, disk.ProviderName or "")
 

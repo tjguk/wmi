@@ -1,7 +1,13 @@
 import os, sys
 import datetime
-import ConfigParser
-import Queue
+try:
+  import ConfigParser
+except ImportError:
+  import configparser as ConfigParser
+try:
+  import Queue
+except ImportError:
+  import queue as Queue
 import subprocess
 import threading
 import unittest
@@ -162,8 +168,8 @@ class TestFunctions (unittest.TestCase):
       (0, 0),
       (-1, 0xffffffff),
       (+1, 1),
-      (sys.maxint, 0x7fffffff),
-      (-sys.maxint, 0x80000001)
+      (0x7fffffff, 0x7fffffff),
+      (-0x7fffffff, 0x80000001)
     ]
     for signed, unsigned in tests:
       self.assertEquals (wmi.signed_to_unsigned (signed), unsigned)
