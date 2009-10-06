@@ -29,7 +29,8 @@ IMPERSONATION_LEVELS = [None, "identify", "impersonate", "delegate"]
 AUTHENTICATION_LEVELS = [None, "default", "none", "connect", "call", "pkt", "pktintegrity", "pktprivacy"]
 AUTHORITIES = [None]
 if set (["domain", "machine"]) <= set (settings):
-  AUTHORITIES.append (["ntlmdomain:%s" % settings['domain']])
+  #~ AUTHORITIES.append ("kerberos:%s" % settings['domain'])
+  AUTHORITIES.append ("ntlmdomain:%s" % settings['domain'])
 PRIVILEGES = [None, ['security', '!shutdown']]
 NAMESPACES = [None, "root/cimv2", "default"]
 

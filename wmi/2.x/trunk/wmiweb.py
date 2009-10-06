@@ -1,10 +1,18 @@
 from cgi import escape
 import threading
-from urllib import quote
+try:
+  from urllib import quote
+except ImportError:
+  from urllib.parse import quote
 from wsgiref.simple_server import make_server
 from wsgiref.util import request_uri, application_uri, shift_path_info
 
 import wmi
+
+try:
+  unicode
+except NameError:
+  unicode = str
 
 doc = []
 
@@ -200,7 +208,7 @@ def app (environ, start_response):
   elif computer:
     start_response ("200 OK", [("Content-Type", "text/html; charset=utf-8")])
     handle_computer (environ, computer)
-    return (unicode (d).encode ("utf8") + "\n" for d in doc)
+    return (unicode (d).encode ("utf8") + unicode ("\n").encode ("utf8") for d in doc)
   else:
     start_response ("301 Moved Permanently", [("Location", "/localhost"), ("Content-Type", "text/plain")])
     return ["Redirected to /localhost"]
@@ -217,4 +225,4 @@ if __name__ == '__main__':
   try:
     httpd.serve_forever ()
   except KeyboardInterrupt:
-    print "Shutting down gracefully..."
+    print ("Shutting down gracefully...")
