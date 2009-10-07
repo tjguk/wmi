@@ -16,7 +16,7 @@ import warnings
 import wmi
 
 ini = ConfigParser.SafeConfigParser ()
-ini.read ("wmitest.ini")
+ini.read (["wmitest.master.ini", "wmitest.ini"])
 settings = {}
 if ini.has_section ("settings"):
   settings.update (ini.items ("settings"))
