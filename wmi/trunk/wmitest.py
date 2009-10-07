@@ -9,9 +9,14 @@ try:
 except ImportError:
   import queue as Queue
 import subprocess
+import tempfile
 import threading
+import time
 import unittest
+import uuid
 import warnings
+import win32api
+import win32file
 
 import wmi
 
@@ -307,20 +312,34 @@ class TestWatcher (unittest.TestCase):
 
   def test_creation (self):
 
-    def _create (queue):
-      queue.put (subprocess.Popen ([sys.executable, "-c", "pass"]))
+    def _create (new_letter):
+      here = os.path.dirname (os.path.abspath (__file__))
+      win32file.DefineDosDevice (0, new_letter, here)
+      #
+      # This sleep is needed for the WMI pollster to react
+      #
+      time.sleep (2)
+      win32file.DefineDosDevice (2, new_letter, here)
 
-    watcher = self.connection.Win32_Process.watch_for (
-      notification_type="creation"
+    try:
+      new_letter = \
+        set ("%s:" % chr (i) for i in range (ord ('A'), 1 + ord ('Z'))).\
+        difference (d.DeviceID for d in self.connection.Win32_LogicalDisk ()).\
+        pop ()
+    except KeyError:
+      warnings.warn ("Unable to find a spare drive letter to map.")
+      return
+
+    watcher = self.connection.Win32_LogicalDisk.watch_for (
+      notification_type="Creation",
+      DeviceID=new_letter
     )
-    q = Queue.Queue ()
-    t = threading.Timer (2, _create, (q,))
+    t = threading.Timer (2, _create, (new_letter,))
     try:
       t.start ()
-      found_process = watcher (timeout_ms=5000.0)
-      self.assert_ (isinstance (found_process, wmi._wmi_object))
-      spawned_process = q.get_nowait ()
-      self.assertEqual (int (found_process.Handle), spawned_process.pid)
+      found_disk = watcher (timeout_ms=20000)
+      self.assert_ (isinstance (found_disk, wmi._wmi_object))
+      self.assertEqual (found_disk.Caption, new_letter)
     finally:
       t.cancel ()
 
@@ -338,17 +357,17 @@ class TestWatcher (unittest.TestCase):
     #
 
     def _create (queue):
-      queue.put (subprocess.Popen ([sys.executable, "-c", "pass"]))
+      queue.put (subprocess.Popen ([sys.executable, "-c", "import time; time.sleep (10)"]))
 
     watcher = self.connection.Win32_ProcessStartTrace.watch_for (
-      fields=["*"],
-      ProcessName=os.path.basename (sys.executable)
+      fields=["*"]##,
+      #~ ProcessName=os.path.basename (sys.executable)
     )
     q = Queue.Queue ()
     t = threading.Timer (2, _create, (q,))
     try:
       t.start ()
-      found_process = watcher (timeout_ms=5000.0)
+      found_process = watcher (timeout_ms=20000)
       spawned_process = q.get_nowait ()
       self.assert_ (isinstance (found_process, wmi._wmi_event))
       self.assertEqual (int (found_process.ProcessID), spawned_process.pid)
