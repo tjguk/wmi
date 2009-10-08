@@ -13,7 +13,6 @@ import tempfile
 import threading
 import time
 import unittest
-import uuid
 import warnings
 
 import pythoncom
@@ -433,7 +432,7 @@ class TestMethods (TestWMI):
   def test_positional_params (self):
     dir = tempfile.mkdtemp ()
     filename = "abc.txt"
-    contents = str (uuid.uuid1 ())
+    contents = str (datetime.datetime.now ())
     handle, result = self.connection.Win32_Process.Create ("cmd /c echo %s > %s" % (contents, filename), dir)
     time.sleep (0.5)
     self.assertEqual (open (os.path.join (dir, filename)).read (), contents + " \n")
@@ -441,7 +440,7 @@ class TestMethods (TestWMI):
   def test_named_params (self):
     dir = tempfile.mkdtemp ()
     filename = "abc.txt"
-    contents = str (uuid.uuid1 ())
+    contents = str (datetime.datetime.now ())
     handle, result = self.connection.Win32_Process.Create (CurrentDirectory=dir, CommandLine="cmd /c echo %s > %s" % (contents, filename))
     time.sleep (0.5)
     self.assertEqual (open (os.path.join (dir, filename)).read (), contents + " \n")
