@@ -15,6 +15,8 @@ import time
 import unittest
 import uuid
 import warnings
+
+import pythoncom
 import win32api
 import win32file
 
@@ -130,6 +132,41 @@ class TestBasicConnections (unittest.TestCase):
     "By default, don't scan for classes"
     self.assertFalse (wmi.WMI ().classes)
 
+class TestThreadedConnection (unittest.TestCase):
+
+
+  def test_initialised_thread (self):
+    def f (q):
+      pythoncom.CoInitialize ()
+      try:
+        try:
+          wmi.WMI ()
+        except:
+          q.put (False)
+        else:
+          q.put (True)
+      finally:
+        pythoncom.CoUninitialize ()
+
+    q = Queue.Queue ()
+    threading.Thread (target=f, args=(q,)).start ()
+    self.assert_ (q.get ())
+
+  def test_uninitialised_thread (self):
+    def f (q):
+      try:
+        wmi.WMI ()
+      except wmi.x_wmi_uninitialised_thread:
+        q.put (True)
+      except:
+        q.put (False)
+      else:
+        q.put (False)
+
+    q = Queue.Queue ()
+    threading.Thread (target=f, args=(q,)).start ()
+    self.assert_ (q.get ())
+
 class TestMoniker (unittest.TestCase):
 
   def test_moniker (self):
@@ -208,11 +245,13 @@ class TestFunctions (unittest.TestCase):
     the StdRegProv class out of the DEFAULT namespace"""
     self.assertEquals (wmi.Registry (), wmi.WMI (namespace="DEFAULT").StdRegProv)
 
-class TestNamespace (unittest.TestCase):
+class TestWMI (unittest.TestCase):
 
   def setUp (self):
     self.connection = wmi.WMI (namespace="root/cimv2", find_classes=False)
     self.logical_disks = set (self.connection.Win32_LogicalDisk ())
+
+class TestNamespace (TestWMI):
 
   def test_subclasses_of_simple (self):
     self.assert_ ("Win32_ComputerSystem" in self.connection.subclasses_of ())
@@ -254,10 +293,7 @@ class TestNamespace (unittest.TestCase):
     )
     self.assert_ (isinstance (watcher, wmi._wmi_watcher))
 
-class TestClass (unittest.TestCase):
-
-  def setUp (self):
-    self.connection = wmi.WMI (namespace="root/cimv2", find_classes=False)
+class TestClass (TestWMI):
 
   def test_class_from_namespace (self):
     self.assert_ (self.connection.Win32_ComputerSystem._namespace is self.connection)
@@ -305,10 +341,7 @@ class TestClass (unittest.TestCase):
     self.assertEquals (process._instance_of, self.connection.Win32_process)
 
 
-class TestWatcher (unittest.TestCase):
-
-  def setUp (self):
-    self.connection = wmi.WMI ()
+class TestWatcher (TestWMI):
 
   def test_creation (self):
 
@@ -374,6 +407,58 @@ class TestWatcher (unittest.TestCase):
     finally:
       t.cancel ()
 
+class TestMethods (TestWMI):
+
+  def test_exists (self):
+    "Check that a well-known method is available by attribute"
+    self.assert_ (self.connection.Win32_Process.Create)
+
+  def test_params (self):
+    "Check that the names and arrayness of params are picked up when not arrays"
+    self.assertEquals (
+      [(n, False) for n in ["CommandLine", "CurrentDirectory", "ProcessStartupInformation"]],
+      self.connection.Win32_Process.Create.in_parameter_names
+    )
+    self.assertEquals (
+      [("ProcessId", False), ("ReturnValue", False)],
+      self.connection.Win32_Process.Create.out_parameter_names
+    )
+
+  def test_in_params_with_array (self):
+    "Check that the names and arrayness of params are picked up when arrays"
+    self.assertEquals (
+      [("DNSServerSearchOrder", True)],
+      self.connection.Win32_NetworkAdapterConfiguration.SetDNSServerSearchOrder.in_parameter_names
+    )
+
+  def test_instance_methods_are_distinct (self):
+    """Check that the methods of difference instances of a class are distinct.
+    This caused a problem when calling .Terminate on one process killed another.
+    """
+    methods = [d.Reset for d in self.logical_disks]
+    for i in range (len (methods)-1):
+      self.assertNotEqual (methods[i], methods[i+1])
+
+  def test_call_from_class (self):
+    "Check that a method can be called from a class"
+    self.assert_ (self.connection.Win32_Process.Create (CommandLine=sys.executable + " -c pass"))
+
+  def test_call_from_instance (self):
+    "Check that a method can be called from an instance"
+    handle, _ = self.connection.Win32_Process.Create (CommandLine=sys.executable)
+    result = 1
+    for p in self.connection.Win32_Process (Handle=handle):
+      result, = p.Terminate ()
+    self.assertEqual (result, 0)
+
+class TestProperties (TestWMI):
+
+  def test_access (self):
+    "Check that all properties are available as attributes"
+    for d in self.logical_disks:
+      break
+    for p in d.ole_object.Properties_:
+      self.assertEqual (p.Value, getattr (d, p.Name))
 
 if __name__ == '__main__':
   unittest.main ()

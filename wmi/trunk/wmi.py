@@ -1061,7 +1061,6 @@ class _wmi_namespace:
           "SELECT %s FROM __Instance%sEvent WITHIN %d WHERE TargetInstance ISA '%s' %s" % \
           (field_list, notification_type, delay_secs, class_name, where)
 
-    print wql
     try:
       return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic, fields=fields)
     except pywintypes.com_error:
