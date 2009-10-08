@@ -626,7 +626,10 @@ class _wmi_object:
       else:
         params = {'bClassesOnly' : True}
       try:
-        associated_classes = dict ((assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for assoc in self.ole_object.Associators_ (**params))
+        associated_classes = dict (
+          (assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for \
+            assoc in self.ole_object.Associators_ (**params)
+        )
         _set (self, "_associated_classes", associated_classes)
       except pywintypes.com_error:
         handle_com_error ()
@@ -1062,7 +1065,11 @@ class _wmi_namespace:
           (field_list, notification_type, delay_secs, class_name, where)
 
     try:
-      return _wmi_watcher (self._namespace.ExecNotificationQuery (wql), is_extrinsic=is_extrinsic, fields=fields)
+      return _wmi_watcher (
+        self._namespace.ExecNotificationQuery (wql),
+        is_extrinsic=is_extrinsic,
+        fields=fields
+      )
     except pywintypes.com_error:
       handle_com_error ()
 

@@ -136,6 +136,9 @@ class TestThreadedConnection (unittest.TestCase):
 
 
   def test_initialised_thread (self):
+    """A WMI connection in a thread which has been initialised for COM
+    should succeed.
+    """
     def f (q):
       pythoncom.CoInitialize ()
       try:
@@ -153,6 +156,9 @@ class TestThreadedConnection (unittest.TestCase):
     self.assert_ (q.get ())
 
   def test_uninitialised_thread (self):
+    """A WMI connection in a thread which has not been initialised
+    for COM should fail with a wmi-specific exception.
+    """
     def f (q):
       try:
         wmi.WMI ()
@@ -423,6 +429,22 @@ class TestMethods (TestWMI):
       [("ProcessId", False), ("ReturnValue", False)],
       self.connection.Win32_Process.Create.out_parameter_names
     )
+
+  def test_positional_params (self):
+    dir = tempfile.mkdtemp ()
+    filename = "abc.txt"
+    contents = str (uuid.uuid1 ())
+    handle, result = self.connection.Win32_Process.Create ("cmd /c echo %s > %s" % (contents, filename), dir)
+    time.sleep (0.5)
+    self.assertEqual (open (os.path.join (dir, filename)).read (), contents + " \n")
+
+  def test_named_params (self):
+    dir = tempfile.mkdtemp ()
+    filename = "abc.txt"
+    contents = str (uuid.uuid1 ())
+    handle, result = self.connection.Win32_Process.Create (CurrentDirectory=dir, CommandLine="cmd /c echo %s > %s" % (contents, filename))
+    time.sleep (0.5)
+    self.assertEqual (open (os.path.join (dir, filename)).read (), contents + " \n")
 
   def test_in_params_with_array (self):
     "Check that the names and arrayness of params are picked up when arrays"
