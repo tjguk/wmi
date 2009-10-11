@@ -4,10 +4,15 @@ try:
   import ConfigParser
 except ImportError:
   import configparser as ConfigParser
+import operator
 try:
   import Queue
 except ImportError:
   import queue as Queue
+try:
+  next
+except NameError:
+  def next (iterator): return iterator.next ()
 import subprocess
 import tempfile
 import threading
@@ -353,11 +358,13 @@ class TestWatcher (TestWMI):
     def _create (new_letter):
       here = os.path.dirname (os.path.abspath (__file__))
       win32file.DefineDosDevice (0, new_letter, here)
-      #
-      # This sleep is needed for the WMI pollster to react
-      #
-      time.sleep (2)
-      win32file.DefineDosDevice (2, new_letter, here)
+      try:
+        #
+        # This sleep is needed for the WMI pollster to react
+        #
+        time.sleep (2)
+      finally:
+        win32file.DefineDosDevice (2, new_letter, here)
 
     try:
       new_letter = \
@@ -372,14 +379,10 @@ class TestWatcher (TestWMI):
       notification_type="Creation",
       DeviceID=new_letter
     )
-    t = threading.Timer (2, _create, (new_letter,))
-    try:
-      t.start ()
-      found_disk = watcher (timeout_ms=20000)
-      self.assert_ (isinstance (found_disk, wmi._wmi_object))
-      self.assertEqual (found_disk.Caption, new_letter)
-    finally:
-      t.cancel ()
+    threading.Timer (2, _create, (new_letter,)).start ()
+    found_disk = watcher (timeout_ms=20000)
+    self.assert_ (isinstance (found_disk, wmi._wmi_object))
+    self.assertEqual (found_disk.Caption, new_letter)
 
   def do_not_test_extrinsic_event (self):
 
@@ -480,6 +483,72 @@ class TestProperties (TestWMI):
       break
     for p in d.ole_object.Properties_:
       self.assertEqual (p.Value, getattr (d, p.Name))
+      
+  def test_attribute_passthrough (self):
+    "Check that unknown attributes are passed through to the underlying object"
+    for d in self.logical_disks:
+      break
+    #
+    # Can't rely on the COM Objects testing identical or equal;
+    # have to check their values and their emptiness.
+    #
+    self.assert_ (d.Properties_)
+    self.assert_ (d.ole_object.Properties_)
+    self.assertEqual (
+      [p.Value for p in d.Properties_], 
+      [p.Value for p in d.ole_object.Properties_]
+    )
+    
+class TestInstances (TestWMI):
+  
+  def test_hashable (self):
+    "Ensure instances are hashable so can be used in a set/dict"
+    self.assert_ (dict.fromkeys (self.logical_disks))
+    
+  def test_equalable (self):
+    "Ensure instances compare equal"
+    self.assertEqual (self.logical_disks, self.logical_disks)
+    
+  def test_sortable (self):
+    "Ensure instances sort by full path/key"
+    self.assertEqual (
+      sorted (self.logical_disks),
+      sorted (self.logical_disks, key=operator.attrgetter ("DeviceID"))
+    )
+    
+  def test_references (self):
+    "Ensure that associations are special-cased to return wrapped objects"
+    for d in self.logical_disks:
+      break
+    for r in d.references ("Win32_LogicalDiskRootDirectory"):
+      self.assert_ (r.is_association)
+      self.assertEqual (r.GroupComponent, d)
+      self.assert_ (isinstance (r.GroupComponent, wmi._wmi_object))
+      self.assert_ (isinstance (r.PartComponent, wmi._wmi_object))
+      
+  def test_associators (self):
+    "Ensure that associators are returned by association / result"
+    d = next (iter (self.logical_disks))
+    root_dir = d.associators (wmi_association_class="Win32_LogicalDiskRootDirectory")[0]
+    self.assertEqual (root_dir.Name.lower (), d.Name.lower () + "\\".lower ())
+    root_dir = d.associators (wmi_result_class="Win32_Directory")[0]
+    self.assertEqual (root_dir.Name.lower (), d.Name.lower () + "\\")
+  
+  def test_derivation (self):
+    "Check that derivation mimics WMI-provided Derivation_ property"
+    for d in self.logical_disks:
+      break
+    self.assertEqual (d.derivation (), d.ole_object.Derivation_)
+    
+  def test_keys (self):
+    "Check that the readonly keys property returns the keys for an object"
+    self.assertEqual (self.connection.Win32_LogicalDisk.keys, ['DeviceID'])
+    self.assertEqual (next (iter (self.logical_disks)).keys, ['DeviceID'])
+    
+class TestInstanceCreation (TestWMI):
+  
+  def test_create_instance (self):
+    self.assert_ (isinstance (self.connection.Win32_ProcessStartup.new (ShowWindow=2), wmi._wmi_object))
 
 if __name__ == '__main__':
   unittest.main ()

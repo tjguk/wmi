@@ -429,7 +429,7 @@ class _wmi_object:
   def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
     try:
       _set (self, "ole_object", ole_object)
-      _set (self, "id", hash (ole_object.Path_.DisplayName))
+      _set (self, "id", ole_object.Path_.DisplayName.lower ())
       _set (self, "_instance_of", instance_of)
       _set (self, "properties", {})
       _set (self, "methods", {})
@@ -540,7 +540,7 @@ class _wmi_object:
     return self.id == other.id
 
   def __hash__ (self):
-    return self.id
+    return hash (self.id)
 
   def _getAttributeNames (self):
      """Return list of methods/properties for IPython completion"""
@@ -552,6 +552,10 @@ class _wmi_object:
     """A WMI object is uniquely defined by a set of properties
     which constitute its keys. Lazily retrieves the keys for this
     instance or class.
+    
+    NB You can get the keys of an instance more directly, via
+    Path_.Keys but this doesn't apply to classes. The technique
+    here appears to work for both.
 
     :returns: list of key property names
     """
@@ -601,6 +605,8 @@ class _wmi_object:
     pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
     print pp0.path ().RelPath
     </pre>
+    
+    FIXME: DO more with this
     """
     try:
       return self.ole_object.Path_
@@ -684,6 +690,10 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
       print i
     </pre>
     """
+    #
+    # FIXME: Allow an actual class to be passed in, using
+    # its .Path_.RelPath property to determine the string
+    #
     try:
       return [_wmi_object (i) for i in self.ole_object.References_ (strResultClass=wmi_class)]
     except pywintypes.com_error:
