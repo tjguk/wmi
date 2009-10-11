@@ -3,4 +3,4 @@ setup.py
 wmi.py
 wmitest.py
 wmiweb.py
-multitest.cmd
+wmitest.cmd
