@@ -120,7 +120,7 @@
 #
 # For change history see CHANGELOG.TXT
 ##
-__VERSION__ = __version__ = "1.4.0"
+__VERSION__ = __version__ = "1.4.1"
 
 _DEBUG = False
 
