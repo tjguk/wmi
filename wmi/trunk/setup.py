@@ -20,6 +20,7 @@ setup (
   author_email = "mail@timgolden.me.uk",
   url = "http://timgolden.me.uk/python/wmi.html",
   license = "http://www.opensource.org/licenses/mit-license.php",
-  py_modules = ["wmi"]
+  py_modules = ["wmi"],
+  scripts = ["wmitest.py", "wmiweb.py", "multitest.cmd"]
 )
 
