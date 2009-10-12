@@ -8,7 +8,7 @@ What is it?
 The Python WMI module is a lightweight wrapper on top of the pywin32
 extensions, and hides some of the messy plumbing needed to get Python to
 talk to the WMI API. It's pure Python and should work with any version of
-Python from 2.1 onwards (list comprehensions) and any recent version of
+Python from 2.4 onwards (list comprehensions) and any recent version of
 pywin32.
 
 
@@ -24,9 +24,17 @@ What's Changed?
 4th Oct 2009  1.4.0  . Now requires Python 2.4
                      . Added unittest-based test suite (wmitest.py)
                      . All tests pass with Python 2.4, 2.5, 2.6, 3.1
-                     . find_classes now defaults to False
+                       (use wmitest.cmd to run wmitest.py against all
+                       installed versions from 2.4 to 3.2)
+                     . find_classes now defaults to False: this should speed up
+                       startup time considerably.
                      . Removed machines_in_domain code
                      . wmiweb now runs local WMI server
+                     . x_wmi and its subclasses return the original COM error
+                       as an attribute: com_error. This is intended to avoid
+                       issues with international error messages.
+                     . Special-cased the Syntax Error exception you commonly
+                       receive when you run WMI in an uninitialised thread.
 27th Dec 2007 1.3.2  . Squashed long-standing cached method bug which had
                        resulted in an instance-level method being called even
                        after that instance had died.
