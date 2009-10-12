@@ -120,7 +120,7 @@
 #
 # For change history see CHANGELOG.TXT
 ##
-__VERSION__ = __version__ = "1.4.1"
+__VERSION__ = __version__ = "1.4.2"
 
 _DEBUG = False
 
@@ -133,9 +133,9 @@ from win32com.client import GetObject, Dispatch
 import pywintypes
 
 def signed_to_unsigned (signed):
-  """Convert a (possibly signed) long to unsigned hex"""
-  unsigned, = struct.unpack ("L", struct.pack ("l", signed))
-  return unsigned
+    """Convert a (possibly signed) long to unsigned hex"""
+    unsigned, = struct.unpack ("L", struct.pack ("l", signed))
+    return unsigned
 
 class ProvideConstants (object):
   """
@@ -174,7 +174,13 @@ wbemFlagForwardOnly = obj._constants.wbemFlagForwardOnly
 # Exceptions
 #
 class x_wmi (Exception):
-  pass
+
+  def __init__ (self, message="", com_error=None):
+    self.message = message
+    self.com_error = com_error
+
+  def __str__ (self):
+    return "<x_wmi: %s : %s>" % (self.message or "Unexpected COM Error", self.com_error or "(no underlying exception)")
 
 class x_wmi_invalid_query (x_wmi):
   pass
@@ -224,7 +230,7 @@ def handle_com_error (err=None):
       break
   else:
     klass = x_wmi
-  raise klass ("\n".join (exception_string))
+  raise klass (com_error=err)
 
 
 BASE = datetime.datetime (1601, 1, 1)
@@ -552,7 +558,7 @@ class _wmi_object:
     """A WMI object is uniquely defined by a set of properties
     which constitute its keys. Lazily retrieves the keys for this
     instance or class.
-    
+
     NB You can get the keys of an instance more directly, via
     Path_.Keys but this doesn't apply to classes. The technique
     here appears to work for both.
@@ -605,7 +611,7 @@ class _wmi_object:
     pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
     print pp0.path ().RelPath
     </pre>
-    
+
     FIXME: DO more with this
     """
     try:
