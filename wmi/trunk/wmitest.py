@@ -449,7 +449,7 @@ class TestMethods (TestWMI):
     handle, result = self.connection.Win32_Process.Create (
       "cmd /c echo %s > %s" % (contents, filename),
       dir,
-      self.connection.Win32_ProcessStartup (ShowWindow=0)
+      self.connection.Win32_ProcessStartup.new (ShowWindow=0)
     )
     time.sleep (0.5)
     self.assertEqual (open (os.path.join (dir, filename)).read (), contents + " \n")
@@ -459,7 +459,7 @@ class TestMethods (TestWMI):
     filename = "abc.txt"
     contents = str (datetime.datetime.now ())
     handle, result = self.connection.Win32_Process.Create (
-      ProcessStartupInformation=self.connection.Win32_ProcessStartup (ShowWindow=0),
+      ProcessStartupInformation=self.connection.Win32_ProcessStartup.new (ShowWindow=0),
       CurrentDirectory=dir,
       CommandLine="cmd /c echo %s > %s" % (contents, filename)
     )
@@ -483,11 +483,17 @@ class TestMethods (TestWMI):
 
   def test_call_from_class (self):
     "Check that a method can be called from a class"
-    self.assert_ (self.connection.Win32_Process.Create (CommandLine=sys.executable + " -c pass"))
+    self.assert_ (self.connection.Win32_Process.Create (
+      CommandLine=sys.executable + " -c pass",
+      ProcessStartupInformation=self.connection.Win32_ProcessStartup.new (ShowWindow=0)
+    ))
 
   def test_call_from_instance (self):
     "Check that a method can be called from an instance"
-    handle, _ = self.connection.Win32_Process.Create (CommandLine=sys.executable)
+    handle, _ = self.connection.Win32_Process.Create (
+      CommandLine=sys.executable,
+      ProcessStartupInformation=self.connection.Win32_ProcessStartup.new (ShowWindow=0)
+    )
     result = 1
     for p in self.connection.Win32_Process (Handle=handle):
       result, = p.Terminate ()

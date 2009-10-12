@@ -175,12 +175,12 @@ wbemFlagForwardOnly = obj._constants.wbemFlagForwardOnly
 #
 class x_wmi (Exception):
 
-  def __init__ (self, message="", com_error=None):
-    self.message = message
+  def __init__ (self, info="", com_error=None):
+    self.info = info
     self.com_error = com_error
 
   def __str__ (self):
-    return "<x_wmi: %s : %s>" % (self.message or "Unexpected COM Error", self.com_error or "(no underlying exception)")
+    return "<x_wmi: %s %s>" % (self.info or "Unexpected COM Error", self.com_error or "(no underlying exception)")
 
 class x_wmi_invalid_query (x_wmi):
   pass
