@@ -1,0 +1,700 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wmi Tutorial &mdash; WMI v1.4.2 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.4.2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="WMI v1.4.2 documentation" href="index.html" />
+    <link rel="next" title="Changes" href="changes.html" />
+    <link rel="prev" title="WMI - Windows Management Instrumentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="WMI - Windows Management Instrumentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">wmi Tutorial</a><ul>
+<li><a class="reference external" href="#introduction">Introduction</a></li>
+<li><a class="reference external" href="#the-basics">The Basics</a><ul>
+<li><a class="reference external" href="#connecting">Connecting</a></li>
+<li><a class="reference external" href="#querying">Querying</a></li>
+<li><a class="reference external" href="#monitoring">Monitoring</a></li>
+<li><a class="reference external" href="#updating">Updating</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#advanced-stuff">Advanced Stuff</a><ul>
+<li><a class="reference external" href="#advanced-connecting">Advanced Connecting</a><ul>
+<li><a class="reference external" href="#connecting-to-a-remote-machine">Connecting to a remote machine</a></li>
+<li><a class="reference external" href="#connecting-to-a-remote-machine-as-a-named-user">Connecting to a remote machine as a named user</a></li>
+<li><a class="reference external" href="#connecting-to-a-particular-namespace">Connecting to a particular namespace</a></li>
+<li><a class="reference external" href="#specifying-the-full-moniker">Specifying the full moniker</a></li>
+<li><a class="reference external" href="#connecting-to-a-specific-class-or-object">Connecting to a specific class or object</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#advanced-querying">Advanced Querying</a><ul>
+<li><a class="reference external" href="#filtering-the-returned-list">Filtering the returned list</a></li>
+<li><a class="reference external" href="#selecting-only-certain-fields">Selecting only certain fields</a></li>
+<li><a class="reference external" href="#performing-arbitrary-wql-queries">Performing arbitrary WQL queries</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#advanced-monitoring">Advanced Monitoring</a><ul>
+<li><a class="reference external" href="#intrinsic-events">Intrinsic events</a></li>
+<li><a class="reference external" href="#extrinsic-events">Extrinsic events</a></li>
+<li><a class="reference external" href="#watchers-with-timeouts">Watchers with timeouts</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#more-about-methods">More About Methods</a><ul>
+<li><a class="reference external" href="#determing-available-methods">Determing available methods</a></li>
+<li><a class="reference external" href="#showing-method-signatures">Showing method signatures</a></li>
+<li><a class="reference external" href="#finding-a-method-s-win32-api-equivalent">Finding a method&#8217;s Win32 API equivalent</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#more-advanced-topics-bits-pieces">More Advanced Topics: Bits &amp; Pieces</a><ul>
+<li><a class="reference external" href="#creating-wmi-objects">Creating WMI Objects</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#wmi-classes-objects">WMI Classes/Objects</a><ul>
+<li><a class="reference external" href="#class-object-details">Class/Object details</a></li>
+<li><a class="reference external" href="#the-object-hierarchy">The object hierarchy</a></li>
+<li><a class="reference external" href="#comparing-two-wmi-objects-for-equality">Comparing two WMI objects for equality</a></li>
+<li><a class="reference external" href="#associators">Associators</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#caveats-troubleshooting-and-performance">Caveats, Troubleshooting and Performance</a><ul>
+<li><a class="reference external" href="#speeding-things-up">Speeding things up</a></li>
+<li><a class="reference external" href="#pre-cache-class-and-method-wrappers">Pre-cache class and method wrappers</a></li>
+<li><a class="reference external" href="#specifying-fields-in-the-query">Specifying fields in the query</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#security">Security</a><ul>
+<li><a class="reference external" href="#nt-security">NT Security</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#links">Links</a><ul>
+<li><a class="reference external" href="#authoritative-links">Authoritative Links</a></li>
+<li><a class="reference external" href="#useful-examples">Useful Examples</a></li>
+<li><a class="reference external" href="#lists-groups-etc">Lists, Groups, etc.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">WMI - Windows Management Instrumentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="changes.html"
+                                  title="next chapter">Changes</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/tutorial.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="wmi-tutorial">
+<h1>wmi Tutorial<a class="headerlink" href="#wmi-tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>From the Wikipedia entry for WMI:</p>
+<blockquote>
+Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
+operating system interface through which instrumented components can provide information and notification. WMI is
+Microsoft&#8217;s implementation of the Web-Based Enterprise Management(WBEM) Standard from the Distributed Management
+Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
+servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows
+Me, and Windows 2000.</blockquote>
+<p>This tutorial covers accessing WMI specifically using the Python programming language and assumes you have downloaded and installed Python itself, the pywin32 extensions and the WMI Python module. Python is able to use WMI by means of COM-enabling packages such as Mark Hammond&#8217;s pywin32 extensions or the comtypes spinoff from Thomas Heller&#8217;s ctypes. The WMI module assumes that the pywin32 extensions are present, and exposes a slightly more Python-friendly interface to the sometimes messy WMI scripting API. NB it does nothing but wrap pywin32 functionality: if WMI under pywin32 is too slow, this module won&#8217;t be any faster.</p>
+</div>
+<div class="section" id="the-basics">
+<h2>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this headline">¶</a></h2>
+<p>We&#8217;re not really going to be looking at what you can do with WMI in general, except by way of demonstrating some functionality within the module. There are no few examples around the web of what you can do with the technology (and you can do most things with it if you try hard enough). Some links are at the bottom of the document.</p>
+<div class="section" id="connecting">
+<h3>Connecting<a class="headerlink" href="#connecting" title="Permalink to this headline">¶</a></h3>
+<p>Most of the time, you&#8217;ll simply connect to the local machine with the defaults:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you need to connect to a different machine, specify its name as the first parameter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="s">&quot;other_machine&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="querying">
+<h3>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h3>
+<p>The most common thing you&#8217;ll be doing with WMI is finding out about various parts of your system. That involves determining which WMI class to interrogate and then treating that as an attribute of the Python WMI object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">os</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_OperatingSystem</span><span class="p">():</span>
+  <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">Caption</span>
+</pre></div>
+</div>
+<p>The &#8220;which WMI class to interrogate&#8221; part of that earlier sentence is not always so easy as it sounds. However, with a good search engine at your disposal, you can be pretty much assured that someone somewhere has done the same thing as you albeit with a different language. There are some helpful links at the bottom of this document, but I often simply stick &#8220;WMI thing-to-do&#8221; into my search engine of choice and scan the results for convincing answers.</p>
+<p>Note that, although there is only, in this case, one Operating System, a WMI query always returns a list, possibly of one item. The items in the list are wrapped by the Python module for attribute access. In this case, the Win32_OperatingSystem class has several attributes, one of which is .Caption, which refers to the name of the installed OS.</p>
+</div>
+<div class="section" id="monitoring">
+<h3>Monitoring<a class="headerlink" href="#monitoring" title="Permalink to this headline">¶</a></h3>
+<p>WMI has the concept of events. There are two types, intrinsic and extrinsic, which are discussed below. The Python module makes the difference as transparent as it can. Say you wanted to track new processes starting up:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">process_watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="s">&quot;creation&quot;</span><span class="p">)</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+  <span class="n">new_process</span> <span class="o">=</span> <span class="n">process_watcher</span><span class="p">()</span>
+  <span class="k">print</span> <span class="n">new_process</span><span class="o">.</span><span class="n">Caption</span>
+</pre></div>
+</div>
+<p>Note that you must pass one of &#8220;creation&#8221;, &#8220;deletion&#8221;, &#8220;modification&#8221; or &#8220;operation&#8221; to the .watch_for method. If not, slightly odd errors will result.
+1.3.1 If you don&#8217;t specify a modification type to an intrinsic event then &#8220;operation&#8221; will be assumed, which triggers on any change to an object of that class.</p>
+</div>
+<div class="section" id="updating">
+<h3>Updating<a class="headerlink" href="#updating" title="Permalink to this headline">¶</a></h3>
+<p>Some, but by no means all, WMI classes allow for the possibility of writing information back. This you do by setting attributes as usual in Python. Note that the class may let you do this without complaint even though nothing useful has happened. To change the display name of a service, for example, you need to call the service&#8217;s .Change method. You can update the displayName attribute directly without error, but it will have no effect.</p>
+<p>The most typical place in which you&#8217;ll set an attribute directly is when you&#8217;re creating a whole new object from a class&#8217;s .new method. In that case you can either set all the parameters as keyword arguments to the .new call or you can specify them one by one afterwards.
+Methods</p>
+<p>Some WMI classes have methods to operate on them. You can call them as though they were normal class or instance methods in Python. From version 1.3.1, parameters can be positioned; before that, they must be named. If you wanted to stop the (running) RunAs service, whose short name is &#8220;seclogon&#8221;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;seclogon&quot;</span><span class="p">):</span>
+  <span class="n">result</span><span class="p">,</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">StopService</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Service&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="s">&quot;stopped&quot;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Some problem&quot;</span>
+  <span class="k">break</span>
+<span class="k">else</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;Service not found&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="advanced-stuff">
+<h2>Advanced Stuff<a class="headerlink" href="#advanced-stuff" title="Permalink to this headline">¶</a></h2>
+<p>The basics of what can be done with the WMI module is covered above and this is probably as far as many people need to go. However, there are many slight subtleties to WMI and you may find yourself studying a VBS-oriented example somewhere on the web and thinking &#8220;How do I do this in Python?&#8221;.</p>
+<div class="section" id="advanced-connecting">
+<h3>Advanced Connecting<a class="headerlink" href="#advanced-connecting" title="Permalink to this headline">¶</a></h3>
+<p>The .connect function(aliased as .WMI) has quite a few parameters, most of which are optional and can safely be ignored. For the majority of them, I would refer you to the MS documentation on WMI monikers into which they slot fairly straightforwardly. We will introduce here a few of the more common requirements.</p>
+<div class="section" id="connecting-to-a-remote-machine">
+<h4>Connecting to a remote machine<a class="headerlink" href="#connecting-to-a-remote-machine" title="Permalink to this headline">¶</a></h4>
+<p>This is the most common and the most straightforward extra parameter. It is the first positional parameter or the one named &#8220;computer&#8221;. You can connect to your own computer this way by specifying nothing, a blank string, a dot or any of the computer&#8217;s DNS names, including localhost. But usually you just don&#8217;t need to pass the parameter at all. To connect to the WMI subsystem on a computer named &#8220;MachineB&#8221;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="s">&quot;MachineB&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connecting-to-a-remote-machine-as-a-named-user">
+<h4>Connecting to a remote machine as a named user<a class="headerlink" href="#connecting-to-a-remote-machine-as-a-named-user" title="Permalink to this headline">¶</a></h4>
+<p>This is the second most common need and is fairly straightforward, but with a few caveats. The first is that ? no matter how hard you try to obfuscate ? you can&#8217;t connect to your local computer this way. The second is this technique doesn&#8217;t always play well with the many layers of WMI security. More on that below in troubleshooting. To connect to a machine called &#8220;MachineB&#8221; with username &#8220;fred&#8221; and password &#8220;secret&#8221;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="s">&quot;MachineB&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s">r&quot;MachineB\fred&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&quot;secret&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connecting-to-a-particular-namespace">
+<h4>Connecting to a particular namespace<a class="headerlink" href="#connecting-to-a-particular-namespace" title="Permalink to this headline">¶</a></h4>
+<p>WMI classes are organised into a namespace hierarchy. The majority of the useful ones are under the cimv2 namespace, which is the default. But add-on providers may supply extra namespaces, for example MicrosoftIISv2 or DEFAULT/StdRegProv. To use a different namespace from the default(which is, incidentally, not the one named default!) specify it via the namespace parameter. All namespaces are assumed to start from root so it need not be specified, although if you want to specify the root namespace itself, you can do:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s">&quot;WMI&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="specifying-the-full-moniker">
+<h4>Specifying the full moniker<a class="headerlink" href="#specifying-the-full-moniker" title="Permalink to this headline">¶</a></h4>
+<p>In some cases you want to be able to pass the full moniker along, either because the moniker itself is so complex, or because you want to be able to cut-and-paste from elsewhere. In that case, pass the moniker as a string via the &#8220;moniker&#8221; parameter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span>
+  <span class="n">moniker</span><span class="o">=</span><span class="s">&quot;winmgmts:{impersonationLevel=impersonate,(LockMemory, !IncreaseQuota)}&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connecting-to-a-specific-class-or-object">
+<h4>Connecting to a specific class or object<a class="headerlink" href="#connecting-to-a-specific-class-or-object" title="Permalink to this headline">¶</a></h4>
+<p>A special case of the full moniker is that it can be used to connect directly to a WMI class or even a specific object. The Python module will notice that the moniker refers to a class or object and will return the wrapped object directly rather than a namespace. Any WMI object&#8217;s path can be used as a moniker to recreate it, so to attach directly to the Win32_LogicalDisk class, for example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">logical_disk</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">moniker</span><span class="o">=</span><span class="s">&quot;//./root/cimv2:Win32_LogicalDisk&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is equivalent to getting hold of the class through the normal mechanism although it&#8217;s mostly of use internally to the module and when translating examples which use the technique. Access to a specific object is similar and slightly more useful:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c_drive</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">moniker</span><span class="o">=</span><span class="s">&#39;//./root/cimv2:Win32_LogicalDisk.DeviceID=&quot;C:&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This object is the same as you&#8217;d have received by querying against the Win32_LogicalDisk in the cimv2 namespace with a parameter of DeviceID=&#8221;C:&#8221; so from the point of view of the Python module is not so very useful. However it is a fairly common usage in VBS examples on the web and eases translation a little.</p>
+</div>
+</div>
+<div class="section" id="advanced-querying">
+<h3>Advanced Querying<a class="headerlink" href="#advanced-querying" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="filtering-the-returned-list">
+<h4>Filtering the returned list<a class="headerlink" href="#filtering-the-returned-list" title="Permalink to this headline">¶</a></h4>
+<p>We&#8217;ve already seen this in action above; I just didn&#8217;t comment on it at the time. When you &#8220;call&#8221; a WMI class, you can pass along simple equal-to parameters to narrow down the list. This filtering is happening at the WMI level; you can still do whatever post-hoc filtering you want in Python once you&#8217;ve got the values back. Note that, even if the resulting list is only one element long, it is still a list. To find all fixed disks:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span><span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">disk</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="selecting-only-certain-fields">
+<h4>Selecting only certain fields<a class="headerlink" href="#selecting-only-certain-fields" title="Permalink to this headline">¶</a></h4>
+<p>By default, all fields in the class will be returned. For reasons of performance or simply manageability, you may want to specify that only certain fields be returned by the query. This is done by setting the first positional parameter to a list of field names. Note that the key field(typically an id or a unique name or even a combination) will always be returned:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span><span class="p">([</span><span class="s">&quot;Caption&quot;</span><span class="p">,</span> <span class="s">&quot;Description&quot;</span><span class="p">],</span> <span class="n">DriveType</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">disk</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="performing-arbitrary-wql-queries">
+<h4>Performing arbitrary WQL queries<a class="headerlink" href="#performing-arbitrary-wql-queries" title="Permalink to this headline">¶</a></h4>
+<p>If you want to carry out arbitrary WMI queries, using its pseudo-SQL language WQL, you can use the .query method of the namespace. To list all non-fixed disks, for example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">wql</span> <span class="o">=</span> <span class="s">&quot;SELECT Caption, Description FROM Win32_LogicalDisk WHERE DriveType &lt;&gt; 3&quot;</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">wql</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">disk</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="advanced-monitoring">
+<h3>Advanced Monitoring<a class="headerlink" href="#advanced-monitoring" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="intrinsic-events">
+<h4>Intrinsic events<a class="headerlink" href="#intrinsic-events" title="Permalink to this headline">¶</a></h4>
+<p>Intrinsic events occur when you hook into a general event mechanism offered by the WMI system to poll other classes on your behalf. You can track the creation, modification or deletion of any WMI class. You have to specify the type of event (creation, deletion, modification or simply operation to catch any type) and give a polling frequency in whole seconds. After those parameters, you can pass along keyword parameters in the normal way to narrow down the events returned. Note that, since this is polling behind the scenes, you do not want to use this to, say, monitor an entire directory structure.</p>
+<p>To watch an event log for errors, say:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">privileges</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Security&quot;</span><span class="p">])</span>
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_NTLogEvent</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="s">&quot;creation&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Type</span><span class="o">=</span><span class="s">&quot;error&quot;</span><span class="p">)</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+  <span class="n">error</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">()</span>
+  <span class="k">print</span> <span class="s">&quot;Error in </span><span class="si">%s</span><span class="s"> log: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">Logfile</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span>
+  <span class="c"># send mail to sysadmin etc.</span>
+</pre></div>
+</div>
+<p>A caveat here: this is polling, and at the frequency you&#8217;ve specified. It is possible to miss events this way.</p>
+<p>The return from a watcher is in fact a special _wmi_event object, subclass of a conventional _wmi_object, and which includes, for intrinsic events, the event type, timestamp and previous value for a modification as attributes: event_type, timestamp and previous respectively.</p>
+</div>
+<div class="section" id="extrinsic-events">
+<h4>Extrinsic events<a class="headerlink" href="#extrinsic-events" title="Permalink to this headline">¶</a></h4>
+<p>Note that, while &#8220;Win32_NTLogEvent&#8221; ends in &#8220;Event&#8221;, it is not in fact an extrinsic event. You can tell which classes are extrinsic events by examining their derivation and looking for __ExtrinsicEvent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_PowerManagementEvent</span><span class="o">.</span><span class="n">derivation</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Alternatively, you can go top down and look for subclasses of __ExtrinsicEvent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subclasses_of</span><span class="p">(</span><span class="s">&quot;__ExtrinsicEvent&quot;</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">i</span>
+</pre></div>
+</div>
+<p>You use extrinsic events in much the same way as intrinsic ones. The difference is that any event type and delay are ignored since WMI isn&#8217;t polling on your behalf, but waiting on the underlying subsystem. The return from the watcher is still a _wmi_event object(1.3.1) but without the extra information, which isn&#8217;t supplied by WMI. Suppose you wanted to do something whenever your computer came out of standby, eg to notify an IM group of your presence:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_PowerManagementEvent</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="n">EventType</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+  <span class="n">event</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">()</span>
+  <span class="k">print</span> <span class="s">&quot;resumed&quot;</span>
+  <span class="c">#</span>
+  <span class="c"># Number of 100-ns intervals since 1st Jan 1601!</span>
+  <span class="c"># TIME_CREATED doesn&#39;t seem to be provided on Win2K</span>
+  <span class="c">#</span>
+  <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="s">&quot;TIME_CREATED&quot;</span><span class="p">):</span>
+    <span class="n">ns100</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">TIME_CREATED</span><span class="p">)</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">ns100</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1601</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;Resumed at&quot;</span><span class="p">,</span> <span class="n">base</span>  <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+<p>For an intrinsic modification event, you could compare the before and after values of the trigger instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="s">&quot;modification&quot;</span><span class="p">)</span>
+<span class="n">event</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;Modification occurred at&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">timestamp</span>
+
+<span class="k">print</span> <span class="n">event</span><span class="o">.</span><span class="n">path</span><span class="p">()</span>
+<span class="n">prev</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">previous</span>
+<span class="n">curr</span> <span class="o">=</span> <span class="n">event</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prev</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+  <span class="n">pprev</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+  <span class="n">pcurr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">curr</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">pprev</span> <span class="o">!=</span> <span class="n">pcurr</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">p</span>
+    <span class="k">print</span> <span class="s">&quot;  Previous:&quot;</span><span class="p">,</span> <span class="n">pprev</span>
+    <span class="k">print</span> <span class="s">&quot;   Current:&quot;</span><span class="p">,</span> <span class="n">pcurr</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="watchers-with-timeouts">
+<h4>Watchers with timeouts<a class="headerlink" href="#watchers-with-timeouts" title="Permalink to this headline">¶</a></h4>
+<p>But there&#8217;s more! Although you can use these watchers inside threads(of which more below) it might be easier in some cases to poll them with a timeout. If, for example, you wanted to monitor event log entries on two boxes without getting into threading and queues:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+
+<span class="k">def</span> <span class="nf">wmi_connection</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+  <span class="k">print</span> <span class="s">&quot;attempting connection with&quot;</span><span class="p">,</span> <span class="n">server</span>
+  <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+
+<span class="n">servers</span> <span class="o">=</span> <span class="p">[</span>
+ <span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&quot;goyle&quot;</span><span class="p">,</span> <span class="s">&quot;wmiuser&quot;</span><span class="p">,</span> <span class="s">&quot;secret&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">watchers</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">server</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span> <span class="ow">in</span> <span class="n">servers</span><span class="p">:</span>
+  <span class="n">connection</span> <span class="o">=</span> <span class="n">wmi_connection</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+  <span class="n">watchers</span><span class="p">[</span><span class="n">server</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">Win32_PrintJob</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="s">&quot;creation&quot;</span><span class="p">)</span>
+
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">server</span><span class="p">,</span> <span class="n">watcher</span> <span class="ow">in</span> <span class="n">watchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">event</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">(</span><span class="n">timeout_ms</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi_timed_out</span><span class="p">:</span>
+      <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">print</span> <span class="s">&quot;print job added on&quot;</span><span class="p">,</span> <span class="n">server</span>
+      <span class="k">print</span> <span class="n">event</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="more-about-methods">
+<h3>More About Methods<a class="headerlink" href="#more-about-methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="determing-available-methods">
+<h4>Determing available methods<a class="headerlink" href="#determing-available-methods" title="Permalink to this headline">¶</a></h4>
+<p>If you examine the keys of the .methods dictionary which every wrapped WMI class uses to cache its wrapped methods, you will see what methods are exposed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">c</span><span class="o">.</span><span class="n">Win32_ComputerSystem</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="showing-method-signatures">
+<h4>Showing method signatures<a class="headerlink" href="#showing-method-signatures" title="Permalink to this headline">¶</a></h4>
+<p>Each wrapped method produces its function signature as its repr or str. If a function such as .Shutdown requires additional privileges, this is also indicated:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">os</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_OperatingSystem</span>
+<span class="k">for</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+  <span class="n">method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)</span>
+  <span class="k">print</span> <span class="n">method</span>
+</pre></div>
+</div>
+<p>Note that if a parameter is expected to be a list it will be suffixed with &#8220;[]&#8221;. Note also that the return values are always a tuple, albeit of length one.</p>
+</div>
+<div class="section" id="finding-a-method-s-win32-api-equivalent">
+<h4>Finding a method&#8217;s Win32 API equivalent<a class="headerlink" href="#finding-a-method-s-win32-api-equivalent" title="Permalink to this headline">¶</a></h4>
+<p>I was a bit surprised to come across this myself, but WMI tells you which Win32 API call is going on under the covers when you call a WMI method(not, unfortunately, for a property). This is exposed as a function wrapper&#8217;s .provenance attribute:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="o">.</span><span class="n">Create</span><span class="o">.</span><span class="n">provenance</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="more-advanced-topics-bits-pieces">
+<h3>More Advanced Topics: Bits &amp; Pieces<a class="headerlink" href="#more-advanced-topics-bits-pieces" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="creating-wmi-objects">
+<h4>Creating WMI Objects<a class="headerlink" href="#creating-wmi-objects" title="Permalink to this headline">¶</a></h4>
+<p>WMI exposes a SpawnInstance_ method which is wrapped as the .new method of the Python WMI classes. But you&#8217;ll use this method far less often than you think. If you want to create a new disk share, for example, rather than using Win32_Share.new, you&#8217;ll actually call the Win32_Share class&#8217;s .Create method. In fact, most of the classes which allow instance creation via WMI offer a .Create method(Win32_Process, Win32_Share etc.):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">result</span><span class="p">,</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Share</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">Path</span><span class="o">=</span><span class="s">&quot;c:</span><span class="se">\\</span><span class="s">temp&quot;</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s">&quot;temp&quot;</span><span class="p">,</span> <span class="n">Type</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;Share created successfully&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+  <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">,</span> <span class="s">&quot;Problem creating share: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>The times you will need to spawn a new instance are when you need to feed one WMI object with another created on the fly. Typical examples are passing security descriptors to new objects or process startup information to a new process. This example from MSDN can be translated into Python as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">win32con</span>
+<span class="kn">import</span> <span class="nn">wmi</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="n">process_startup</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ProcessStartup</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="n">process_startup</span><span class="o">.</span><span class="n">ShowWindow</span> <span class="o">=</span> <span class="n">win32con</span><span class="o">.</span><span class="n">SW_NORMAL</span>
+<span class="c">#</span>
+<span class="c"># could also be done:</span>
+<span class="c"># process_startup = c.Win32_ProcessStartup.new(ShowWindow=win32con.SW_NORMAL)</span>
+
+<span class="n">process_id</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span>
+  <span class="n">CommandLine</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">,</span>
+  <span class="n">ProcessStartupInformation</span><span class="o">=</span><span class="n">process_startup</span>
+<span class="p">)</span>
+<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;Process started successfully: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">process_id</span>
+<span class="k">else</span><span class="p">:</span>
+  <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">,</span> <span class="s">&quot;Problem creating process: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">result</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="wmi-classes-objects">
+<h3>WMI Classes/Objects<a class="headerlink" href="#wmi-classes-objects" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="class-object-details">
+<h4>Class/Object details<a class="headerlink" href="#class-object-details" title="Permalink to this headline">¶</a></h4>
+<p>Each class and object will return a readable version of its structure when rendered as a string:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_OperatingSystem</span>
+<span class="k">for</span> <span class="n">os</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_OperatingSystem</span><span class="p">():</span>
+  <span class="k">print</span> <span class="n">os</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-object-hierarchy">
+<h4>The object hierarchy<a class="headerlink" href="#the-object-hierarchy" title="Permalink to this headline">¶</a></h4>
+<p>WMI objects occur within a hierarchy of classes. Each object knows its own ancestors:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="o">.</span><span class="n">derivation</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can also look down the tree by finding all the subclasses of a named class, optionally filtering via a regex. To find all extrinsic event classes other than the builtin ones(indicated by a leading underscore):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">extrinsic_event</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subclasses_of</span><span class="p">(</span><span class="s">&quot;__ExtrinsicEvent&quot;</span><span class="p">,</span> <span class="s">&quot;[^_].*&quot;</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">extrinsic_event</span>
+  <span class="k">print</span> <span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="s">&quot; &lt; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">extrinsic_event</span><span class="p">)</span><span class="o">.</span><span class="n">derivation</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="comparing-two-wmi-objects-for-equality">
+<h4>Comparing two WMI objects for equality<a class="headerlink" href="#comparing-two-wmi-objects-for-equality" title="Permalink to this headline">¶</a></h4>
+<p>The __eq__ operator is overridden in wrapped WMI classes and calls the underlying .CompareTo method, so comparing two WMI objects for equality should do The Right Thing.</p>
+</div>
+<div class="section" id="associators">
+<h4>Associators<a class="headerlink" href="#associators" title="Permalink to this headline">¶</a></h4>
+<p>Associators are classes which link together other classes. If, for example, you want to know what groups are on your system, and which users are in each group:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Group</span><span class="p">():</span>
+  <span class="k">print</span> <span class="n">group</span><span class="o">.</span><span class="n">Caption</span>
+  <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">associators</span><span class="p">(</span><span class="n">wmi_result_class</span><span class="o">=</span><span class="s">&quot;Win32_UserAccount&quot;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">Caption</span>
+</pre></div>
+</div>
+<p>which can also be written in terms of the associator classes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Group</span><span class="p">():</span>
+  <span class="k">print</span> <span class="n">group</span><span class="o">.</span><span class="n">Caption</span>
+  <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">associators</span><span class="p">(</span><span class="s">&quot;Win32_GroupUser&quot;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">Caption</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="caveats-troubleshooting-and-performance">
+<h3>Caveats, Troubleshooting and Performance<a class="headerlink" href="#caveats-troubleshooting-and-performance" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="speeding-things-up">
+<h4>Speeding things up<a class="headerlink" href="#speeding-things-up" title="Permalink to this headline">¶</a></h4>
+<p>Thanks to a useful collaboration last summer with Paul Tiemann, the module was able to speed things up considerably if needed with a combination of caching and lightweight calls where needed. Not all of that is covered here, but the most straightforward improvements combine removing runtime introspection and caching so that wrappers are generated only on demand and can be pre-cached.
+Turning off introspection</p>
+<p>The focus of the module originally, and still a large part of its use today, is in the interpreter. For that reason, when you instantiate a WMI namespace it looks for all the classes available in that namespace. But this takes quite a while on the larger namespaces and is unncessary even on the smaller ones once you know what you&#8217;re after. In production code, therefore, you can turn this off:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">find_classes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you need to determine which classes are available, you can still use the subclasses_of functionality described above to search, for example, for the performances classes available on a given machine at runtime:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">find_classes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">perf_classes</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">subclasses_of</span><span class="p">(</span><span class="s">&quot;Win32_PerfRawData&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pre-cache-class-and-method-wrappers">
+<h4>Pre-cache class and method wrappers<a class="headerlink" href="#pre-cache-class-and-method-wrappers" title="Permalink to this headline">¶</a></h4>
+<p>To avoid an initial lookup hit when a class is first queried or its method first called, it&#8217;s possible to push the class into the cache beforehand simply by referring to it. So, extending the code above:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">find_classes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">perf_class</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subclasses_of</span><span class="p">(</span><span class="s">&quot;Win32_PerfRawData&quot;</span><span class="p">):</span>
+  <span class="c"># do nothing, just get it into the cache</span>
+  <span class="nb">getattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">perf_class</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="specifying-fields-in-the-query">
+<h4>Specifying fields in the query<a class="headerlink" href="#specifying-fields-in-the-query" title="Permalink to this headline">¶</a></h4>
+<p>By default a WMI query will return all the fields of a class in each instance. By specifying the fields you&#8217;re interested in up-front as the first parameter of the query, you&#8217;ll avoid any expensive lookups:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">find_classes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="p">([</span><span class="s">&quot;Caption&quot;</span><span class="p">,</span> <span class="s">&quot;ProcessID&quot;</span><span class="p">]):</span>
+  <span class="k">print</span> <span class="n">i</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="security">
+<h3>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h3>
+<p>This is going to be a small section at the moment, more of a heads-up until I have a few more firm facts at my disposal. In short, the simplest way by far to access WMI functionality is to run as a Domain Admin user on an NT/AD domain. Other techniques are certainly possible, but if they stall at any point, you&#8217;re left ploughing through at least three layers of security, prodding hopefully at each one until you get a result or give up in disgust.</p>
+<div class="section" id="nt-security">
+<h4>NT Security<a class="headerlink" href="#nt-security" title="Permalink to this headline">¶</a></h4>
+<p>The user in question has to have some kind of access to the machine whose WMI functionality is being invoked. This might either be by virtue of being included in the local Admin group or by specific access granted to a named user.
+DCOM Security</p>
+<p>WMI is a DCOM-based technology and so whatever rules apply to DCOM connections apply to WMI. If there&#8217;s a problem authenticating at the DCOM level then, in theory, you ought to have the same problem doing a DispatchEx on Word.Application. The program you want to look at is dcomcnfg.exe and that&#8217;s all I&#8217;ll say for now.
+WMI Security</p>
+<p>WMI namespaces are system objects with their own ACLs. If you go to the WMI MMC snap-in(accessed via the Manage Computer interface) and access the properties for a namespace, there will be a security tab. The account using WMI functionality on the machine should have sufficient access via this security.
+WMI and Threads</p>
+<p>WMI is a COM/DCOM-based mechanism so the rules which apply to COM-threading apply to WMI as well. This is true whether or not your program explicitly invokes Python threading: if you&#8217;re running in a service, for example, you&#8217;re probably threading whether you like it or not, since the service control manager seems to run the service control code in a different thread from the main service.
+CoInitialize &amp; CoUninitialize</p>
+<p>Any COM code which wants to use threading must specify a threading model. There is much said out there on the subject but unless you have specific requirements you can normally get away with initializing COM threading before you instantiate a WMI object within a thread and then uninitializing afterwards:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pythoncom</span>
+<span class="kn">import</span> <span class="nn">wmi</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">Info</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;In Another Thread...&#39;</span>
+    <span class="n">pythoncom</span><span class="o">.</span><span class="n">CoInitialize</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="p">():</span>
+          <span class="k">print</span> <span class="n">process</span><span class="o">.</span><span class="n">ProcessId</span><span class="p">,</span> <span class="n">process</span><span class="o">.</span><span class="n">Name</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+      <span class="n">pythoncom</span><span class="o">.</span><span class="n">CoUninitialize</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&#39;In Main Thread&#39;</span>
+  <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="p">():</span>
+    <span class="k">print</span> <span class="n">process</span><span class="o">.</span><span class="n">ProcessId</span><span class="p">,</span> <span class="n">process</span><span class="o">.</span><span class="n">Name</span>
+  <span class="n">Info</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>NB Slightly oddly, if you forget to do this, the error you receive is a syntax error!</p>
+</div>
+</div>
+<div class="section" id="links">
+<h3>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="authoritative-links">
+<h4>Authoritative Links<a class="headerlink" href="#authoritative-links" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<ul class="simple">
+<li>Microsoft&#8217;s WMI Pages</li>
+<li>Python</li>
+<li>The Pywin32 Extensions</li>
+<li>The Python WMI module</li>
+<li>The Microsoft WMI SDK</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="useful-examples">
+<h4>Useful Examples<a class="headerlink" href="#useful-examples" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<ul class="simple">
+<li>The Python WMI Cookbook</li>
+<li>Absolutely loads of examples on ActivExperts</li>
+<li>The Microsoft Scripting Repository</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="lists-groups-etc">
+<h4>Lists, Groups, etc.<a class="headerlink" href="#lists-groups-etc" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<ul class="simple">
+<li>The main Python mailing list(mirroring the comp.lang.python newsgroup)</li>
+<li>The Google Groups mirror of the Python mailing list</li>
+<li>The Python Win32 mailing list</li>
+<li>The general WMI programming group</li>
+<li>The WinXP WMI programming group</li>
+<li>The Windows Scripting group</li>
+</ul>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="WMI - Windows Management Instrumentation"
+             >previous</a> |</li>
+        <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Tim Golden.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>
