@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Changes &mdash; WMI v1.4.2 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.4.2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="WMI v1.4.2 documentation" href="index.html" />
+    <link rel="prev" title="WMI - Windows Management Instrumentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="WMI - Windows Management Instrumentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Changes</a><ul>
+<li><a class="reference external" href="#id1">1.4</a></li>
+<li><a class="reference external" href="#id2">1.3</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">WMI - Windows Management Instrumentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/changes.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="changes">
+<h1>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>1.4<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>WMI now needs Python 2.4+. It wouldn&#8217;t be impossible to continue to support older
+versions but it&#8217;s increasingly onerous and 2.4 is now 5 years old.</li>
+<li>Tests - WMI now comes with a unittest-based set of tests which have been run (and passed)
+against all versions of Python from 2.4 to 3.2 using pywin32 214.</li>
+<li>Exception changes - x_wmi and its subclasses now store the underlying COM error as .com_error instead of returning
+an equivalent string. This should help code which needs to know the exact error which
+occurred and should also make it easier for non-ASCII systems which were experiencing
+difficulties when the code attempted to manipulate non-decoded byte strings.</li>
+<li>Specific trapping of uninitialised threads - like all COM-based code, WMI needs to be initialised if run
+inside a thread. If this isn&#8217;t done, the error message is slightly obscure. The connection maker now
+traps this specific case and returns a specific exception: <tt class="xref docutils literal"><span class="pre">x_wmi_uninitialised_thread</span></tt>.</li>
+<li>More specific checks for invalid connection combinations - certain combinations of identification
+and authentication are invalid when connection. A specific exception is now raised for these:
+<tt class="xref docutils literal"><span class="pre">x_wmi_authentication</span></tt>.</li>
+<li>keys - each <tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt> now has a keys attribute, inferred from the underlying
+WMI class definition, which is the list of attributes which uniquely define an instance of that class.</li>
+<li>associated_classes - each <tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt> has an associated_classes attribute which is
+a dictionary mapping the names of the other WMI classes which can be associated to this one to their
+<tt class="xref docutils literal"><span class="pre">_wmi_class</span></tt> objects. This is most immediately of use in the wmiweb browser (qv) but can
+be used by client code.</li>
+<li>By default, the <tt class="xref docutils literal"><span class="pre">wmi()</span></tt> connection function &#8211; the one you call most often &#8211; no longer looks to
+find the subclasses of a namespace. This makes for much faster startup times: altho&#8217; it was
+always possible to pass <cite>find_classes=False</cite> this was little known, and you now have to pass
+<cite>find_classes=True</cite> to get this functionality, or use the <tt class="xref docutils literal"><span class="pre">WMI.classes</span></tt> attribute which
+is now calculated lazily, so things like IPython&#8217;s attribute lookup still work.</li>
+<li>wmiweb.py - the installation now ships with a small but functional web-based WMI browser.
+It uses only the stdlib WSGI server and makes it easy to explore any of the namespaces
+on the local or a remote machine.</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h2>1.3<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Support for IPython&#8217;s getAttribute protocol (patch supplied by Igor Dvorkin)</li>
+<li>Allow positional parameters for method calls. Previously, parameters had to
+be passed by keyword and failure to do so resulted in an obscure error message.</li>
+<li>Allow extrinsic events to use the same watcher API as intrinsic ones. Under the
+covers these behave slightly differently. Intrinsic events now default to modification
+rather than creation.</li>
+<li>Remove the restriction where an instantiated class didn&#8217;t know its own namespace.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="WMI - Windows Management Instrumentation"
+             >previous</a> |</li>
+        <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Tim Golden.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

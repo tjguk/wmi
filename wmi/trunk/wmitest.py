@@ -139,12 +139,13 @@ class TestBasicConnections (unittest.TestCase):
 
   def test_find_classes (self):
     "Check ability to switch class scan on and off"
-    self.assert_ (wmi.WMI (find_classes=True).classes)
-    self.assertFalse (wmi.WMI (find_classes=False).classes)
+    self.assert_ (wmi.WMI (find_classes=True)._classes)
+    self.assertFalse (wmi.WMI (find_classes=False)._classes)
 
   def test_find_classes_false (self):
-    "By default, don't scan for classes"
-    self.assertFalse (wmi.WMI ().classes)
+    "By default, don't scan for classes but load them on demand"
+    self.assertFalse (wmi.WMI ()._classes)
+    self.assert_ (wmi.WMI ().classes)
 
 class TestThreadedConnection (unittest.TestCase):
 
@@ -292,9 +293,9 @@ class TestNamespace (TestWMI):
   def test_query (self):
     self.assertEquals (self.logical_disks, set (self.connection.query ("SELECT * FROM Win32_LogicalDisk")))
 
-  def test_ipython_attributes (self):
+  def test_ipython_attributes_with_find_classes (self):
     connection = wmi.WMI (find_classes=True)
-    self.assertEquals (connection._getAttributeNames (), [i for i in connection.classes if not i.startswith ("__")])
+    self.assertEquals (sorted (connection._getAttributeNames ()), sorted (i for i in connection.classes if not i.startswith ("__")))
 
   def test_getattr (self):
     "Check that WMI classes are returned by attribute access on their namespace"

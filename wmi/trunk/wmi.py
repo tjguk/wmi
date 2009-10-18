@@ -880,9 +880,8 @@ class _wmi_namespace:
     #
     _set (self, "wmi", namespace)
 
-    # Initialise the "classes" attribute, to avoid infinite recursion in the
-    # __getattr__ method (which uses it).
-    self.classes = {}
+    self._classes = None
+    self._classes_map = {}
     #
     # Pick up the list of classes under this namespace
     #  so that they can be queried, and used as though
@@ -892,17 +891,20 @@ class _wmi_namespace:
     #  regardless
     #
     if find_classes:
-      try:
-        self.classes.update (self.subclasses_of ())
-      except AttributeError:
-        pass
-
+      _ = self.classes
+ 
   def __repr__ (self):
     return "<_wmi_namespace: %s>" % self.wmi
 
   def __str__ (self):
     return repr (self)
 
+  def _get_classes (self):
+    if self._classes is None:
+      self._classes = self.subclasses_of ()
+    return self._classes
+  classes = property (_get_classes)
+  
   def get (self, moniker):
     try:
       return _wmi_object (self.wmi.Get (moniker))
@@ -914,12 +916,16 @@ class _wmi_namespace:
     return self._namespace
 
   def subclasses_of (self, root="", regex=r".*"):
-    classes = {}
-    for c in self._namespace.SubclassesOf (root):
-      klass = c.Path_.Class
-      if re.match (regex, klass):
-        classes[klass] = None
-    return classes
+    try:
+      SubclassesOf = self._namespace.SubclassesOf
+    except AttributeError:
+      return set ()
+    else:
+      return set (
+        c.Path_.Class
+          for c in SubclassesOf (root)
+          if re.match (regex, c.Path_.Class)
+      )
 
   def instances (self, class_name):
     """Return a list of instances of the WMI class. This is
@@ -1102,10 +1108,7 @@ class _wmi_namespace:
     try:
       return self._cached_classes (attribute)
     except pywintypes.com_error:
-      try:
-        return self._cached_classes ("Win32_" + attribute)
-      except pywintypes.com_error:
-        return getattr (self._namespace, attribute)
+      return getattr (self._namespace, attribute)
 
   def _cached_classes (self, class_name):
     """Standard caching helper which keeps track of classes
@@ -1113,14 +1116,13 @@ class _wmi_namespace:
     if found. If this is the first retrieval, store it and
     pass it back
     """
-    if self.classes.get (class_name) is None:
-      self.classes[class_name] = _wmi_class (self, self._namespace.Get (class_name))
-    return self.classes[class_name]
+    if class_name not in self._classes_map:
+      self._classes_map[class_name] = _wmi_class (self, self._namespace.Get (class_name))
+    return self._classes_map[class_name]
 
   def _getAttributeNames (self):
     """Return list of classes for IPython completion engine"""
-    classes = [str (x) for x in self.classes.keys () if not x.startswith ('__')]
-    return classes
+    return [x for x in self.classes if not x.startswith ('__')]
 
 #
 # class _wmi_watcher

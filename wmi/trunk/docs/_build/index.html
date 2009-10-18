@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>WMI - Windows Management Instrumentation &mdash; WMI v1.4.2 documentation</title>
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,6 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="WMI v1.4.2 documentation" href="" />
+    <link rel="next" title="Changes" href="changes.html" />
     <link rel="prev" title="Contents" href="contents.html" /> 
   </head>
   <body>
@@ -30,110 +31,14 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="changes.html" title="Changes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
           <a href="contents.html" title="Contents"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
       </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
-            
-  <div class="section" id="wmi-windows-management-instrumentation">
-<h1>WMI - Windows Management Instrumentation<a class="headerlink" href="#wmi-windows-management-instrumentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="what-is-it">
-<h2>What is it?<a class="headerlink" href="#what-is-it" title="Permalink to this headline">¶</a></h2>
-<p>Windows Management Instrumentation (WMI) is Microsoft&#8217;s implementation of
-Web-Based Enterprise Management (WBEM), an industry initiative to provide
-a Common Information Model (CIM) for pretty much any information about a
-computer system.</p>
-<p>The Python WMI module is a lightweight wrapper on top of the pywin32
-extensions, and hides some of the messy plumbing needed to get Python to
-talk to the WMI API. It&#8217;s pure Python and has been tested against all
-versions of Python from 2.4 to 3.2. It should work with any recent
-version of pywin32.</p>
-</div>
-<div class="section" id="where-do-i-get-it">
-<h2>Where do I get it?<a class="headerlink" href="#where-do-i-get-it" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="http://timgolden.me.uk/python/wmi.html">http://timgolden.me.uk/python/wmi.html</a></p>
-</div>
-<div class="section" id="copyright-license">
-<h2>Copyright &amp; License?<a class="headerlink" href="#copyright-license" title="Permalink to this headline">¶</a></h2>
-<p>Copyright Tim Golden &lt;<a class="reference external" href="mailto:mail&#37;&#52;&#48;timgolden&#46;me&#46;uk">mail<span>&#64;</span>timgolden<span>&#46;</span>me<span>&#46;</span>uk</a>&gt; 5th June 2003
-Licensed under the (GPL-compatible) MIT License:
-<a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a></p>
-</div>
-<div class="section" id="how-do-i-install-it">
-<h2>How do I install it?<a class="headerlink" href="#how-do-i-install-it" title="Permalink to this headline">¶</a></h2>
-<p>When all&#8217;s said and done, it&#8217;s just a module. But for those
-who like setup programs:</p>
-<p>python setup.py install</p>
-<p>Or download the Windows installer and double-click.</p>
-</div>
-<div class="section" id="how-do-i-use-it">
-<h2>How do I use it?<a class="headerlink" href="#how-do-i-use-it" title="Permalink to this headline">¶</a></h2>
-<p>There&#8217;s a tutorial here: <a class="reference external" href="http://timgolden.me.uk/python/wmi-tutorial.html">http://timgolden.me.uk/python/wmi-tutorial.html</a>,
-and some examples at: <a class="reference external" href="http://timgolden.me.uk/python/wmi_cookbook.html">http://timgolden.me.uk/python/wmi_cookbook.html</a>
-but as a quick taster, try this, to show the startup state (Manual,
-Automatic, Disabled) of all stopped services:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
-
-<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span> <span class="p">(</span><span class="n">State</span><span class="o">=</span><span class="s">&quot;Stopped&quot;</span><span class="p">):</span>
-  <span class="k">print</span> <span class="n">s</span><span class="o">.</span><span class="n">Caption</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">StartMode</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="what-s-changed">
-<h2>What&#8217;s Changed?<a class="headerlink" href="#what-s-changed" title="Permalink to this headline">¶</a></h2>
-<p>See the <cite>changes</cite> document</p>
-</div>
-<div class="section" id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>If you&#8217;re running a recent Python (2.4+) on a recent Windows (2k, 2k3, XP)
-and you have Mark Hammond&#8217;s win32 extensions installed, you&#8217;re probably
-up-and-running already. Otherwise...</p>
-<div class="section" id="windows">
-<h3>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
-<p>If you&#8217;re running Win9x / NT4 you&#8217;ll need to get WMI support
-from Microsoft. Microsoft URLs change quite often, so I suggest you
-do this: <a class="reference external" href="http://www.google.com/search?q=wmi+downloads">http://www.google.com/search?q=wmi+downloads</a></p>
-</div>
-<div class="section" id="python">
-<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="http://www.python.org/">http://www.python.org/</a> (just in case you didn&#8217;t know)</p>
-</div>
-<div class="section" id="pywin32-was-win32all">
-<h3>pywin32 (was win32all)<a class="headerlink" href="#pywin32-was-win32all" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="http://starship.python.net/crew/mhammond/win32/Downloads.html">http://starship.python.net/crew/mhammond/win32/Downloads.html</a>
-Specifically, builds 154/155 fixed a problem which affected the WMI
-moniker construction. You can still work without this fix, but some
-more complex monikers will fail.</p>
-</div>
-<div class="section" id="makepy">
-<h3>makepy<a class="headerlink" href="#makepy" title="Permalink to this headline">¶</a></h3>
-<p>(NB my own experience over several systems is that this
-step isn&#8217;t necessary. However, if you have problems...)
-You may have to compile makepy support for some typelibs. The following
-are reported to be significant:</p>
-<ul class="simple">
-<li>Microsoft WMI Scripting Library</li>
-<li>WMI ADSI Extension Type Library</li>
-<li>WMICntl Type Library</li>
-</ul>
-<p>If you&#8217;ve not done this before, start the PythonWin environment, select
-Tools &gt; Com Makepy utility from the menu, select the library by name, and
-click [OK].</p>
-</div>
-</div>
-</div>
-
-
-          </div>
-        </div>
-      </div>
+    </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
             <h3><a href="contents.html">Table Of Contents</a></h3>
@@ -159,6 +64,9 @@ click [OK].</p>
             <h4>Previous topic</h4>
             <p class="topless"><a href="contents.html"
                                   title="previous chapter">Contents</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="changes.html"
+                                  title="next chapter">Changes</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/index.txt"
@@ -179,6 +87,113 @@ click [OK].</p>
           <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="wmi-windows-management-instrumentation">
+<h1>WMI - Windows Management Instrumentation<a class="headerlink" href="#wmi-windows-management-instrumentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-it">
+<h2>What is it?<a class="headerlink" href="#what-is-it" title="Permalink to this headline">¶</a></h2>
+<p>Windows Management Instrumentation (WMI) is Microsoft&#8217;s implementation of
+Web-Based Enterprise Management (WBEM), an industry initiative to provide
+a Common Information Model (CIM) for pretty much any information about a
+computer system.</p>
+<p>The Python WMI module is a lightweight wrapper on top of the pywin32
+extensions, and hides some of the messy plumbing needed to get Python to
+talk to the WMI API. It&#8217;s pure Python and has been tested against all
+versions of Python from 2.4 to 3.2. It should work with any recent
+version of pywin32.</p>
+</div>
+<div class="section" id="where-do-i-get-it">
+<h2>Where do I get it?<a class="headerlink" href="#where-do-i-get-it" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Subversion: <a class="reference external" href="http://svn.timgolden.me.uk/wmi/trunk/">http://svn.timgolden.me.uk/wmi/trunk/</a></li>
+<li>Windows installer: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe">http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe</a></li>
+<li>Zipped-up source: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip">http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip</a></li>
+<li>Older Versions: <a class="reference external" href="http://timgolden.me.uk/python/downloads">http://timgolden.me.uk/python/downloads</a></li>
+</ul>
+</div>
+<div class="section" id="copyright-license">
+<h2>Copyright &amp; License?<a class="headerlink" href="#copyright-license" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Copyright Tim Golden &lt;<a class="reference external" href="mailto:mail&#37;&#52;&#48;timgolden&#46;me&#46;uk">mail<span>&#64;</span>timgolden<span>&#46;</span>me<span>&#46;</span>uk</a>&gt; 2003 - 2009</li>
+<li>Licensed under the (GPL-compatible) MIT License: <a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a></li>
+</ul>
+</div>
+<div class="section" id="how-do-i-install-it">
+<h2>How do I install it?<a class="headerlink" href="#how-do-i-install-it" title="Permalink to this headline">¶</a></h2>
+<p>When all&#8217;s said and done, it&#8217;s just a module. But for those who like setup programs:</p>
+<div class="highlight-python"><pre>python setup.py install</pre>
+</div>
+<p>Or download the Windows installer and double-click.</p>
+</div>
+<div class="section" id="how-do-i-use-it">
+<h2>How do I use it?<a class="headerlink" href="#how-do-i-use-it" title="Permalink to this headline">¶</a></h2>
+<p>Have a look at the <tt class="xref docutils literal"><span class="pre">tutorial</span></tt> or the <tt class="xref docutils literal"><span class="pre">cookbook</span></tt>. As a quick
+taster, try this, to find all Automatic services which are not running
+and offer the option to restart each one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span> <span class="p">(</span><span class="n">StartMode</span><span class="o">=</span><span class="s">&quot;Automatic&quot;</span><span class="p">,</span> <span class="n">State</span><span class="o">=</span><span class="s">&quot;Stopped&quot;</span><span class="p">):</span>
+  <span class="k">if</span> <span class="nb">raw_input</span> <span class="p">(</span><span class="s">&quot;Restart </span><span class="si">%s</span><span class="s">?&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">Caption</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span> <span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Y&quot;</span><span class="p">:</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">StartService</span> <span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-s-changed">
+<h2>What&#8217;s Changed?<a class="headerlink" href="#what-s-changed" title="Permalink to this headline">¶</a></h2>
+<p>See the <a class="reference external" href="changes.html"><em>Changes</em></a> document</p>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re running a recent Python (2.4+) on a recent Windows (2k, 2k3, XP)
+and you have Mark Hammond&#8217;s win32 extensions installed, you&#8217;re probably
+up-and-running already. Otherwise...</p>
+<div class="section" id="windows">
+<h3>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
+<p>If you&#8217;re running Win9x / NT4 you&#8217;ll need to get WMI support
+from Microsoft. Microsoft URLs change quite often, so I suggest you
+do this: <a class="reference external" href="http://www.google.com/search?q=wmi+downloads">http://www.google.com/search?q=wmi+downloads</a></p>
+</div>
+<div class="section" id="python">
+<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://www.python.org/">http://www.python.org/</a> (just in case you didn&#8217;t know)</p>
+</div>
+<div class="section" id="pywin32-was-win32all">
+<h3>pywin32 (was win32all)<a class="headerlink" href="#pywin32-was-win32all" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://starship.python.net/crew/mhammond/win32/Downloads.html">http://starship.python.net/crew/mhammond/win32/Downloads.html</a>
+Specifically, builds 154/155 fixed a problem which affected the WMI
+moniker construction. You can still work without this fix, but some
+more complex monikers will fail. (The current build is 214 so you&#8217;re
+probably ok unless you have some very stringent backwards-compatible
+requirement).</p>
+</div>
+<div class="section" id="makepy">
+<h3>makepy<a class="headerlink" href="#makepy" title="Permalink to this headline">¶</a></h3>
+<p>(NB my own experience over several systems is that this
+step isn&#8217;t necessary. However, if you have problems...)
+You may have to compile makepy support for some typelibs. The following
+are reported to be significant:</p>
+<ul class="simple">
+<li>Microsoft WMI Scripting Library</li>
+<li>WMI ADSI Extension Type Library</li>
+<li>WMICntl Type Library</li>
+</ul>
+<p>If you&#8217;ve not done this before, start the PythonWin environment, select
+Tools &gt; Com Makepy utility from the menu, select the library by name, and
+click [OK].</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -187,6 +202,9 @@ click [OK].</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             >next</a> |</li>
         <li class="right" >
           <a href="contents.html" title="Contents"
              >previous</a> |</li>

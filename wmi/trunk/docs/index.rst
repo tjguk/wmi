@@ -23,24 +23,27 @@ version of pywin32.
 Where do I get it?
 ------------------
 
-http://timgolden.me.uk/python/wmi.html
+* Subversion: http://svn.timgolden.me.uk/wmi/trunk/
+* Windows installer: http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe
+* Zipped-up source: http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip
+
+* Older Versions: http://timgolden.me.uk/python/downloads
 
 
 Copyright & License?
 --------------------
 
-Copyright Tim Golden <mail@timgolden.me.uk> 5th June 2003
-Licensed under the (GPL-compatible) MIT License:
-http://www.opensource.org/licenses/mit-license.php
+* Copyright Tim Golden <mail@timgolden.me.uk> 2003 - 2009
+
+* Licensed under the (GPL-compatible) MIT License: http://www.opensource.org/licenses/mit-license.php
 
 
 How do I install it?
 --------------------
 
-When all's said and done, it's just a module. But for those
-who like setup programs:
+When all's said and done, it's just a module. But for those who like setup programs::
 
-python setup.py install
+  python setup.py install
 
 Or download the Windows installer and double-click.
 
@@ -48,17 +51,16 @@ Or download the Windows installer and double-click.
 How do I use it?
 ----------------
 
-There's a tutorial here: http://timgolden.me.uk/python/wmi-tutorial.html,
-and some examples at: http://timgolden.me.uk/python/wmi_cookbook.html
-but as a quick taster, try this, to show the startup state (Manual,
-Automatic, Disabled) of all stopped services::
+Have a look at the :doc:`tutorial` or the :doc:`cookbook`. As a quick
+taster, try this, to find all Automatic services which are not running
+and offer the option to restart each one::
 
   import wmi
 
   c = wmi.WMI ()
-  for s in c.Win32_Service (State="Stopped"):
-    print s.Caption, s.StartMode
-
+  for s in c.Win32_Service (StartMode="Automatic", State="Stopped"):
+    if raw_input ("Restart %s?" % s.Caption).upper () == "Y":
+      s.StartService ()
 
 What's Changed?
 ---------------
@@ -87,7 +89,9 @@ pywin32 (was win32all)
 http://starship.python.net/crew/mhammond/win32/Downloads.html
 Specifically, builds 154/155 fixed a problem which affected the WMI
 moniker construction. You can still work without this fix, but some
-more complex monikers will fail.
+more complex monikers will fail. (The current build is 214 so you're
+probably ok unless you have some very stringent backwards-compatible
+requirement).
 
 makepy
 ~~~~~~
