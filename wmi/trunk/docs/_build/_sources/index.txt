@@ -23,19 +23,12 @@ version of pywin32.
 Where do I get it?
 ------------------
 
-* Subversion: http://svn.timgolden.me.uk/wmi/trunk/
-* Windows installer: http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe
-* Zipped-up source: http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip
+* **Subversion**: http://svn.timgolden.me.uk/wmi/trunk/
+* **Windows installer**: http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe
+* **Zipped-up source**: http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip
 
-* Older Versions: http://timgolden.me.uk/python/downloads
+* **Older Versions**: http://timgolden.me.uk/python/downloads
 
-
-Copyright & License?
---------------------
-
-* Copyright Tim Golden <mail@timgolden.me.uk> 2003 - 2009
-
-* Licensed under the (GPL-compatible) MIT License: http://www.opensource.org/licenses/mit-license.php
 
 
 How do I install it?
@@ -59,13 +52,21 @@ and offer the option to restart each one::
 
   c = wmi.WMI ()
   for s in c.Win32_Service (StartMode="Automatic", State="Stopped"):
-    if raw_input ("Restart %s?" % s.Caption).upper () == "Y":
+    if raw_input ("Restart %s? " % s.Caption).upper () == "Y":
       s.StartService ()
 
 What's Changed?
 ---------------
 
 See the :doc:`changes` document
+
+Copyright & License?
+--------------------
+
+* Copyright Tim Golden <mail@timgolden.me.uk> 2003 - 2009
+
+* Licensed under the (GPL-compatible) MIT License: 
+  http://www.opensource.org/licenses/mit-license.php
 
 Prerequisites
 -------------

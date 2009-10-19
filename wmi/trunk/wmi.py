@@ -128,6 +128,7 @@ import sys
 import datetime
 import re
 import struct
+import warnings
 
 from win32com.client import GetObject, Dispatch
 import pywintypes
@@ -136,6 +137,36 @@ def signed_to_unsigned (signed):
     """Convert a (possibly signed) long to unsigned hex"""
     unsigned, = struct.unpack ("L", struct.pack ("l", signed))
     return unsigned
+
+class SelfDeprecatingDict (object):
+  
+  dict_only = set (dir (dict)).difference (dir (list))
+  
+  def __init__ (self, dictlike):
+    self.dict = dict (dictlike)
+    self.list = list (self.dict)
+    
+  def __getattr__ (self, attribute):
+    if attribute in self.dict_only:
+      warnings.warn ("In future this will be a list and not a dictionary", DeprecationWarning)
+      return getattr (self.dict, attribute)
+    else:
+      return getattr (self.list, attribute)
+      
+  def __iter__ (self):
+    return iter (self.list)
+    
+  def __str__ (self):
+    return str (self.list)
+    
+  def __repr__ (self):
+    return repr (self.list)
+    
+  def __getitem__ (self, item):
+    try:
+      return self.list[item]
+    except TypeError:
+      return self.dict[item]
 
 class ProvideConstants (object):
   """
@@ -902,7 +933,7 @@ class _wmi_namespace:
   def _get_classes (self):
     if self._classes is None:
       self._classes = self.subclasses_of ()
-    return self._classes
+    return SelfDeprecatingDict (dict.fromkeys (self._classes))
   classes = property (_get_classes)
   
   def get (self, moniker):

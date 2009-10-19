@@ -1,0 +1,5 @@
+@import url("sphinxdoc.css");
+
+div.seealso dl {
+  margin-left : 1em;
+}

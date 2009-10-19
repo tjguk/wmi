@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>WMI - Windows Management Instrumentation &mdash; WMI v1.4.2 documentation</title>
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="WMI v1.4.2 documentation" href="" />
-    <link rel="next" title="Changes" href="changes.html" />
+    <link rel="next" title="wmi Tutorial" href="tutorial.html" />
     <link rel="prev" title="Contents" href="contents.html" /> 
   </head>
   <body>
@@ -31,7 +31,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="changes.html" title="Changes"
+          <a href="tutorial.html" title="wmi Tutorial"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="contents.html" title="Contents"
@@ -46,10 +46,10 @@
 <li><a class="reference external" href="">WMI - Windows Management Instrumentation</a><ul>
 <li><a class="reference external" href="#what-is-it">What is it?</a></li>
 <li><a class="reference external" href="#where-do-i-get-it">Where do I get it?</a></li>
-<li><a class="reference external" href="#copyright-license">Copyright &amp; License?</a></li>
 <li><a class="reference external" href="#how-do-i-install-it">How do I install it?</a></li>
 <li><a class="reference external" href="#how-do-i-use-it">How do I use it?</a></li>
 <li><a class="reference external" href="#what-s-changed">What&#8217;s Changed?</a></li>
+<li><a class="reference external" href="#copyright-license">Copyright &amp; License?</a></li>
 <li><a class="reference external" href="#prerequisites">Prerequisites</a><ul>
 <li><a class="reference external" href="#windows">Windows</a></li>
 <li><a class="reference external" href="#python">Python</a></li>
@@ -65,8 +65,8 @@
             <p class="topless"><a href="contents.html"
                                   title="previous chapter">Contents</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="changes.html"
-                                  title="next chapter">Changes</a></p>
+            <p class="topless"><a href="tutorial.html"
+                                  title="next chapter">wmi Tutorial</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/index.txt"
@@ -110,17 +110,10 @@ version of pywin32.</p>
 <div class="section" id="where-do-i-get-it">
 <h2>Where do I get it?<a class="headerlink" href="#where-do-i-get-it" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Subversion: <a class="reference external" href="http://svn.timgolden.me.uk/wmi/trunk/">http://svn.timgolden.me.uk/wmi/trunk/</a></li>
-<li>Windows installer: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe">http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe</a></li>
-<li>Zipped-up source: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip">http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip</a></li>
-<li>Older Versions: <a class="reference external" href="http://timgolden.me.uk/python/downloads">http://timgolden.me.uk/python/downloads</a></li>
-</ul>
-</div>
-<div class="section" id="copyright-license">
-<h2>Copyright &amp; License?<a class="headerlink" href="#copyright-license" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Copyright Tim Golden &lt;<a class="reference external" href="mailto:mail&#37;&#52;&#48;timgolden&#46;me&#46;uk">mail<span>&#64;</span>timgolden<span>&#46;</span>me<span>&#46;</span>uk</a>&gt; 2003 - 2009</li>
-<li>Licensed under the (GPL-compatible) MIT License: <a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a></li>
+<li><strong>Subversion</strong>: <a class="reference external" href="http://svn.timgolden.me.uk/wmi/trunk/">http://svn.timgolden.me.uk/wmi/trunk/</a></li>
+<li><strong>Windows installer</strong>: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe">http://timgolden.me.uk/python/downloads/WMI-1.4.2.win32.exe</a></li>
+<li><strong>Zipped-up source</strong>: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip">http://timgolden.me.uk/python/downloads/WMI-1.4.2.zip</a></li>
+<li><strong>Older Versions</strong>: <a class="reference external" href="http://timgolden.me.uk/python/downloads">http://timgolden.me.uk/python/downloads</a></li>
 </ul>
 </div>
 <div class="section" id="how-do-i-install-it">
@@ -132,14 +125,14 @@ version of pywin32.</p>
 </div>
 <div class="section" id="how-do-i-use-it">
 <h2>How do I use it?<a class="headerlink" href="#how-do-i-use-it" title="Permalink to this headline">¶</a></h2>
-<p>Have a look at the <tt class="xref docutils literal"><span class="pre">tutorial</span></tt> or the <tt class="xref docutils literal"><span class="pre">cookbook</span></tt>. As a quick
+<p>Have a look at the <a class="reference external" href="tutorial.html"><em>wmi Tutorial</em></a> or the <tt class="xref docutils literal"><span class="pre">cookbook</span></tt>. As a quick
 taster, try this, to find all Automatic services which are not running
 and offer the option to restart each one:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span> <span class="p">(</span><span class="n">StartMode</span><span class="o">=</span><span class="s">&quot;Automatic&quot;</span><span class="p">,</span> <span class="n">State</span><span class="o">=</span><span class="s">&quot;Stopped&quot;</span><span class="p">):</span>
-  <span class="k">if</span> <span class="nb">raw_input</span> <span class="p">(</span><span class="s">&quot;Restart </span><span class="si">%s</span><span class="s">?&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">Caption</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span> <span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Y&quot;</span><span class="p">:</span>
+  <span class="k">if</span> <span class="nb">raw_input</span> <span class="p">(</span><span class="s">&quot;Restart </span><span class="si">%s</span><span class="s">? &quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">Caption</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span> <span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Y&quot;</span><span class="p">:</span>
     <span class="n">s</span><span class="o">.</span><span class="n">StartService</span> <span class="p">()</span>
 </pre></div>
 </div>
@@ -147,6 +140,14 @@ and offer the option to restart each one:</p>
 <div class="section" id="what-s-changed">
 <h2>What&#8217;s Changed?<a class="headerlink" href="#what-s-changed" title="Permalink to this headline">¶</a></h2>
 <p>See the <a class="reference external" href="changes.html"><em>Changes</em></a> document</p>
+</div>
+<div class="section" id="copyright-license">
+<h2>Copyright &amp; License?<a class="headerlink" href="#copyright-license" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Copyright Tim Golden &lt;<a class="reference external" href="mailto:mail&#37;&#52;&#48;timgolden&#46;me&#46;uk">mail<span>&#64;</span>timgolden<span>&#46;</span>me<span>&#46;</span>uk</a>&gt; 2003 - 2009</li>
+<li>Licensed under the (GPL-compatible) MIT License:
+<a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a></li>
+</ul>
 </div>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
@@ -203,7 +204,7 @@ click [OK].</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="changes.html" title="Changes"
+          <a href="tutorial.html" title="wmi Tutorial"
              >next</a> |</li>
         <li class="right" >
           <a href="contents.html" title="Contents"
