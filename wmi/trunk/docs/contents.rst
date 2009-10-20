@@ -8,4 +8,5 @@ Contents
 
     index
     tutorial
+    cookbook
     changes
