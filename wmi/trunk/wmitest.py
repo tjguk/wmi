@@ -146,6 +146,12 @@ class TestBasicConnections (unittest.TestCase):
     "By default, don't scan for classes but load them on demand"
     self.assertFalse (wmi.WMI ()._classes)
     self.assert_ (wmi.WMI ().classes)
+    
+  def test_classes_acts_as_list (self):
+    self.assert_ (wmi.WMI ().classes.index)
+
+  def test_classes_acts_as_dict (self):
+    self.assert_ (wmi.WMI ().classes.keys)
 
 class TestThreadedConnection (unittest.TestCase):
 
@@ -390,11 +396,20 @@ class TestWatcher (TestWMI):
       notification_type="Creation",
       DeviceID=new_letter
     )
-    threading.Timer (2, _create, (new_letter,)).start ()
+    t = threading.Timer (2, _create, (new_letter,))
+    t.start ()
     found_disk = watcher (timeout_ms=20000)
     self.assert_ (isinstance (found_disk, wmi._wmi_object))
     self.assertEqual (found_disk.Caption, new_letter)
+    t.join ()
 
+  def test_valid_notification_types (self):
+    for notification_type in ['operation', 'modification', 'creation', 'deletion']:
+      self.assert_ (self.connection.Win32_LogicalDisk.watch_for (notification_type=notification_type))
+  
+  def test_invalid_notification_types (self):
+    self.assertRaises (wmi.x_wmi, self.connection.Win32_LogicalDisk.watch_for, notification_type="***")
+  
   def do_not_test_extrinsic_event (self):
 
     #

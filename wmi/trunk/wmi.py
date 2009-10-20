@@ -818,6 +818,10 @@ class _wmi_class (_wmi_object):
     if self._namespace is None:
       raise x_wmi_no_namespace ("You cannot watch directly from a WMI class")
 
+    valid_notification_types = ("operation", "creation", "deletion", "modification")
+    if notification_type.lower () not in valid_notification_types:
+      raise x_wmi ("notification_type must be one of %s" % ", ".join (valid_notification_types))
+    
     return self._namespace.watch_for (
       notification_type=notification_type,
       wmi_class=self,
