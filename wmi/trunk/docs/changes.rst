@@ -7,7 +7,7 @@ Changes
 * WMI now needs Python 2.4+. It wouldn't be impossible to continue to support older
   versions but it's increasingly onerous and 2.4 is now 5 years old.
 
-* Tests - WMI now comes with a unittest-based set of tests which have been run (and passed) 
+* Tests - WMI now comes with a unittest-based set of tests which have been run (and passed)
   against all versions of Python from 2.4 to 3.2 using pywin32 214.
 
 * Exception changes - x_wmi and its subclasses now store the underlying COM error as .com_error instead of returning
@@ -48,7 +48,7 @@ Changes
 
 * Allow positional parameters for method calls. Previously, parameters had to
   be passed by keyword and failure to do so resulted in an obscure error message.
-  
+
 * Allow extrinsic events to use the same watcher API as intrinsic ones. Under the
   covers these behave slightly differently. Intrinsic events now default to modification
   rather than creation.

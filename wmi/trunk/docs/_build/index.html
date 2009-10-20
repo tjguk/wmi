@@ -131,7 +131,7 @@ and offer the option to restart each one:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span> <span class="p">(</span><span class="n">StartMode</span><span class="o">=</span><span class="s">&quot;Automatic&quot;</span><span class="p">,</span> <span class="n">State</span><span class="o">=</span><span class="s">&quot;Stopped&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span> <span class="p">(</span><span class="n">StartMode</span><span class="o">=</span><span class="s">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">State</span><span class="o">=</span><span class="s">&quot;Stopped&quot;</span><span class="p">):</span>
   <span class="k">if</span> <span class="nb">raw_input</span> <span class="p">(</span><span class="s">&quot;Restart </span><span class="si">%s</span><span class="s">? &quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">Caption</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span> <span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Y&quot;</span><span class="p">:</span>
     <span class="n">s</span><span class="o">.</span><span class="n">StartService</span> <span class="p">()</span>
 </pre></div>
@@ -166,8 +166,8 @@ do this: <a class="reference external" href="http://www.google.com/search?q=wmi+
 </div>
 <div class="section" id="pywin32-was-win32all">
 <h3>pywin32 (was win32all)<a class="headerlink" href="#pywin32-was-win32all" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="http://starship.python.net/crew/mhammond/win32/Downloads.html">http://starship.python.net/crew/mhammond/win32/Downloads.html</a>
-Specifically, builds 154/155 fixed a problem which affected the WMI
+<p><a class="reference external" href="http://sourceforge.net/projects/pywin32/files/">http://sourceforge.net/projects/pywin32/files/</a></p>
+<p>Specifically, builds 154/155 fixed a problem which affected the WMI
 moniker construction. You can still work without this fix, but some
 more complex monikers will fail. (The current build is 214 so you&#8217;re
 probably ok unless you have some very stringent backwards-compatible

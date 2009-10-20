@@ -3,3 +3,14 @@
 div.seealso dl {
   margin-left : 1em;
 }
+
+div.admonition {
+  font-size : 84%;
+}
+
+@media print {
+  body {
+    margin : 0 0;
+	background-color : white;
+  }
+}

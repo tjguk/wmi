@@ -8,15 +8,15 @@ WMI - Windows Management Instrumentation
 What is it?
 -----------
 
-Windows Management Instrumentation (WMI) is Microsoft's implementation of 
-Web-Based Enterprise Management (WBEM), an industry initiative to provide 
-a Common Information Model (CIM) for pretty much any information about a 
+Windows Management Instrumentation (WMI) is Microsoft's implementation of
+Web-Based Enterprise Management (WBEM), an industry initiative to provide
+a Common Information Model (CIM) for pretty much any information about a
 computer system.
 
 The Python WMI module is a lightweight wrapper on top of the pywin32
 extensions, and hides some of the messy plumbing needed to get Python to
 talk to the WMI API. It's pure Python and has been tested against all
-versions of Python from 2.4 to 3.2. It should work with any recent 
+versions of Python from 2.4 to 3.2. It should work with any recent
 version of pywin32.
 
 
@@ -51,7 +51,7 @@ and offer the option to restart each one::
   import wmi
 
   c = wmi.WMI ()
-  for s in c.Win32_Service (StartMode="Automatic", State="Stopped"):
+  for s in c.Win32_Service (StartMode="Auto", State="Stopped"):
     if raw_input ("Restart %s? " % s.Caption).upper () == "Y":
       s.StartService ()
 
@@ -65,7 +65,7 @@ Copyright & License?
 
 * Copyright Tim Golden <mail@timgolden.me.uk> 2003 - 2009
 
-* Licensed under the (GPL-compatible) MIT License: 
+* Licensed under the (GPL-compatible) MIT License:
   http://www.opensource.org/licenses/mit-license.php
 
 Prerequisites
@@ -87,7 +87,8 @@ http://www.python.org/ (just in case you didn't know)
 
 pywin32 (was win32all)
 ~~~~~~~~~~~~~~~~~~~~~~
-http://starship.python.net/crew/mhammond/win32/Downloads.html
+http://sourceforge.net/projects/pywin32/files/
+
 Specifically, builds 154/155 fixed a problem which affected the WMI
 moniker construction. You can still work without this fix, but some
 more complex monikers will fail. (The current build is 214 so you're

@@ -5,25 +5,25 @@ Introduction
 ------------
 From the Wikipedia entry for WMI:
 
-  Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an   
-  operating system interface through which instrumented components can provide information and notification. WMI is 
-  Microsoft's implementation of the Web-Based Enterprise Management(WBEM) Standard from the Distributed Management 
-  Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and 
-  servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows 
+  Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
+  operating system interface through which instrumented components can provide information and notification. WMI is
+  Microsoft's implementation of the Web-Based Enterprise Management(WBEM) Standard from the Distributed Management
+  Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
+  servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows
   Me, and Windows 2000.
 
-This tutorial covers accessing WMI specifically using the Python programming language and assumes you have 
-downloaded and installed Python itself, the pywin32 extensions and the WMI Python module. Python is able to use WMI 
-by means of COM-enabling packages such as Mark Hammond's pywin32 extensions or the comtypes spinoff from Thomas 
-Heller's ctypes. The WMI module assumes that the pywin32 extensions are present, and exposes a slightly more 
-Python-friendly interface to the sometimes messy WMI scripting API. NB it does nothing but wrap pywin32 
+This tutorial covers accessing WMI specifically using the Python programming language and assumes you have
+downloaded and installed Python itself, the pywin32 extensions and the WMI Python module. Python is able to use WMI
+by means of COM-enabling packages such as Mark Hammond's pywin32 extensions or the comtypes spinoff from Thomas
+Heller's ctypes. The WMI module assumes that the pywin32 extensions are present, and exposes a slightly more
+Python-friendly interface to the sometimes messy WMI scripting API. NB it does nothing but wrap pywin32
 functionality: if WMI under pywin32 is too slow, this module won't be any faster.
 
 The Basics
 ----------
 
-We're not really going to be looking at what you can do with WMI in general, except by way of demonstrating some 
-functionality within the module. There are no few examples around the web of what you can do with the technology 
+We're not really going to be looking at what you can do with WMI in general, except by way of demonstrating some
+functionality within the module. There are no few examples around the web of what you can do with the technology
 (and you can do most things with it if you try hard enough). Some links are at the bottom of the document.
 
 Connecting
@@ -42,7 +42,7 @@ If you need to connect to a different machine, specify its name as the first par
 Querying
 ~~~~~~~~
 
-The most common thing you'll be doing with WMI is finding out about various parts of your system. That involves 
+The most common thing you'll be doing with WMI is finding out about various parts of your system. That involves
 determining which WMI class to interrogate and then treating that as an attribute of the Python WMI object::
 
   import wmi
@@ -50,20 +50,20 @@ determining which WMI class to interrogate and then treating that as an attribut
   for os in c.Win32_OperatingSystem():
     print os.Caption
 
-The "which WMI class to interrogate" part of that earlier sentence is not always so easy as it sounds. However, 
-with a good search engine at your disposal, you can be pretty much assured that someone somewhere has done the same 
-thing as you albeit with a different language. There are some helpful links at the bottom of this document, but I 
+The "which WMI class to interrogate" part of that earlier sentence is not always so easy as it sounds. However,
+with a good search engine at your disposal, you can be pretty much assured that someone somewhere has done the same
+thing as you albeit with a different language. There are some helpful links at the bottom of this document, but I
 often simply stick "WMI thing-to-do" into my search engine of choice and scan the results for convincing answers.
 
-Note that, although there is only, in this case, one Operating System, a WMI query always returns a list, possibly 
-of one item. The items in the list are wrapped by the Python module for attribute access. In this case, the 
-Win32_OperatingSystem class has several attributes, one of which is .Caption, which refers to the name of the 
+Note that, although there is only, in this case, one Operating System, a WMI query always returns a list, possibly
+of one item. The items in the list are wrapped by the Python module for attribute access. In this case, the
+Win32_OperatingSystem class has several attributes, one of which is .Caption, which refers to the name of the
 installed OS.
 
 Monitoring
 ~~~~~~~~~~
 
-WMI has the concept of events. There are two types, intrinsic and extrinsic, which are discussed below. The Python 
+WMI has the concept of events. There are two types, intrinsic and extrinsic, which are discussed below. The Python
 module makes the difference as transparent as it can. Say you wanted to track new processes starting up::
 
   import wmi
@@ -74,28 +74,30 @@ module makes the difference as transparent as it can. Say you wanted to track ne
     print new_process.Caption
 
 
-Note that you must pass one of "creation", "deletion", "modification" or "operation" to the .watch_for method. If 
+Note that you must pass one of "creation", "deletion", "modification" or "operation" to the .watch_for method. If
 not, slightly odd errors will result.
 
 ..  versionadded:: 1.3.1
-    If you don't specify a modification type to an intrinsic event then 
+    If you don't specify a notification type to an intrinsic event then
     "operation" will be assumed, which triggers on any change to an object of that class.
 
 Updating
 ~~~~~~~~
 
-Some, but by no means all, WMI classes allow for the possibility of writing information back. This you do by 
-setting attributes as usual in Python. Note that the class may let you do this without complaint even though 
-nothing useful has happened. To change the display name of a service, for example, you need to call the service's 
+Some, but by no means all, WMI classes allow for the possibility of writing information back. This you do by
+setting attributes as usual in Python. Note that the class may let you do this without complaint even though
+nothing useful has happened. To change the display name of a service, for example, you need to call the service's
 .Change method. You can update the displayName attribute directly without error, but it will have no effect.
 
-The most typical place in which you'll set an attribute directly is when you're creating a whole new object from a 
-class's .new method. In that case you can either set all the parameters as keyword arguments to the .new call or 
+The most typical place in which you'll set an attribute directly is when you're creating a whole new object from a
+class's .new method. In that case you can either set all the parameters as keyword arguments to the .new call or
 you can specify them one by one afterwards.
-Methods
 
-Some WMI classes have methods to operate on them. You can call them as though they were normal class or instance 
-methods in Python. From version 1.3.1, parameters can be positioned; before that, they must be named. If you wanted 
+Methods
+~~~~~~~
+
+Some WMI classes have methods to operate on them. You can call them as though they were normal class or instance
+methods in Python. From version 1.3.1, parameters can be positioned; before that, they must be named. If you wanted
 to stop the (running) RunAs service, whose short name is "seclogon"::
 
   import wmi
@@ -114,23 +116,23 @@ to stop the (running) RunAs service, whose short name is "seclogon"::
 Advanced Stuff
 --------------
 
-The basics of what can be done with the WMI module is covered above and this is probably as far as many people need 
-to go. However, there are many slight subtleties to WMI and you may find yourself studying a VBS-oriented example 
+The basics of what can be done with the WMI module is covered above and this is probably as far as many people need
+to go. However, there are many slight subtleties to WMI and you may find yourself studying a VBS-oriented example
 somewhere on the web and thinking "How do I do this in Python?".
 
 Advanced Connecting
 ~~~~~~~~~~~~~~~~~~~
 
-The .connect function(aliased as .WMI) has quite a few parameters, most of which are optional and can safely be 
-ignored. For the majority of them, I would refer you to the MS documentation on WMI monikers into which they slot 
+The .connect function(aliased as .WMI) has quite a few parameters, most of which are optional and can safely be
+ignored. For the majority of them, I would refer you to the MS documentation on WMI monikers into which they slot
 fairly straightforwardly. We will introduce here a few of the more common requirements.
 
 Connecting to a remote machine
 ******************************
 
-This is the most common and the most straightforward extra parameter. It is the first positional parameter or the 
-one named "computer". You can connect to your own computer this way by specifying nothing, a blank string, a dot or 
-any of the computer's DNS names, including localhost. But usually you just don't need to pass the parameter at all. 
+This is the most common and the most straightforward extra parameter. It is the first positional parameter or the
+one named "computer". You can connect to your own computer this way by specifying nothing, a blank string, a dot or
+any of the computer's DNS names, including localhost. But usually you just don't need to pass the parameter at all.
 To connect to the WMI subsystem on a computer named "MachineB"::
 
   import wmi
@@ -139,9 +141,9 @@ To connect to the WMI subsystem on a computer named "MachineB"::
 Connecting to a remote machine as a named user
 **********************************************
 
-This is the second most common need and is fairly straightforward, but with a few caveats. The first is that, no 
-matter how hard you try to obfuscate, you can't connect to your local computer this way. The second is this 
-technique doesn't always play well with the many layers of WMI security. More on that below in troubleshooting. To 
+This is the second most common need and is fairly straightforward, but with a few caveats. The first is that, no
+matter how hard you try to obfuscate, you can't connect to your local computer this way. The second is this
+technique doesn't always play well with the many layers of WMI security. More on that below in troubleshooting. To
 connect to a machine called "MachineB" with username "fred" and password "secret"::
 
   import wmi
@@ -150,10 +152,10 @@ connect to a machine called "MachineB" with username "fred" and password "secret
 Connecting to a particular namespace
 ************************************
 
-WMI classes are organised into a namespace hierarchy. The majority of the useful ones are under the cimv2 
-namespace, which is the default. But add-on providers may supply extra namespaces, for example MicrosoftIISv2 or 
-DEFAULT/StdRegProv. To use a different namespace from the default(which is, incidentally, not the one named 
-default!) specify it via the namespace parameter. All namespaces are assumed to start from root so it need not be 
+WMI classes are organised into a namespace hierarchy. The majority of the useful ones are under the cimv2
+namespace, which is the default. But add-on providers may supply extra namespaces, for example MicrosoftIISv2 or
+DEFAULT/StdRegProv. To use a different namespace from the default(which is, incidentally, not the one named
+default!) specify it via the namespace parameter. All namespaces are assumed to start from root so it need not be
 specified, although if you want to specify the root namespace itself, you can do::
 
   import wmi
@@ -162,8 +164,8 @@ specified, although if you want to specify the root namespace itself, you can do
 Specifying the full moniker
 ***************************
 
-In some cases you want to be able to pass the full moniker along, either because the moniker itself is so complex, 
-or because you want to be able to cut-and-paste from elsewhere. In that case, pass the moniker as a string via the 
+In some cases you want to be able to pass the full moniker along, either because the moniker itself is so complex,
+or because you want to be able to cut-and-paste from elsewhere. In that case, pass the moniker as a string via the
 "moniker" parameter::
 
   import wmi
@@ -174,23 +176,23 @@ or because you want to be able to cut-and-paste from elsewhere. In that case, pa
 Connecting to a specific class or object
 ****************************************
 
-A special case of the full moniker is that it can be used to connect directly to a WMI class or even a specific 
-object. The Python module will notice that the moniker refers to a class or object and will return the wrapped 
-object directly rather than a namespace. Any WMI object's path can be used as a moniker to recreate it, so to 
+A special case of the full moniker is that it can be used to connect directly to a WMI class or even a specific
+object. The Python module will notice that the moniker refers to a class or object and will return the wrapped
+object directly rather than a namespace. Any WMI object's path can be used as a moniker to recreate it, so to
 attach directly to the Win32_LogicalDisk class, for example::
 
   import wmi
   logical_disk = wmi.WMI(moniker="//./root/cimv2:Win32_LogicalDisk")
 
-This is equivalent to getting hold of the class through the normal mechanism although it's mostly of use internally 
-to the module and when translating examples which use the technique. Access to a specific object is similar and 
+This is equivalent to getting hold of the class through the normal mechanism although it's mostly of use internally
+to the module and when translating examples which use the technique. Access to a specific object is similar and
 slightly more useful::
 
   import wmi
   c_drive = wmi.WMI(moniker='//./root/cimv2:Win32_LogicalDisk.DeviceID="C:"')
 
-This object is the same as you'd have received by querying against the Win32_LogicalDisk in the cimv2 namespace 
-with a parameter of DeviceID="C:" so from the point of view of the Python module is not so very useful. However it 
+This object is the same as you'd have received by querying against the Win32_LogicalDisk in the cimv2 namespace
+with a parameter of DeviceID="C:" so from the point of view of the Python module is not so very useful. However it
 is a fairly common usage in VBS examples on the web and eases translation a little.
 
 Advanced Querying
@@ -199,9 +201,9 @@ Advanced Querying
 Filtering the returned list
 ***************************
 
-We've already seen this in action above; I just didn't comment on it at the time. When you "call" a WMI class, you 
-can pass along simple equal-to parameters to narrow down the list. This filtering is happening at the WMI level; 
-you can still do whatever post-hoc filtering you want in Python once you've got the values back. Note that, even if 
+We've already seen this in action above; I just didn't comment on it at the time. When you "call" a WMI class, you
+can pass along simple equal-to parameters to narrow down the list. This filtering is happening at the WMI level;
+you can still do whatever post-hoc filtering you want in Python once you've got the values back. Note that, even if
 the resulting list is only one element long, it is still a list. To find all fixed disks::
 
   import wmi
@@ -213,9 +215,9 @@ the resulting list is only one element long, it is still a list. To find all fix
 Selecting only certain fields
 *****************************
 
-By default, all fields in the class will be returned. For reasons of performance or simply manageability, you may 
-want to specify that only certain fields be returned by the query. This is done by setting the first positional 
-parameter to a list of field names. Note that the key field (typically an id or a unique name or even a combination) 
+By default, all fields in the class will be returned. For reasons of performance or simply manageability, you may
+want to specify that only certain fields be returned by the query. This is done by setting the first positional
+parameter to a list of field names. Note that the key field (typically an id or a unique name or even a combination)
 will always be returned::
 
   import wmi
@@ -227,7 +229,7 @@ will always be returned::
 Performing arbitrary WQL queries
 ********************************
 
-If you want to carry out arbitrary WMI queries, using its pseudo-SQL language WQL, you can use the .query method of 
+If you want to carry out arbitrary WMI queries, using its pseudo-SQL language WQL, you can use the .query method of
 the namespace. To list all non-fixed disks, for example::
 
   import wmi
@@ -243,11 +245,11 @@ Advanced Monitoring
 Intrinsic events
 ****************
 
-Intrinsic events occur when you hook into a general event mechanism offered by the WMI system to poll other classes 
-on your behalf. You can track the creation, modification or deletion of any WMI class. You have to specify the type 
-of event (creation, deletion, modification or simply operation to catch any type) and give a polling frequency in 
-whole seconds. After those parameters, you can pass along keyword parameters in the normal way to narrow down the 
-events returned. Note that, since this is polling behind the scenes, you do not want to use this to, say, monitor 
+Intrinsic events occur when you hook into a general event mechanism offered by the WMI system to poll other classes
+on your behalf. You can track the creation, modification or deletion of any WMI class. You have to specify the type
+of event (creation, deletion, modification or simply operation to catch any type) and give a polling frequency in
+whole seconds. After those parameters, you can pass along keyword parameters in the normal way to narrow down the
+events returned. Note that, since this is polling behind the scenes, you do not want to use this to, say, monitor
 an entire directory structure.
 
 To watch an event log for errors, say::
@@ -262,16 +264,16 @@ To watch an event log for errors, say::
 
 A caveat here: this is polling, and at the frequency you've specified. It is possible to miss events this way.
 
-The return from a watcher is in fact a special :class:`_wmi_event object`, 
-subclass of a conventional :class:`_wmi_object`, and which includes, for 
-intrinsic events, the event type, timestamp and previous value for a 
-modification as attributes: :attr:`_wmi_event.event_type`, :attr:`_wmi_event.timestamp` 
+The return from a watcher is in fact a special :class:`_wmi_event object`,
+subclass of a conventional :class:`_wmi_object`, and which includes, for
+intrinsic events, the event type, timestamp and previous value for a
+modification as attributes: :attr:`_wmi_event.event_type`, :attr:`_wmi_event.timestamp`
 and :attr:`_wmi_event.previous` respectively.
 
 Extrinsic events
 ****************
 
-Note that, while "Win32_NTLogEvent" ends in "Event", it is not in fact an extrinsic event. You can tell which 
+Note that, while "Win32_NTLogEvent" ends in "Event", it is not in fact an extrinsic event. You can tell which
 classes are extrinsic events by examining their derivation and looking for `__ExtrinsicEvent`::
 
   import wmi
@@ -285,9 +287,9 @@ Alternatively, you can go top down and look for subclasses of __ExtrinsicEvent::
   for i in c.subclasses_of("__ExtrinsicEvent"):
     print i
 
-You use extrinsic events in much the same way as intrinsic ones. The difference is that any event type and delay 
-are ignored since WMI isn't polling on your behalf, but waiting on the underlying subsystem. The return from the 
-watcher is still a _wmi_event object (1.3.1) but without the extra information, which isn't supplied by WMI. Suppose 
+You use extrinsic events in much the same way as intrinsic ones. The difference is that any event type and delay
+are ignored since WMI isn't polling on your behalf, but waiting on the underlying subsystem. The return from the
+watcher is still a _wmi_event object (1.3.1) but without the extra information, which isn't supplied by WMI. Suppose
 you wanted to do something whenever your computer came out of standby, eg to notify an IM group of your presence::
 
   import wmi
@@ -329,8 +331,8 @@ For an intrinsic modification event, you could compare the before and after valu
 Watchers with timeouts
 **********************
 
-But there's more! Although you can use these watchers inside threads (of which more below) it might be easier in 
-some cases to poll them with a timeout. If, for example, you wanted to monitor event log entries on two boxes 
+But there's more! Although you can use these watchers inside threads (of which more below) it might be easier in
+some cases to poll them with a timeout. If, for example, you wanted to monitor event log entries on two boxes
 without getting into threading and queues::
 
   import wmi
@@ -367,7 +369,7 @@ More About Methods
 Determing available methods
 ***************************
 
-If you examine the keys of the .methods dictionary which every wrapped WMI class uses to cache its wrapped methods, 
+If you examine the keys of the .methods dictionary which every wrapped WMI class uses to cache its wrapped methods,
 you will see what methods are exposed::
 
   import wmi
@@ -377,7 +379,7 @@ you will see what methods are exposed::
 Showing method signatures
 *************************
 
-Each wrapped method produces its function signature as its repr or str. If a function such as .Shutdown requires 
+Each wrapped method produces its function signature as its repr or str. If a function such as .Shutdown requires
 additional privileges, this is also indicated::
 
   import wmi
@@ -388,14 +390,14 @@ additional privileges, this is also indicated::
     print method
 
 
-Note that if a parameter is expected to be a list it will be suffixed with "[]". Note also that the return values 
+Note that if a parameter is expected to be a list it will be suffixed with "[]". Note also that the return values
 are always a tuple, albeit of length one.
 
 Finding a method's Win32 API equivalent
 ***************************************
 
-I was a bit surprised to come across this myself, but WMI tells you which Win32 API call is going on under the 
-covers when you call a WMI method (not, unfortunately, for a property). This is exposed as a function wrapper's 
+I was a bit surprised to come across this myself, but WMI tells you which Win32 API call is going on under the
+covers when you call a WMI method (not, unfortunately, for a property). This is exposed as a function wrapper's
 .provenance attribute::
 
   import wmi
@@ -408,11 +410,11 @@ More Advanced Topics: Bits & Pieces
 Creating WMI Objects
 ********************
 
-WMI exposes a SpawnInstance\_ method which is wrapped as the :meth:`_wmi_object.new` method 
-of the Python WMI classes. But you'll use 
-this method far less often than you think. If you want to create a new disk share, for example, rather than using 
-`Win32_Share.new`, you'll actually call the `Win32_Share` class's `Create` method. 
-In fact, most of the classes which allow instance creation via WMI offer a 
+WMI exposes a SpawnInstance\_ method which is wrapped as the :meth:`_wmi_object.new` method
+of the Python WMI classes. But you'll use
+this method far less often than you think. If you want to create a new disk share, for example, rather than using
+`Win32_Share.new`, you'll actually call the `Win32_Share` class's `Create` method.
+In fact, most of the classes which allow instance creation via WMI offer a
 `Create` method (`Win32_Process`, `Win32_Share` etc.)::
 
   import wmi
@@ -423,14 +425,14 @@ In fact, most of the classes which allow instance creation via WMI offer a
   else:
     raise RuntimeError, "Problem creating share: %d" % result
 
-The times you will need to spawn a new instance are when you need to feed one WMI object with another created on 
-the fly. Typical examples are passing security descriptors to new objects or process startup information to a new 
+The times you will need to spawn a new instance are when you need to feed one WMI object with another created on
+the fly. Typical examples are passing security descriptors to new objects or process startup information to a new
 process. This example from MSDN can be translated into Python as follows::
 
   import wmi
 
   SW_SHOWNORMAL = 1
-  
+
   c = wmi.WMI()
   process_startup = c.Win32_ProcessStartup.new()
   process_startup.ShowWindow = SW_SHOWNORMAL
@@ -471,7 +473,7 @@ WMI objects occur within a hierarchy of classes. Each object knows its own ances
   c = wmi.WMI()
   print c.Win32_Process.derivation()
 
-You can also look down the tree by finding all the subclasses of a named class, optionally filtering via a regex. 
+You can also look down the tree by finding all the subclasses of a named class, optionally filtering via a regex.
 To find all extrinsic event classes other than the builtin ones (indicated by a leading underscore)::
 
   import wmi
@@ -483,14 +485,14 @@ To find all extrinsic event classes other than the builtin ones (indicated by a 
 Comparing two WMI objects for equality
 **************************************
 
-The :meth:`_wmi_object.__eq__` operator is overridden in wrapped WMI classes and 
-calls the underlying .CompareTo method, so comparing two WMI objects for equality 
+The :meth:`_wmi_object.__eq__` operator is overridden in wrapped WMI classes and
+calls the underlying .CompareTo method, so comparing two WMI objects for equality
 should do The Right Thing.
 
 Associators
 ***********
 
-Associators are classes which link together other classes. If, for example, you want to know what groups are on 
+Associators are classes which link together other classes. If, for example, you want to know what groups are on
 your system, and which users are in each group::
 
   import wmi
@@ -510,7 +512,7 @@ which can also be written in terms of the associator classes::
     print group.Caption
     for user in group.associators("Win32_GroupUser"):
       print "  ", user.Caption
-      
+
 ..  versionadded:: 1.3.1
     The :meth:`_wmi_object.associators` method will convert its results to
     a _wmi_object.
@@ -521,29 +523,29 @@ Caveats, Troubleshooting and Performance
 Speeding things up
 ******************
 
-Thanks to a useful collaboration last summer with Paul Tiemann, the module was able to speed things up considerably 
-if needed with a combination of caching and lightweight calls where needed. Not all of that is covered here, but 
-the most straightforward improvements combine removing runtime introspection and caching so that wrappers are 
+Thanks to a useful collaboration last summer with Paul Tiemann, the module was able to speed things up considerably
+if needed with a combination of caching and lightweight calls where needed. Not all of that is covered here, but
+the most straightforward improvements combine removing runtime introspection and caching so that wrappers are
 generated only on demand and can be pre-cached.
 
 Turning off introspection
 *************************
 
-The focus of the module originally, and still a large part of its use today, is in the interpreter. For that 
-reason, when you instantiate a WMI namespace it looks for all the classes available in that namespace. But this 
-takes quite a while on the larger namespaces and is unnecessary even on the smaller ones once you know what you're 
+The focus of the module originally, and still a large part of its use today, is in the interpreter. For that
+reason, when you instantiate a WMI namespace it looks for all the classes available in that namespace. But this
+takes quite a while on the larger namespaces and is unnecessary even on the smaller ones once you know what you're
 after. In production code, therefore, you can turn this off::
 
   import wmi
   c = wmi.WMI(find_classes=False)
 
-If you need to determine which classes are available, you can still use the subclasses_of functionality described 
+If you need to determine which classes are available, you can still use the subclasses_of functionality described
 above to search, for example, for the performances classes available on a given machine at runtime::
 
   import wmi
   c = wmi.WMI(find_classes=False)
   perf_classes = c.subclasses_of("Win32_PerfRawData")
-  
+
 ..  note::
     From v1.4 onwards, the `find_classes` parameter is False by default: it has
     to be turned on specifically. But... the :attr:`classes` attribute now does
@@ -554,7 +556,7 @@ above to search, for example, for the performances classes available on a given 
 Pre-cache class and method wrappers
 ***********************************
 
-To avoid an initial lookup hit when a class is first queried or its method first called, it's possible to push the 
+To avoid an initial lookup hit when a class is first queried or its method first called, it's possible to push the
 class into the cache beforehand simply by referring to it. So, extending the code above::
 
   import wmi
@@ -566,7 +568,7 @@ class into the cache beforehand simply by referring to it. So, extending the cod
 Specifying fields in the query
 ******************************
 
-By default a WMI query will return all the fields of a class in each instance. By specifying the fields you're 
+By default a WMI query will return all the fields of a class in each instance. By specifying the fields you're
 interested in up-front as the first parameter of the query, you'll avoid any expensive lookups. Although
 many fields represent static or cheap data, a few are calculated on the fly. This is especially true
 for performance or other realtime data in classes such as `Win32_Process`::
@@ -579,37 +581,37 @@ for performance or other realtime data in classes such as `Win32_Process`::
 Security
 ~~~~~~~~
 
-This is going to be a small section at the moment, more of a heads-up until I have a few more firm facts at my 
-disposal. In short, the simplest way by far to access WMI functionality is to run as a Domain Admin user on an 
-NT/AD domain. Other techniques are certainly possible, but if they stall at any point, you're left ploughing 
-through at least three layers of security, prodding hopefully at each one until you get a result or give up in 
+This is going to be a small section at the moment, more of a heads-up until I have a few more firm facts at my
+disposal. In short, the simplest way by far to access WMI functionality is to run as a Domain Admin user on an
+NT/AD domain. Other techniques are certainly possible, but if they stall at any point, you're left ploughing
+through at least three layers of security, prodding hopefully at each one until you get a result or give up in
 disgust.
 
 NT Security
 ***********
 
-The user in question has to have some kind of access to the machine whose WMI functionality is being invoked. This 
+The user in question has to have some kind of access to the machine whose WMI functionality is being invoked. This
 might either be by virtue of being included in the local Admin group or by specific access granted to a named user.
 DCOM Security
 
-WMI is a DCOM-based technology and so whatever rules apply to DCOM connections apply to WMI. If there's a problem 
-authenticating at the DCOM level then, in theory, you ought to have the same problem doing a DispatchEx on 
+WMI is a DCOM-based technology and so whatever rules apply to DCOM connections apply to WMI. If there's a problem
+authenticating at the DCOM level then, in theory, you ought to have the same problem doing a DispatchEx on
 Word.Application. The program you want to look at is dcomcnfg.exe and that's all I'll say for now.
 WMI Security
 
-WMI namespaces are system objects with their own ACLs. If you go to the WMI MMC snap-in(accessed via the Manage 
-Computer interface) and access the properties for a namespace, there will be a security tab. The account using WMI 
+WMI namespaces are system objects with their own ACLs. If you go to the WMI MMC snap-in(accessed via the Manage
+Computer interface) and access the properties for a namespace, there will be a security tab. The account using WMI
 functionality on the machine should have sufficient access via this security.
 WMI and Threads
 
-WMI is a COM/DCOM-based mechanism so the rules which apply to COM-threading apply to WMI as well. This is true 
-whether or not your program explicitly invokes Python threading: if you're running in a service, for example, 
-you're probably threading whether you like it or not, since the service control manager seems to run the service 
+WMI is a COM/DCOM-based mechanism so the rules which apply to COM-threading apply to WMI as well. This is true
+whether or not your program explicitly invokes Python threading: if you're running in a service, for example,
+you're probably threading whether you like it or not, since the service control manager seems to run the service
 control code in a different thread from the main service.
 CoInitialize & CoUninitialize
 
-Any COM code which wants to use threading must specify a threading model. There is much said out there on the 
-subject but unless you have specific requirements you can normally get away with initializing COM threading before 
+Any COM code which wants to use threading must specify a threading model. There is much said out there on the
+subject but unless you have specific requirements you can normally get away with initializing COM threading before
 you instantiate a WMI object within a thread and then uninitializing afterwards::
 
   import pythoncom
@@ -650,10 +652,10 @@ Links
 ..  seealso::
 
     **Translations**
-    
+
     `Russian <http://www.script-coding.info/Python/wmi.html>`_
       This tutorial translated into Russian by Alexander Ludogovski
-    
+
     **Authoritative Links**
 
     `Windows Management Instrumentation <http://www.microsoft.com/whdc/system/pnppwr/wmi/default.mspx>`_
@@ -667,7 +669,7 @@ Links
       Extensive set of Python modules wrapping areas of the Windows API
     `The Python WMI module <http://timgolden.me.uk/python/wmi.html>`_
       This module
-      
+
     **Useful Examples**
 
     `ActivExperts <http://www.activexperts.com/activmonitor/windowsmanagement/wmi/samples>`_
@@ -678,7 +680,7 @@ Links
     **Lists, Groups, etc.**
 
     `python-list <http://mail.python.org/mailman/listinfo/python-list>`_
-      The main Python mailing list (mirroring the comp.lang.python newsgroup)    
+      The main Python mailing list (mirroring the comp.lang.python newsgroup)
     `python-list on Google Groups <http://groups.google.com/group/comp.lang.python>`_
       Google Groups mirror of the Python mailing list
     `The Python Win32 mailing list <http://mail.python.org/mailman/listinfo/python-win32>`_
@@ -689,4 +691,3 @@ Links
       Google Groups mirror of Microsoft's WinXP list
     `The Windows Scripting group <http://groups.google.com/group/microsoft.public.windows.server.scripting>`_
       Google Groups mirror of Microsoft's general Scripting list
-  
