@@ -1351,7 +1351,7 @@ def Registry (
   moniker=None
 ):
 
-  raise DeprecationWarning ("This function can be implemented using wmi.WMI (namespace='DEFAULT').StdRegProv")
+  warnings.warn ("This function can be implemented using wmi.WMI (namespace='DEFAULT').StdRegProv", DeprecationWarning)
   if not moniker:
     moniker = construct_moniker (
       computer=computer,
