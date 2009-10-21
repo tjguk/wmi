@@ -127,11 +127,53 @@ class TestBasicConnections (unittest.TestCase):
       warnings.warn ("Skipping test_user_password because not machine, user or password")
 
   def test_too_much_authentication (self):
-    "Check that user/password plus any other authentication raises exception"
-    self.assertRaises (wmi.x_wmi_authentication, wmi.WMI, computer='***', user="***", password="***", impersonation_level="***")
-    self.assertRaises (wmi.x_wmi_authentication, wmi.WMI, computer='***', user="***", password="***", authentication_level="***")
+    "Check that user/password plus privs / suffix raises exception"
     self.assertRaises (wmi.x_wmi_authentication, wmi.WMI, computer='***', user="***", password="***", privileges=["***"])
     self.assertRaises (wmi.x_wmi_authentication, wmi.WMI, computer='***', user="***", password="***", suffix="***")
+
+  def test_user_password_with_impersonation_level (self):
+    "Check that an impersonation level works with a username / password"
+    self.assert_ (
+      wmi.WMI (
+        computer=settings['machine'],
+        user=settings['user'],
+        password=settings['password'],
+        impersonation_level="impersonate"
+      )
+    )
+
+  def test_user_password_with_invalid_impersonation_level (self):
+    "Check that an impersonation level works with a username / password"
+    self.assertRaises (
+      wmi.x_wmi_authentication,
+      wmi.WMI,
+      computer=settings['machine'],
+      user=settings['user'],
+      password=settings['password'],
+      impersonation_level="***"
+    )
+
+  def test_user_password_with_authentication_level (self):
+    "Check that an invalid impersonation level raises x_wmi_authentication"
+    self.assert_ (
+      wmi.WMI (
+        computer=settings['machine'],
+        user=settings['user'],
+        password=settings['password'],
+        authentication_level="pktIntegrity"
+      )
+    )
+
+  def test_user_password_with_invalid_authentication_level (self):
+    "Check that an invalid authentication level raises x_wmi_authentication"
+    self.assertRaises (
+      wmi.x_wmi_authentication,
+      wmi.WMI,
+      computer=settings['machine'],
+      user=settings['user'],
+      password=settings['password'],
+      authentication_level="***"
+    )
 
   def test_local_user_password (self):
     "Check that user/password for local connection raises exception"
