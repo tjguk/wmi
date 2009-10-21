@@ -1218,8 +1218,8 @@ def connect (
 
       else:
         if user:
-          if impersonation_level or authentication_level or privileges or suffix:
-            raise x_wmi_authentication ("You can't specify an impersonation, authentication or privilege as well as a username")
+          if privileges or suffix:
+            raise x_wmi_authentication ("You can't specify privileges or a suffix as well as a username")
           elif computer in (None, '', '.'):
             raise x_wmi_authentication ("You can only specify user/password for a remote connection")
           else:
@@ -1228,7 +1228,9 @@ def connect (
               namespace=namespace,
               user=user,
               password=password,
-              authority=authority
+              authority=authority,
+              impersonation_level=impersonation_level,
+              authentication_level=authentication_level
             )
 
         else:
@@ -1309,6 +1311,8 @@ def connect_server (
   password = "",
   locale = "",
   authority = "",
+  impersonation_level="",
+  authentication_level="",
   security_flags = 0,
   named_value_set = None
 ):
@@ -1320,6 +1324,7 @@ def connect_server (
   :param password: leave blank to use current context
   :param locale: desired locale in form MS_XXXX (eg MS_409 for Am En)
   :param authority: either "Kerberos:" or an NT domain. Not needed if included in user
+  :param impersonation_level: valid WMI impersonation level
   :param security_flags: if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins
   :param named_value_set: typically empty, otherwise a context-specific `SWbemNamedValueSet`
 
@@ -1330,7 +1335,27 @@ def connect_server (
     )
     c = wmi.WMI (wmi=remote_connection)
   """
-  return Dispatch ("WbemScripting.SWbemLocator").\
+  #
+  # Thanks to Matt Mercer for example code to set
+  # impersonation & authentication on ConnectServer
+  #
+  if impersonation_level:
+    try:
+      impersonation = getattr (obj._constants, "wbemImpersonationLevel%s" % impersonation_level.title ())
+    except AttributeError:
+      raise x_wmi_authentication ("No such impersonation level: %s" % impersonation_level)
+  else:
+    impersonation = None
+
+  if authentication_level:
+    try:
+      authentication = getattr (obj._constants, "wbemAuthenticationLevel%s" % authentication_level.title ())
+    except AttributeError:
+      raise x_wmi_authentication ("No such impersonation level: %s" % impersonation_level)
+  else:
+    authentication = None
+
+  server = Dispatch ("WbemScripting.SWbemLocator").\
     ConnectServer (
       server,
       namespace,
@@ -1341,6 +1366,11 @@ def connect_server (
       security_flags,
       named_value_set
     )
+  if impersonation:
+    server.Security_.ImpersonationLevel  = impersonation
+  if authentication:
+    server.Security_.AuthenticationLevel  = authentication
+  return server
 
 def Registry (
   computer=None,
