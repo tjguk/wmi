@@ -146,7 +146,7 @@ class TestBasicConnections (unittest.TestCase):
     "By default, don't scan for classes but load them on demand"
     self.assertFalse (wmi.WMI ()._classes)
     self.assert_ (wmi.WMI ().classes)
-    
+
   def test_classes_acts_as_list (self):
     self.assert_ (wmi.WMI ().classes.index)
 
@@ -406,10 +406,10 @@ class TestWatcher (TestWMI):
   def test_valid_notification_types (self):
     for notification_type in ['operation', 'modification', 'creation', 'deletion']:
       self.assert_ (self.connection.Win32_LogicalDisk.watch_for (notification_type=notification_type))
-  
+
   def test_invalid_notification_types (self):
     self.assertRaises (wmi.x_wmi, self.connection.Win32_LogicalDisk.watch_for, notification_type="***")
-  
+
   def do_not_test_extrinsic_event (self):
 
     #

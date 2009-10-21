@@ -44,6 +44,17 @@
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">wmi</span></tt> &#8211; Windows Management Instrumentation</a><ul>
+<li><a class="reference external" href="#exceptions">Exceptions</a></li>
+<li><a class="reference external" href="#support-classes-functions">Support Classes &amp; Functions</a></li>
+<li><a class="reference external" href="#implementation">Implementation</a></li>
+<li><a class="reference external" href="#main-entry-points">Main Entry Points</a></li>
+</ul>
+</li>
+</ul>
+
             <h4>Previous topic</h4>
             <p class="topless"><a href="cookbook.html"
                                   title="previous chapter">wmi Cookbook</a></p>
@@ -87,7 +98,7 @@ necessary authority.</p>
 programmers, I&#8217;ve wrapped it in some lightweight classes with
 some getattr / setattr magic to ease the way. In particular:</p>
 <ul>
-<li><p class="first">The <tt class="xref docutils literal"><span class="pre">_wmi_namespace</span></tt> object itself will determine its classes
+<li><p class="first">The <a title="wmi._wmi_namespace" class="reference internal" href="#wmi._wmi_namespace"><tt class="xref docutils literal"><span class="pre">_wmi_namespace</span></tt></a> object itself will determine its classes
 and allow you to return all instances of any of them by
 using its name as an attribute:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">disks</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">()</span>
@@ -158,6 +169,593 @@ extensions, but also to Alex Martelli and Roger Upole, whose
 c.l.py postings pointed me in the right direction.
 Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.</p>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<p>All COM-related exceptions are wrapped in <a title="wmi.x_wmi" class="reference internal" href="#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> or one of its
+subclasses. Therefore you can safely trap <a title="wmi.x_wmi" class="reference internal" href="#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> as a root
+exception.</p>
+<p>From v1.4 onwards exceptions now contain the underlying COM error
+(if any) as their <tt class="xref docutils literal"><span class="pre">x_wmi.com_error</span></tt> attribute:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+
+<span class="k">try</span><span class="p">:</span>
+  <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="s">&quot;non-existent-machine&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="c"># Py3+ except wmi.x_wmi as x:</span>
+  <span class="k">print</span> <span class="s">&quot;Exception number&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">com_error</span><span class="o">.</span><span class="n">hresult</span>
+</pre></div>
+</div>
+<dl class="exception">
+<dt id="wmi.x_wmi">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi" title="Permalink to this definition">¶</a></dt>
+<dd>Ancestor of all wmi-related exceptions. Keeps track of
+an info message and the underlying COM error if any, exposed
+as the <tt class="xref docutils literal"><span class="pre">com_error</span></tt> attribute.</dd></dl>
+
+<dl class="exception">
+<dt id="wmi.x_wmi_invalid_query">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_invalid_query</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_invalid_query" title="Permalink to this definition">¶</a></dt>
+<dd>Raised when a WMI returns <cite>wbemErrInvalidQuery</cite></dd></dl>
+
+<dl class="exception">
+<dt id="wmi.x_wmi_timed_out">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_timed_out</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_timed_out" title="Permalink to this definition">¶</a></dt>
+<dd>Raised when a watcher times out</dd></dl>
+
+<dl class="exception">
+<dt id="wmi.x_wmi_no_namespace">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_no_namespace</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_no_namespace" title="Permalink to this definition">¶</a></dt>
+<dd>Raised when an attempt is made to query or watch
+from a class without a namespace.</dd></dl>
+
+<dl class="exception">
+<dt id="wmi.x_access_denied">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_access_denied</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_access_denied" title="Permalink to this definition">¶</a></dt>
+<dd>Raised when WMI raises 80070005</dd></dl>
+
+<dl class="exception">
+<dt id="wmi.x_wmi_authentication">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_authentication</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_authentication" title="Permalink to this definition">¶</a></dt>
+<dd>Raised when an invalid combination of authentication properties is attempted when connecting</dd></dl>
+
+<dl class="exception">
+<dt id="wmi.x_wmi_uninitialised_thread">
+<em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_uninitialised_thread</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_uninitialised_thread" title="Permalink to this definition">¶</a></dt>
+<dd>Raised when WMI returns 800401E4 on connection, usually
+indicating that no COM threading model has been initialised</dd></dl>
+
+</div>
+<div class="section" id="support-classes-functions">
+<h2>Support Classes &amp; Functions<a class="headerlink" href="#support-classes-functions" title="Permalink to this headline">¶</a></h2>
+<p>These classes and functions are provided internally to the
+module to support various operations internally. Certain of
+them, in particular <a title="wmi.from_time" class="reference internal" href="#wmi.from_time"><tt class="xref docutils literal"><span class="pre">from_time()</span></tt></a> and <a title="wmi.to_time" class="reference internal" href="#wmi.to_time"><tt class="xref docutils literal"><span class="pre">to_time()</span></tt></a>
+could well be used externally.</p>
+<dl class="class">
+<dt id="wmi.SelfDeprecatingDict">
+<em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">SelfDeprecatingDict</tt><big>(</big><em>dictlike</em><big>)</big><a class="headerlink" href="#wmi.SelfDeprecatingDict" title="Permalink to this definition">¶</a></dt>
+<dd>Provides for graceful degradation of objects which
+are currently dictionaries (and therefore accessed via
+<cite>.keys</cite>, <cite>.items</cite>, etc.) into lists. Wraps an existing
+<cite>dict</cite> and allows it to be addressed as a <cite>dict</cite> or as a
+<cite>list</cite> during an interregnum, issuing a <cite>DeprecationWarning</cite>
+if accessed as a <cite>dict</cite>.</dd></dl>
+
+<dl class="class">
+<dt id="wmi.ProvideConstants">
+<em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">ProvideConstants</tt><big>(</big><em>comobj</em><big>)</big><a class="headerlink" href="#wmi.ProvideConstants" title="Permalink to this definition">¶</a></dt>
+<dd>When called on a <tt class="docutils literal"><span class="pre">win32com.client.Dispatch</span></tt> object,
+provides lazy access to constants defined in the typelib.
+They can then be accessed as attributes of the <tt class="xref docutils literal"><span class="pre">_constants</span></tt>
+property. (From Thomas Heller on c.l.py).</dd></dl>
+
+<dl class="function">
+<dt id="wmi.handle_com_error">
+<tt class="descclassname">wmi.</tt><tt class="descname">handle_com_error</tt><big>(</big><em>err=None</em><big>)</big><a class="headerlink" href="#wmi.handle_com_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience wrapper for displaying all manner of COM errors.
+Raises a <a title="wmi.x_wmi" class="reference internal" href="#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> exception with more useful information attached</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>err</em> &#8211; The structure attached to a <cite>pywintypes.com_error</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wmi.from_time">
+<tt class="descclassname">wmi.</tt><tt class="descname">from_time</tt><big>(</big><em>year=None</em>, <em>month=None</em>, <em>day=None</em>, <em>hours=None</em>, <em>minutes=None</em>, <em>seconds=None</em>, <em>microseconds=None</em>, <em>timezone=None</em><big>)</big><a class="headerlink" href="#wmi.from_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience wrapper to take a series of date/time elements and return a WMI time
+of the form <cite>yyyymmddHHMMSS.mmmmmm+UUU</cite>. All elements may be int, string or
+omitted altogether. If omitted, they will be replaced in the output string
+by a series of stars of the appropriate length.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>year</em> &#8211; The year element of the date/time</li>
+<li><em>month</em> &#8211; The month element of the date/time</li>
+<li><em>day</em> &#8211; The day element of the date/time</li>
+<li><em>hours</em> &#8211; The hours element of the date/time</li>
+<li><em>minutes</em> &#8211; The minutes element of the date/time</li>
+<li><em>seconds</em> &#8211; The seconds element of the date/time</li>
+<li><em>microseconds</em> &#8211; The microseconds element of the date/time</li>
+<li><em>timezone</em> &#8211; The timeezone element of the date/time</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A WMI datetime string of the form: <cite>yyyymmddHHMMSS.mmmmmm+UUU</cite></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wmi.to_time">
+<tt class="descclassname">wmi.</tt><tt class="descname">to_time</tt><big>(</big><em>wmi_time</em><big>)</big><a class="headerlink" href="#wmi.to_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience wrapper to take a WMI datetime string of the form
+yyyymmddHHMMSS.mmmmmm+UUU and return a 9-tuple containing the
+individual elements, or None where string contains placeholder
+stars.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>wmi_time</em> &#8211; The WMI datetime string in <cite>yyyymmddHHMMSS.mmmmmm+UUU</cite> format</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A 9-tuple of (year, month, day, hours, minutes, seconds, microseconds, timezone)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wmi._set">
+<tt class="descclassname">wmi.</tt><tt class="descname">_set</tt><big>(</big><em>obj</em>, <em>attribute</em>, <em>value</em><big>)</big><a class="headerlink" href="#wmi._set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to add an attribute directly into the instance
+dictionary, bypassing possible <cite>__getattr__</cite> calls</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>obj</em> &#8211; Any python object</li>
+<li><em>attribute</em> &#8211; String containing attribute name</li>
+<li><em>value</em> &#8211; Any python object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>These functions &amp; classes are part of the underlying implementation and you
+are not expected to call upon them explicitly. That said, it can be useful
+to know what&#8217;s used and what you might use to assist in implementing some
+functionality not currently exposed.</p>
+<dl class="class">
+<dt id="wmi._wmi_method">
+<em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">_wmi_method</tt><big>(</big><em>ole_object</em>, <em>method_name</em><big>)</big><a class="headerlink" href="#wmi._wmi_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>A currying sort of wrapper around a WMI method name. It
+abstract&#8217;s the method&#8217;s parameters and can be called like
+a normal Python object passing in the parameter values.</p>
+<p>Output parameters are returned from the call as a tuple.
+In addition, the docstring is set up as the method&#8217;s
+signature, including an indication as to whether any
+given parameter is expecting an array, and what
+special privileges are required to call the method.</p>
+<dl class="method">
+<dt id="wmi._wmi_method.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>ole_object</em>, <em>method_name</em><big>)</big><a class="headerlink" href="#wmi._wmi_method.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>ole_object</em> &#8211; The WMI class/instance whose method is to be called</li>
+<li><em>method_name</em> &#8211; The name of the method to be called</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_method.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_method.__call__" title="Permalink to this definition">¶</a></dt>
+<dd>Execute the call to a WMI method, returning
+a tuple (even if is of only one value) containing
+the out and return parameters.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wmi._wmi_object">
+<em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">_wmi_object</tt><big>(</big><em>ole_object</em>, <em>instance_of=None</em>, <em>fields=</em><span class="optional">[</span><span class="optional">]</span>, <em>property_map={}</em><big>)</big><a class="headerlink" href="#wmi._wmi_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>The heart of the WMI module: wraps the objects returned by COM
+ISWbemObject interface and provide readier access to their properties
+and methods resulting in a more Pythonic interface. Not usually
+instantiated directly, rather as a result of calling a <a title="wmi._wmi_class" class="reference internal" href="#wmi._wmi_class"><tt class="xref docutils literal"><span class="pre">_wmi_class</span></tt></a>
+on the parent <a title="wmi._wmi_namespace" class="reference internal" href="#wmi._wmi_namespace"><tt class="xref docutils literal"><span class="pre">_wmi_namespace</span></tt></a>.</p>
+<p>If you get hold of a WMI-related COM object from some other
+source than this module, you can wrap it in one of these objects
+to get the benefits of the module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">win32com.client</span>
+<span class="kn">import</span> <span class="nn">wmi</span>
+
+<span class="n">wmiobj</span> <span class="o">=</span> <span class="n">win32com</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">GetObject</span> <span class="p">(</span><span class="s">&quot;winmgmts:Win32_LogicalDisk.DeviceID=&#39;C:&#39;&quot;</span><span class="p">)</span>
+<span class="n">c_drive</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">_wmi_object</span> <span class="p">(</span><span class="n">wmiobj</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">c_drive</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="wmi._wmi_object.associators">
+<tt class="descname">associators</tt><big>(</big><em>wmi_association_class=''</em>, <em>wmi_result_class=''</em><big>)</big><a class="headerlink" href="#wmi._wmi_object.associators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of objects related to this one, optionally limited
+either by association class (ie the name of the class which relates
+them) or by result class (ie the name of the class which would be
+retrieved):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="n">pp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pp</span><span class="o">.</span><span class="n">associators</span> <span class="p">(</span><span class="n">wmi_association_class</span><span class="o">=</span><span class="s">&quot;Win32_PortResource&quot;</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">i</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pp</span><span class="o">.</span><span class="n">associators</span> <span class="p">(</span><span class="n">wmi_result_class</span><span class="o">=</span><span class="s">&quot;Win32_PnPEntity&quot;</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">i</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_object.derivation">
+<tt class="descname">derivation</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.derivation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Return a tuple representing the object derivation for</dt>
+<dd>this object, with the most specific object first. eg,</dd>
+</dl>
+<p>pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
+print &#8216; &lt;- &#8216;.join (pp0.derivation ())</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_object.get_keys">
+<tt class="descname">get_keys</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.get_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>A WMI object is uniquely defined by a set of properties
+which constitute its keys. Lazily retrieves the keys for this
+instance or class.</p>
+<p>NB You can get the keys of an instance more directly, via
+Path_.Keys but this doesn&#8217;t apply to classes. The technique
+here appears to work for both.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list of key property names</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="wmi._wmi_object.keys">
+<tt class="descname">keys</tt><a class="headerlink" href="#wmi._wmi_object.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>A WMI object is uniquely defined by a set of properties
+which constitute its keys. Lazily retrieves the keys for this
+instance or class.</p>
+<p>NB You can get the keys of an instance more directly, via
+Path_.Keys but this doesn&#8217;t apply to classes. The technique
+here appears to work for both.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list of key property names</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_object.path">
+<tt class="descname">path</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the WMI URI to this object. Can be used to
+determine the path relative to the parent namespace. eg,</p>
+<p>&lt;pre class=&#8221;code&#8221;&gt;
+pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
+print pp0.path ().RelPath
+&lt;/pre&gt;</p>
+<p>FIXME: DO more with this</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_object.references">
+<tt class="descname">references</tt><big>(</big><em>wmi_class=''</em><big>)</big><a class="headerlink" href="#wmi._wmi_object.references" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of associations involving this object, optionally
+limited by the result class (the name of the association class).</p>
+<p>NB Associations are treated specially; although WMI only returns
+the string corresponding to the instance of each associated object,
+this module will automatically convert that to the object itself:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span>  <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="n">sp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_SerialPort</span> <span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sp</span><span class="o">.</span><span class="n">references</span> <span class="p">():</span>
+  <span class="k">print</span> <span class="n">i</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sp</span><span class="o">.</span><span class="n">references</span> <span class="p">(</span><span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_SerialPortSetting&quot;</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">i</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_object.set">
+<tt class="descname">set</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_object.set" title="Permalink to this definition">¶</a></dt>
+<dd>Set several properties of the underlying object
+at one go. This is particularly useful in combination
+with the new () method below. However, an instance
+which has been spawned in this way won&#8217;t have enough
+information to write pack, so only try if the
+instance has a path.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wmi._wmi_class">
+<em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">_wmi_class</tt><big>(</big><em>namespace</em>, <em>wmi_class</em><big>)</big><a class="headerlink" href="#wmi._wmi_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currying class to assist in issuing queries against
+a WMI namespace. The idea is that when someone issues
+an otherwise unknown method against the WMI object, if
+it matches a known WMI class a query object will be
+returned which may then be called with one or more params
+which will form the WHERE clause:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="n">c_drives</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;C:&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="wmi._wmi_class.instances">
+<tt class="descname">instances</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_class.instances" title="Permalink to this definition">¶</a></dt>
+<dd>Return a list of instances of the WMI class</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_class.new">
+<tt class="descname">new</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_class.new" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the equivalent to the raw-WMI SpawnInstance_
+method. Note that there are relatively few uses for
+this, certainly fewer than you might imagine. Most
+classes which need to create a new <em>real</em> instance
+of themselves, eg Win32_Process, offer a .Create
+method. SpawnInstance_ is generally reserved for
+instances which are passed as parameters to such
+<cite>.Create</cite> methods, a common example being the
+<cite>Win32_SecurityDescriptor</cite>, passed to <cite>Win32_Share.Create</cite>
+and other instances which need security.</p>
+<p>The example here is <cite>Win32_ProcessStartup</cite>, which
+controls the shown/hidden state etc. of a new
+<cite>Win32_Process</cite> instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">win32con</span>
+<span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="n">startup</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ProcessStartup</span><span class="o">.</span><span class="n">new</span> <span class="p">(</span><span class="n">ShowWindow</span><span class="o">=</span><span class="n">win32con</span><span class="o">.</span><span class="n">SW_SHOWMINIMIZED</span><span class="p">)</span>
+<span class="n">pid</span><span class="p">,</span> <span class="n">retval</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="o">.</span><span class="n">Create</span> <span class="p">(</span>
+  <span class="n">CommandLine</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">,</span>
+  <span class="n">ProcessStartupInformation</span><span class="o">=</span><span class="n">startup</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">previous versions of this module, used this function
+to create new process. This is <em>not</em> a good example
+of its use; it is better handled with something like
+the example above.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_class.query">
+<tt class="descname">query</tt><big>(</big><em>fields=</em><span class="optional">[</span><span class="optional">]</span>, <em>**where_clause</em><big>)</big><a class="headerlink" href="#wmi._wmi_class.query" title="Permalink to this definition">¶</a></dt>
+<dd>Make it slightly easier to query against the class,
+by calling the namespace&#8217;s query with the class preset.
+Won&#8217;t work if the class has been instantiated directly.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wmi._wmi_namespace">
+<em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">_wmi_namespace</tt><big>(</big><em>namespace</em>, <em>find_classes</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>A WMI root of a computer system. The classes attribute holds a list
+of the classes on offer. This means you can explore a bit with
+things like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
+  <span class="k">if</span> <span class="s">&quot;user&quot;</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span> <span class="p">():</span>
+    <span class="k">print</span> <span class="n">i</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="wmi._wmi_namespace.fetch_as_classes">
+<tt class="descname">fetch_as_classes</tt><big>(</big><em>wmi_classname</em>, <em>fields=()</em>, <em>**where_clause</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.fetch_as_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build and execute a wql query to fetch the specified list of fields from
+the specified wmi_classname + where_clause, then return the results as
+a list of simple class instances with attributes matching field_list.</p>
+<p>If fields is left empty, select * and pre-load all class attributes for
+each class returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.fetch_as_lists">
+<tt class="descname">fetch_as_lists</tt><big>(</big><em>wmi_classname</em>, <em>fields</em>, <em>**where_clause</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.fetch_as_lists" title="Permalink to this definition">¶</a></dt>
+<dd>Build and execute a wql query to fetch the specified list of fields from
+the specified wmi_classname + where_clause, then return the results as
+a list of lists whose values correspond to field_list.</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.handle">
+<tt class="descname">handle</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.handle" title="Permalink to this definition">¶</a></dt>
+<dd>The raw OLE object representing the WMI namespace</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.instances">
+<tt class="descname">instances</tt><big>(</big><em>class_name</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of instances of the WMI class. This is
+(probably) equivalent to querying with no qualifiers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">instances</span> <span class="p">(</span><span class="s">&quot;Win32_LogicalDisk&quot;</span><span class="p">)</span>
+<span class="c"># should be the same as</span>
+<span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.new">
+<tt class="descname">new</tt><big>(</big><em>wmi_class</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.new" title="Permalink to this definition">¶</a></dt>
+<dd>This is now implemented by a call to <a title="wmi._wmi_class.new" class="reference internal" href="#wmi._wmi_class.new"><tt class="xref docutils literal"><span class="pre">_wmi_class.new()</span></tt></a></dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.new_instance_of">
+<tt class="descname">new_instance_of</tt><big>(</big><em>wmi_class</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.new_instance_of" title="Permalink to this definition">¶</a></dt>
+<dd>This is now implemented by a call to <a title="wmi._wmi_class.new" class="reference internal" href="#wmi._wmi_class.new"><tt class="xref docutils literal"><span class="pre">_wmi_class.new()</span></tt></a></dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.query">
+<tt class="descname">query</tt><big>(</big><em>wql</em>, <em>instance_of=None</em>, <em>fields=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.query" title="Permalink to this definition">¶</a></dt>
+<dd>Perform an arbitrary query against a WMI object, and return
+a list of _wmi_object representations of the results.</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_namespace.watch_for">
+<tt class="descname">watch_for</tt><big>(</big><em>raw_wql=None</em>, <em>notification_type='operation'</em>, <em>wmi_class=None</em>, <em>delay_secs=1</em>, <em>fields=</em><span class="optional">[</span><span class="optional">]</span>, <em>**where_clause</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.watch_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up an event tracker on a WMI event. This function
+returns an wmi_watcher which can be called to get the
+next event:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+
+<span class="n">raw_wql</span> <span class="o">=</span> <span class="s">&quot;SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA &#39;Win32_Process&#39;&quot;</span>
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span><span class="n">raw_wql</span><span class="o">=</span><span class="n">raw_wql</span><span class="p">)</span>
+<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+  <span class="n">process_created</span> <span class="o">=</span> <span class="n">watcher</span> <span class="p">()</span>
+  <span class="k">print</span> <span class="n">process_created</span><span class="o">.</span><span class="n">Name</span>
+
+<span class="c"># or</span>
+
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span>
+  <span class="n">notification_type</span><span class="o">=</span><span class="s">&quot;Creation&quot;</span><span class="p">,</span>
+  <span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_Process&quot;</span><span class="p">,</span>
+  <span class="n">delay_secs</span><span class="o">=</span><span class="mf">2</span><span class="p">,</span>
+  <span class="n">Name</span><span class="o">=</span><span class="s">&#39;calc.exe&#39;</span>
+<span class="p">)</span>
+<span class="n">calc_created</span> <span class="o">=</span> <span class="n">watcher</span> <span class="p">()</span>
+</pre></div>
+</div>
+<p>Now supports timeout on the call to watcher:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pythoncom</span>
+<span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">privileges</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Security&quot;</span><span class="p">])</span>
+<span class="n">watcher1</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span>
+  <span class="n">notification_type</span><span class="o">=</span><span class="s">&quot;Creation&quot;</span><span class="p">,</span>
+  <span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_NTLogEvent&quot;</span><span class="p">,</span>
+  <span class="n">Type</span><span class="o">=</span><span class="s">&quot;error&quot;</span>
+<span class="p">)</span>
+<span class="n">watcher2</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span>
+  <span class="n">notification_type</span><span class="o">=</span><span class="s">&quot;Creation&quot;</span><span class="p">,</span>
+  <span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_NTLogEvent&quot;</span><span class="p">,</span>
+  <span class="n">Type</span><span class="o">=</span><span class="s">&quot;warning&quot;</span>
+<span class="p">)</span>
+
+<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">error_log</span> <span class="o">=</span> <span class="n">watcher1</span> <span class="p">(</span><span class="mf">500</span><span class="p">)</span>
+  <span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi_timed_out</span><span class="p">:</span>
+    <span class="n">pythoncom</span><span class="o">.</span><span class="n">PumpWaitingMessages</span> <span class="p">()</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">error_log</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">warning_log</span> <span class="o">=</span> <span class="n">watcher2</span> <span class="p">(</span><span class="mf">500</span><span class="p">)</span>
+  <span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi_timed_out</span><span class="p">:</span>
+    <span class="n">pythoncom</span><span class="o">.</span><span class="n">PumpWaitingMessages</span> <span class="p">()</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">warning_log</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="main-entry-points">
+<h2>Main Entry Points<a class="headerlink" href="#main-entry-points" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="wmi.WMI">
+<tt class="descclassname">wmi.</tt><tt class="descname">WMI</tt><big>(</big><em>computer=''</em>, <em>impersonation_level=''</em>, <em>authentication_level=''</em>, <em>authority=''</em>, <em>privileges=''</em>, <em>moniker=''</em>, <em>wmi=None</em>, <em>namespace=''</em>, <em>suffix=''</em>, <em>user=''</em>, <em>password=''</em>, <em>find_classes=False</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#wmi.WMI" title="Permalink to this definition">¶</a></dt>
+<dd><p>The WMI constructor can either take a ready-made moniker or as many
+parts of one as are necessary. Eg:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">moniker</span><span class="o">=</span><span class="s">&quot;winmgmts:{impersonationLevel=Delegate}//remote&quot;</span><span class="p">)</span>
+<span class="c"># or</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">computer</span><span class="o">=</span><span class="s">&quot;remote&quot;</span><span class="p">,</span> <span class="n">privileges</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;!RemoteShutdown&quot;</span><span class="p">,</span> <span class="s">&quot;Security&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>I daren&#8217;t link to a Microsoft URL; they change so often. Try Googling for
+WMI construct moniker and see what it comes back with.</p>
+<p>For complete control, a named argument &#8220;wmi&#8221; can be supplied, which
+should be a SWbemServices object, which you create yourself. Eg:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">loc</span> <span class="o">=</span> <span class="n">win32com</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Dispatch</span><span class="p">(</span><span class="s">&quot;WbemScripting.SWbemLocator&quot;</span><span class="p">)</span>
+<span class="n">svc</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">ConnectServer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">wmi</span><span class="o">=</span><span class="n">svc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is the only way of connecting to a remote computer with a different
+username, as the moniker syntax does not allow specification of a user
+name.</p>
+<p>If the <cite>wmi</cite> parameter is supplied, all other parameters are ignored.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="wmi.connect_server">
+<tt class="descclassname">wmi.</tt><tt class="descname">connect_server</tt><big>(</big><em>server</em>, <em>namespace=''</em>, <em>user=''</em>, <em>password=''</em>, <em>locale=''</em>, <em>authority=''</em>, <em>security_flags=0</em>, <em>named_value_set=None</em><big>)</big><a class="headerlink" href="#wmi.connect_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a remote server running WMI</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>server</em> &#8211; name of the server</li>
+<li><em>namespace</em> &#8211; namespace to connect to - defaults to whatever&#8217;s defined as default</li>
+<li><em>user</em> &#8211; username to connect as, either local or domain (domname or <a class="reference external" href="mailto:user&#37;&#52;&#48;domain">user<span>&#64;</span>domain</a> for XP)</li>
+<li><em>password</em> &#8211; leave blank to use current context</li>
+<li><em>locale</em> &#8211; desired locale in form MS_XXXX (eg MS_409 for Am En)</li>
+<li><em>authority</em> &#8211; either &#8220;Kerberos:&#8221; or an NT domain. Not needed if included in user</li>
+<li><em>security_flags</em> &#8211; if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins</li>
+<li><em>named_value_set</em> &#8211; typically empty, otherwise a context-specific <cite>SWbemNamedValueSet</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">remote_connetion</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">connect_server</span> <span class="p">(</span>
+  <span class="n">server</span><span class="o">=</span><span class="s">&quot;remote_machine&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s">&quot;myname&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&quot;mypassword&quot;</span>
+<span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">wmi</span><span class="o">=</span><span class="n">remote_connection</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="wmi.Registry">
+<tt class="descclassname">wmi.</tt><tt class="descname">Registry</tt><big>(</big><em>computer=None</em>, <em>impersonation_level='Impersonate'</em>, <em>authentication_level='Default'</em>, <em>authority=None</em>, <em>privileges=None</em>, <em>moniker=None</em><big>)</big><a class="headerlink" href="#wmi.Registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 </div>
 
 

@@ -89,11 +89,23 @@ from win32com.client import GetObject, Dispatch
 import pywintypes
 
 def signed_to_unsigned (signed):
-    """Convert a (possibly signed) long to unsigned hex"""
-    unsigned, = struct.unpack ("L", struct.pack ("l", signed))
-    return unsigned
+  """Convert a (possibly signed) long to unsigned hex. Useful
+  when converting a COM error code to the more conventional
+  8-digit hex::
+
+  print "%08X" % signed_to_unsigned (-2147023174)
+  """
+  unsigned, = struct.unpack ("L", struct.pack ("l", signed))
+  return unsigned
 
 class SelfDeprecatingDict (object):
+  """Provides for graceful degradation of objects which
+  are currently dictionaries (and therefore accessed via
+  `.keys`, `.items`, etc.) into lists. Wraps an existing
+  `dict` and allows it to be addressed as a `dict` or as a
+  `list` during an interregnum, issuing a `DeprecationWarning`
+  if accessed as a `dict`.
+  """
 
   dict_only = set (dir (dict)).difference (dir (list))
 
@@ -124,17 +136,13 @@ class SelfDeprecatingDict (object):
       return self.dict[item]
 
 class ProvideConstants (object):
-  """
-  A class which, when called on a win32com.client.Dispatch object,
+  """When called on a ``win32com.client.Dispatch`` object,
   provides lazy access to constants defined in the typelib.
-
-  They can be accessed as attributes of the _constants property.
-  From Thomas Heller on c.l.py
+  They can then be accessed as attributes of the :attr:`_constants`
+  property. (From Thomas Heller on c.l.py).
   """
   def __init__(self, comobj):
-    "@param comobj A COM object whose typelib constants are to be exposed"
     comobj.__dict__["_constants"] = self
-    # Get the typelibrary's typecomp interface
     self.__typecomp = \
     comobj._oleobj_.GetTypeInfo().GetContainingTypeLib()[0].GetTypeComp()
 
@@ -142,8 +150,6 @@ class ProvideConstants (object):
     if name.startswith("__") and name.endswith("__"):
      raise AttributeError (name)
     result = self.__typecomp.Bind(name)
-    # Bind returns a 2-tuple, first item is TYPEKIND,
-    # the second item has the value
     if not result[0]:
      raise AttributeError (name)
     return result[1].value
@@ -160,30 +166,46 @@ wbemFlagForwardOnly = obj._constants.wbemFlagForwardOnly
 # Exceptions
 #
 class x_wmi (Exception):
-
+  """Ancestor of all wmi-related exceptions. Keeps track of
+  an info message and the underlying COM error if any, exposed
+  as the :attr:`com_error` attribute.
+  """
   def __init__ (self, info="", com_error=None):
     self.info = info
     self.com_error = com_error
 
   def __str__ (self):
-    return "<x_wmi: %s %s>" % (self.info or "Unexpected COM Error", self.com_error or "(no underlying exception)")
+    return "<x_wmi: %s %s>" % (
+      self.info or "Unexpected COM Error",
+      self.com_error or "(no underlying exception)"
+    )
 
 class x_wmi_invalid_query (x_wmi):
+  "Raised when a WMI returns `wbemErrInvalidQuery`"
   pass
 
 class x_wmi_timed_out (x_wmi):
+  "Raised when a watcher times out"
   pass
 
 class x_wmi_no_namespace (x_wmi):
+  """Raised when an attempt is made to query or watch
+  from a class without a namespace.
+  """
   pass
 
 class x_access_denied (x_wmi):
+  "Raised when WMI raises 80070005"
   pass
 
 class x_wmi_authentication (x_wmi):
+  "Raised when an invalid combination of authentication properties is attempted when connecting"
   pass
 
 class x_wmi_uninitialised_thread (x_wmi):
+  """Raised when WMI returns 800401E4 on connection, usually
+  indicating that no COM threading model has been initialised
+  """
   pass
 
 WMI_EXCEPTIONS = {
@@ -196,9 +218,9 @@ WMI_EXCEPTIONS = {
 
 def handle_com_error (err=None):
   """Convenience wrapper for displaying all manner of COM errors.
-  Raises a x_wmi exception with more useful information attached
+  Raises a :exc:`x_wmi` exception with more useful information attached
 
-  @param error_info The structure attached to a pywintypes.com_error
+  :param err: The structure attached to a `pywintypes.com_error`
   """
   if err is None:
     _, err, _ = sys.exc_info ()
@@ -224,22 +246,21 @@ def from_1601 (ns100):
   return BASE + datetime.timedelta (microseconds=int (ns100) / 10)
 
 def from_time (year=None, month=None, day=None, hours=None, minutes=None, seconds=None, microseconds=None, timezone=None):
-  """
-  Convenience wrapper to take a series of date/time elements and return a WMI time
-  of the form yyyymmddHHMMSS.mmmmmm+UUU. All elements may be int, string or
+  """Convenience wrapper to take a series of date/time elements and return a WMI time
+  of the form `yyyymmddHHMMSS.mmmmmm+UUU`. All elements may be int, string or
   omitted altogether. If omitted, they will be replaced in the output string
   by a series of stars of the appropriate length.
 
-  @param year The year element of the date/time
-  @param month The month element of the date/time
-  @param day The day element of the date/time
-  @param hours The hours element of the date/time
-  @param minutes The minutes element of the date/time
-  @param seconds The seconds element of the date/time
-  @param microseconds The microseconds element of the date/time
-  @param timezone The timeezone element of the date/time
+  :param year: The year element of the date/time
+  :param month: The month element of the date/time
+  :param day: The day element of the date/time
+  :param hours: The hours element of the date/time
+  :param minutes: The minutes element of the date/time
+  :param seconds: The seconds element of the date/time
+  :param microseconds: The microseconds element of the date/time
+  :param timezone: The timeezone element of the date/time
 
-  @return A WMI datetime string of the form: yyyymmddHHMMSS.mmmmmm+UUU
+  :returns: A WMI datetime string of the form: `yyyymmddHHMMSS.mmmmmm+UUU`
   """
   def str_or_stars (i, length):
     if i is None:
@@ -262,15 +283,14 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   return wmi_time
 
 def to_time (wmi_time):
-  """
-  Convenience wrapper to take a WMI datetime string of the form
+  """Convenience wrapper to take a WMI datetime string of the form
   yyyymmddHHMMSS.mmmmmm+UUU and return a 9-tuple containing the
   individual elements, or None where string contains placeholder
   stars.
 
-  @param wmi_time The WMI datetime string in yyyymmddHHMMSS.mmmmmm+UUU format
+  :param wmi_time: The WMI datetime string in `yyyymmddHHMMSS.mmmmmm+UUU` format
 
-  @return A 9-tuple of (year, month, day, hours, minutes, seconds, microseconds, timezone)
+  :returns: A 9-tuple of (year, month, day, hours, minutes, seconds, microseconds, timezone)
   """
   def int_or_none (s, start, end):
     try:
@@ -292,19 +312,17 @@ def to_time (wmi_time):
   return year, month, day, hours, minutes, seconds, microseconds, timezone
 
 def _set (obj, attribute, value):
-  """
-  Helper function to add an attribute directly into the instance
-  dictionary, bypassing possible __getattr__ calls
+  """Helper function to add an attribute directly into the instance
+  dictionary, bypassing possible `__getattr__` calls
 
-  @param obj Any python object
-  @param attribute String containing attribute name
-  @param value Any python object
+  :param obj: Any python object
+  :param attribute: String containing attribute name
+  :param value: Any python object
   """
   obj.__dict__[attribute] = value
 
 class _wmi_method:
-  """
-  A currying sort of wrapper around a WMI method name. It
+  """A currying sort of wrapper around a WMI method name. It
   abstract's the method's parameters and can be called like
   a normal Python object passing in the parameter values.
 
@@ -317,8 +335,8 @@ class _wmi_method:
 
   def __init__ (self, ole_object, method_name):
     """
-    @param ole_object The WMI class/instance whose method is to be called
-    @param method_name The name of the method to be called
+    :param ole_object: The WMI class/instance whose method is to be called
+    :param method_name: The name of the method to be called
     """
     try:
       self.ole_object = Dispatch (ole_object)
@@ -352,8 +370,7 @@ class _wmi_method:
       handle_com_error ()
 
   def __call__ (self, *args, **kwargs):
-    """
-    Execute the call to a WMI method, returning
+    """Execute the call to a WMI method, returning
     a tuple (even if is of only one value) containing
     the out and return parameters.
     """
@@ -416,7 +433,23 @@ class _wmi_method:
 # class _wmi_object
 #
 class _wmi_object:
-  "A lightweight wrapper round an OLE WMI object"
+  """The heart of the WMI module: wraps the objects returned by COM
+  ISWbemObject interface and provide readier access to their properties
+  and methods resulting in a more Pythonic interface. Not usually
+  instantiated directly, rather as a result of calling a :class:`_wmi_class`
+  on the parent :class:`_wmi_namespace`.
+
+  If you get hold of a WMI-related COM object from some other
+  source than this module, you can wrap it in one of these objects
+  to get the benefits of the module::
+
+    import win32com.client
+    import wmi
+
+    wmiobj = win32com.client.GetObject ("winmgmts:Win32_LogicalDisk.DeviceID='C:'")
+    c_drive = wmi._wmi_object (wmiobj)
+    print c_drive
+  """
 
   def __init__ (self, ole_object, instance_of=None, fields=[], property_map={}):
     try:
@@ -454,8 +487,7 @@ class _wmi_object:
     return self.id < other.id
 
   def __str__ (self):
-    """
-    For a call to print [object] return the OLE description
+    """For a call to print [object] return the OLE description
     of the properties / values of the object
     """
     try:
@@ -546,7 +578,7 @@ class _wmi_object:
     instance or class.
 
     NB You can get the keys of an instance more directly, via
-    Path_.Keys but this doesn't apply to classes. The technique
+    Path\_.Keys but this doesn't apply to classes. The technique
     here appears to work for both.
 
     :returns: list of key property names
@@ -637,20 +669,18 @@ class _wmi_object:
 
   def associators (self, wmi_association_class="", wmi_result_class=""):
     """Return a list of objects related to this one, optionally limited
-     either by association class (ie the name of the class which relates
-     them) or by result class (ie the name of the class which would be
-     retrieved)
+    either by association class (ie the name of the class which relates
+    them) or by result class (ie the name of the class which would be
+    retrieved)::
 
-    <pre class="code">
-c = wmi.WMI ()
-pp = c.Win32_ParallelPort ()[0]
+      c = wmi.WMI ()
+      pp = c.Win32_ParallelPort ()[0]
 
-for i in pp.associators (wmi_association_class="Win32_PortResource"):
-  print i
+      for i in pp.associators (wmi_association_class="Win32_PortResource"):
+        print i
 
-for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
-  print i
-    </pre>
+      for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
+        print i
     """
     try:
       return [
@@ -665,22 +695,20 @@ for i in pp.associators (wmi_result_class="Win32_PnPEntity"):
 
   def references (self, wmi_class=""):
     """Return a list of associations involving this object, optionally
-     limited by the result class (the name of the association class).
+    limited by the result class (the name of the association class).
 
-     NB Associations are treated specially; although WMI only returns
-     the string corresponding to the instance of each associated object,
-     this module will automatically convert that to the object itself.
+    NB Associations are treated specially; although WMI only returns
+    the string corresponding to the instance of each associated object,
+    this module will automatically convert that to the object itself::
 
-    <pre class="code">
-    c =  wmi.WMI ()
-    sp = c.Win32_SerialPort ()[0]
+      c =  wmi.WMI ()
+      sp = c.Win32_SerialPort ()[0]
 
-    for i in sp.references ():
-      print i
+      for i in sp.references ():
+        print i
 
-    for i in sp.references (wmi_class="Win32_SerialPortSetting"):
-      print i
-    </pre>
+      for i in sp.references (wmi_class="Win32_SerialPortSetting"):
+        print i
     """
     #
     # FIXME: Allow an actual class to be passed in, using
@@ -723,12 +751,10 @@ class _wmi_class (_wmi_object):
    an otherwise unknown method against the WMI object, if
    it matches a known WMI class a query object will be
    returned which may then be called with one or more params
-   which will form the WHERE clause. eg,
+   which will form the WHERE clause::
 
-  <pre class="code">
-  c = wmi.WMI ()
-  c_drive = c.Win32_LogicalDisk (Name='C:')
-  </pre>
+    c = wmi.WMI ()
+    c_drives = c.Win32_LogicalDisk (Name='C:')
   """
   def __init__ (self, namespace, wmi_class):
     _wmi_object.__init__ (self, wmi_class)
@@ -794,36 +820,35 @@ class _wmi_class (_wmi_object):
       handle_com_error ()
 
   def new (self, **kwargs):
-    """This is the equivalent to the raw-WMI SpawnInstance_
-     method. Note that there are relatively few uses for
-     this, certainly fewer than you might imagine. Most
-     classes which need to create a new *real* instance
-     of themselves, eg Win32_Process, offer a .Create
-     method. SpawnInstance_ is generally reserved for
-     instances which are passed as parameters to such
-     .Create methods, a common example being the
-     Win32_SecurityDescriptor, passed to Win32_Share.Create
-     and other instances which need security.
+    """This is the equivalent to the raw-WMI SpawnInstance\_
+    method. Note that there are relatively few uses for
+    this, certainly fewer than you might imagine. Most
+    classes which need to create a new *real* instance
+    of themselves, eg Win32_Process, offer a .Create
+    method. SpawnInstance\_ is generally reserved for
+    instances which are passed as parameters to such
+    `.Create` methods, a common example being the
+    `Win32_SecurityDescriptor`, passed to `Win32_Share.Create`
+    and other instances which need security.
 
-    The example here is Win32_ProcessStartup, which
+    The example here is `Win32_ProcessStartup`, which
     controls the shown/hidden state etc. of a new
-    Win32_Process instance.
+    `Win32_Process` instance::
 
-    <pre class="code">
-    import win32con
-    import wmi
-    c = wmi.WMI ()
-    startup = c.Win32_ProcessStartup.new (ShowWindow=win32con.SW_SHOWMINIMIZED)
-    pid, retval = c.Win32_Process.Create (
-      CommandLine="notepad.exe",
-      ProcessStartupInformation=startup
-    )
-    </pre>
+      import win32con
+      import wmi
+      c = wmi.WMI ()
+      startup = c.Win32_ProcessStartup.new (ShowWindow=win32con.SW_SHOWMINIMIZED)
+      pid, retval = c.Win32_Process.Create (
+        CommandLine="notepad.exe",
+        ProcessStartupInformation=startup
+      )
 
-    NB previous versions of this module, used this function
-    to create new process. This is *not* a good example
-    of its use; it is better handled with something like
-    the example above.
+    ..  warning::
+        previous versions of this module, used this function
+        to create new process. This is *not* a good example
+        of its use; it is better handled with something like
+        the example above.
     """
     try:
       obj = _wmi_object (self.SpawnInstance_ (), self)
@@ -854,14 +879,12 @@ class _wmi_result:
 class _wmi_namespace:
   """A WMI root of a computer system. The classes attribute holds a list
   of the classes on offer. This means you can explore a bit with
-  things like this:
+  things like this::
 
-  <pre class="code">
-  c = wmi.WMI ()
-  for i in c.classes:
-    if "user" in i.lower ():
-      print i
-  </pre>
+    c = wmi.WMI ()
+    for i in c.classes:
+      if "user" in i.lower ():
+        print i
   """
   def __init__ (self, namespace, find_classes):
     _set (self, "_namespace", namespace)
@@ -919,13 +942,11 @@ class _wmi_namespace:
 
   def instances (self, class_name):
     """Return a list of instances of the WMI class. This is
-     (probably) equivalent to querying with no qualifiers.
+     (probably) equivalent to querying with no qualifiers::
 
-    <pre class="code">
-    system.instances ("Win32_LogicalDisk")
-    # should be the same as
-    system.Win32_LogicalDisk ()
-    </pre>
+      wmi.WMI ().instances ("Win32_LogicalDisk")
+      # should be the same as
+      wmi.WMI ().Win32_LogicalDisk ()
     """
     try:
       return [_wmi_object (obj) for obj in self._namespace.InstancesOf (class_name)]
@@ -933,16 +954,15 @@ class _wmi_namespace:
       handle_com_error ()
 
   def new (self, wmi_class, **kwargs):
-    """This is now implemented by a call to _wmi_class.new (qv)"""
+    """This is now implemented by a call to :meth:`_wmi_class.new`"""
     return getattr (self, wmi_class).new (**kwargs)
 
   new_instance_of = new
 
   def _raw_query (self, wql):
     """Execute a WQL query and return its raw results.  Use the flags
-     recommended by Microsoft to achieve a read-only, semi-synchronous
-     query where the time is taken while looping through. Should really
-     be a generator, but ...
+    recommended by Microsoft to achieve a read-only, semi-synchronous
+    query where the time is taken while looping through.
     NB Backslashes need to be doubled up.
     """
     flags = wbemFlagReturnImmediately | wbemFlagForwardOnly
@@ -954,7 +974,7 @@ class _wmi_namespace:
 
   def query (self, wql, instance_of=None, fields=[]):
     """Perform an arbitrary query against a WMI object, and return
-       a list of _wmi_object representations of the results.
+    a list of _wmi_object representations of the results.
     """
     return [ _wmi_object (obj, instance_of, fields) for obj in self._raw_query(wql) ]
 
@@ -995,60 +1015,56 @@ class _wmi_namespace:
   ):
     """Set up an event tracker on a WMI event. This function
     returns an wmi_watcher which can be called to get the
-    next event. eg,
+    next event::
 
-    <pre class="code">
-    c = wmi.WMI ()
+      c = wmi.WMI ()
 
-    raw_wql = "SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'"
-    watcher = c.watch_for (raw_wql=raw_wql)
-    while 1:
-      process_created = watcher ()
-      print process_created.Name
+      raw_wql = "SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'"
+      watcher = c.watch_for (raw_wql=raw_wql)
+      while 1:
+        process_created = watcher ()
+        print process_created.Name
 
-    # or
+      # or
 
-    watcher = c.watch_for (
-      notification_type="Creation",
-      wmi_class="Win32_Process",
-      delay_secs=2,
-      Name='calc.exe'
-    )
-    calc_created = watcher ()
-    </pre>
+      watcher = c.watch_for (
+        notification_type="Creation",
+        wmi_class="Win32_Process",
+        delay_secs=2,
+        Name='calc.exe'
+      )
+      calc_created = watcher ()
 
-    Now supports timeout on the call to watcher, eg:
+    Now supports timeout on the call to watcher::
 
-    <pre class="code">
-    import pythoncom
-    import wmi
-    c = wmi.WMI (privileges=["Security"])
-    watcher1 = c.watch_for (
-      notification_type="Creation",
-      wmi_class="Win32_NTLogEvent",
-      Type="error"
-    )
-    watcher2 = c.watch_for (
-      notification_type="Creation",
-      wmi_class="Win32_NTLogEvent",
-      Type="warning"
-    )
+      import pythoncom
+      import wmi
+      c = wmi.WMI (privileges=["Security"])
+      watcher1 = c.watch_for (
+        notification_type="Creation",
+        wmi_class="Win32_NTLogEvent",
+        Type="error"
+      )
+      watcher2 = c.watch_for (
+        notification_type="Creation",
+        wmi_class="Win32_NTLogEvent",
+        Type="warning"
+      )
 
-    while 1:
-      try:
-        error_log = watcher1 (500)
-      except wmi.x_wmi_timed_out:
-        pythoncom.PumpWaitingMessages ()
-      else:
-        print error_log
+      while 1:
+        try:
+          error_log = watcher1 (500)
+        except wmi.x_wmi_timed_out:
+          pythoncom.PumpWaitingMessages ()
+        else:
+          print error_log
 
-      try:
-        warning_log = watcher2 (500)
-      except wmi.x_wmi_timed_out:
-        pythoncom.PumpWaitingMessages ()
-      else:
-        print warning_log
-    </pre>
+        try:
+          warning_log = watcher2 (500)
+        except wmi.x_wmi_timed_out:
+          pythoncom.PumpWaitingMessages ()
+        else:
+          print warning_log
     """
     if isinstance (wmi_class, _wmi_class):
       class_name = wmi_class._class_name
@@ -1132,7 +1148,7 @@ class _wmi_watcher:
   def __call__ (self, timeout_ms=-1):
     """When called, return the instance which caused the event. Supports
      timeout in milliseconds (defaulting to infinite). If the watcher
-     times out, x_wmi_timed_out is raised. This makes it easy to support
+     times out, :exc:`x_wmi_timed_out` is raised. This makes it easy to support
      watching for multiple objects.
     """
     try:
@@ -1165,33 +1181,27 @@ def connect (
   debug=False
 ):
   """The WMI constructor can either take a ready-made moniker or as many
-   parts of one as are necessary. Eg,
+  parts of one as are necessary. Eg::
 
-   <pre class="code">
-   c = wmi.WMI (moniker="winmgmts:{impersonationLevel=Delegate}//remote")
+    c = wmi.WMI (moniker="winmgmts:{impersonationLevel=Delegate}//remote")
+    # or
+    c = wmi.WMI (computer="remote", privileges=["!RemoteShutdown", "Security"])
 
-   # or
+  I daren't link to a Microsoft URL; they change so often. Try Googling for
+  WMI construct moniker and see what it comes back with.
 
-   c = wmi.WMI (computer="remote", privileges=["!RemoteShutdown", "Security"])
-   </pre>
+  For complete control, a named argument "wmi" can be supplied, which
+  should be a SWbemServices object, which you create yourself. Eg::
 
-   I daren't link to a Microsoft URL; they change so often. Try Googling for
-   WMI construct moniker and see what it comes back with.
+    loc = win32com.client.Dispatch("WbemScripting.SWbemLocator")
+    svc = loc.ConnectServer(...)
+    c = wmi.WMI(wmi=svc)
 
-   For complete control, a named argument "wmi" can be supplied, which
-   should be a SWbemServices object, which you create yourself. Eg,
+  This is the only way of connecting to a remote computer with a different
+  username, as the moniker syntax does not allow specification of a user
+  name.
 
-   <pre class="code">
-   loc = win32com.client.Dispatch("WbemScripting.SWbemLocator")
-   svc = loc.ConnectServer(...)
-   c = wmi.WMI(wmi=svc)
-   </pre>
-
-   This is the only way of connecting to a remote computer with a different
-   username, as the moniker syntax does not allow specification of a user
-   name.
-
-   If the "wmi" parameter is supplied, all other parameters are ignored.
+  If the `wmi` parameter is supplied, all other parameters are ignored.
   """
   global _DEBUG
   _DEBUG = debug
@@ -1304,18 +1314,21 @@ def connect_server (
 ):
   """Return a remote server running WMI
 
-  server - name of the server
-  namespace - namespace to connect to: defaults to whatever's defined as default
-  user - username to connect as, either local or domain (dom\name or user@domain for XP)
-  password: leave blank to use current context
-  locale: desired locale in form MS_XXXX (eg MS_409 for Am En)
-  authority: either "Kerberos:" or an NT domain. Not needed if included in user
-  security_flags: if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins
-  named_value_set: typically empty, otherwise a context-specific SWbemNamedValueSet
+  :param server: name of the server
+  :param namespace: namespace to connect to - defaults to whatever's defined as default
+  :param user: username to connect as, either local or domain (dom\\name or user@domain for XP)
+  :param password: leave blank to use current context
+  :param locale: desired locale in form MS_XXXX (eg MS_409 for Am En)
+  :param authority: either "Kerberos:" or an NT domain. Not needed if included in user
+  :param security_flags: if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins
+  :param named_value_set: typically empty, otherwise a context-specific `SWbemNamedValueSet`
 
-  <pre class="code">
-  c = wmi.WMI (wmi=wmi.connect_server (server="remote_machine", user="myname", password="mypassword"))
-  </pre>
+  Example::
+
+    remote_connetion = wmi.connect_server (
+      server="remote_machine", user="myname", password="mypassword"
+    )
+    c = wmi.WMI (wmi=remote_connection)
   """
   return Dispatch ("WbemScripting.SWbemLocator").\
     ConnectServer (
@@ -1338,6 +1351,7 @@ def Registry (
   moniker=None
 ):
 
+  raise DeprecationWarning ("This function can be implemented using wmi.WMI (namespace='DEFAULT').StdRegProv")
   if not moniker:
     moniker = construct_moniker (
       computer=computer,
