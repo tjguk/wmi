@@ -45,6 +45,9 @@ Changes
   called `Process`, the module would try it again under `Win32_Process` if it failed
   first time round. This has now been removed to avoid the magic.
 
+* Impersonation & Authentication levels now supported when connecting to a remote
+  server with specific credentials. Thanks to Matt Mercer for sample code.
+
 1.3
 ---
 

@@ -721,7 +721,7 @@ name.</p>
 
 <dl class="function">
 <dt id="wmi.connect_server">
-<tt class="descclassname">wmi.</tt><tt class="descname">connect_server</tt><big>(</big><em>server</em>, <em>namespace=''</em>, <em>user=''</em>, <em>password=''</em>, <em>locale=''</em>, <em>authority=''</em>, <em>security_flags=0</em>, <em>named_value_set=None</em><big>)</big><a class="headerlink" href="#wmi.connect_server" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">wmi.</tt><tt class="descname">connect_server</tt><big>(</big><em>server</em>, <em>namespace=''</em>, <em>user=''</em>, <em>password=''</em>, <em>locale=''</em>, <em>authority=''</em>, <em>impersonation_level=''</em>, <em>authentication_level=''</em>, <em>security_flags=0</em>, <em>named_value_set=None</em><big>)</big><a class="headerlink" href="#wmi.connect_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a remote server running WMI</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -734,6 +734,7 @@ name.</p>
 <li><em>password</em> &#8211; leave blank to use current context</li>
 <li><em>locale</em> &#8211; desired locale in form MS_XXXX (eg MS_409 for Am En)</li>
 <li><em>authority</em> &#8211; either &#8220;Kerberos:&#8221; or an NT domain. Not needed if included in user</li>
+<li><em>impersonation_level</em> &#8211; valid WMI impersonation level</li>
 <li><em>security_flags</em> &#8211; if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins</li>
 <li><em>named_value_set</em> &#8211; typically empty, otherwise a context-specific <cite>SWbemNamedValueSet</cite></li>
 </ul>
