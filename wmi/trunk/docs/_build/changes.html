@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="WMI v1.4.2 documentation" href="index.html" />
-    <link rel="prev" title="wmi Cookbook" href="cookbook.html" /> 
+    <link rel="prev" title="wmi – Windows Management Instrumentation" href="wmi.html" /> 
   </head>
   <body>
     <div class="related">
@@ -30,7 +30,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cookbook.html" title="wmi Cookbook"
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="wmi.html" title="wmi – Windows Management Instrumentation"
              accesskey="P">previous</a> |</li>
         <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
       </ul>
@@ -47,8 +50,8 @@
 </ul>
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="cookbook.html"
-                                  title="previous chapter">wmi Cookbook</a></p>
+            <p class="topless"><a href="wmi.html"
+                                  title="previous chapter"><tt class="docutils literal"><span class="pre">wmi</span></tt> &#8211; Windows Management Instrumentation</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/changes.txt"
@@ -108,6 +111,9 @@ is now calculated lazily, so things like IPython&#8217;s attribute lookup still 
 <li>wmiweb.py - the installation now ships with a small but functional web-based WMI browser.
 It uses only the stdlib WSGI server and makes it easy to explore any of the namespaces
 on the local or a remote machine.</li>
+<li>Removed the rarely-used Win32 autoprefix: previously, if you tried for a class
+called <cite>Process</cite>, the module would try it again under <cite>Win32_Process</cite> if it failed
+first time round. This has now been removed to avoid the magic.</li>
 </ul>
 </div>
 <div class="section" id="id2">
@@ -137,7 +143,10 @@ rather than creation.</li>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cookbook.html" title="wmi Cookbook"
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wmi.html" title="wmi – Windows Management Instrumentation"
              >previous</a> |</li>
         <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
       </ul>

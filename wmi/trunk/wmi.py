@@ -1,125 +1,80 @@
-##
-# wmi - a lightweight Python wrapper around Microsoft's WMI interface
-#
-# Windows Management Instrumentation (WMI) is Microsoft's answer to
-# the DMTF's Common Information Model. It allows you to query just
-# about any conceivable piece of information from any computer which
-# is running the necessary agent and over which have you the
-# necessary authority.
-#
-# The implementation is by means of COM/DCOM and most of the examples
-# assume you're running one of Microsoft's scripting technologies.
-# Fortunately, Mark Hammond's pywin32 has pretty much all you need
-# for a workable Python adaptation. I haven't tried any of the fancier
-# stuff like Async calls and so on, so I don't know if they'd work.
-#
-# Since the COM implementation doesn't give much away to Python
-# programmers, I've wrapped it in some lightweight classes with
-# some getattr / setattr magic to ease the way. In particular:
-#
-# <ul>
-# <li>
-# The _wmi_namespace object itself will determine its classes
-# and allow you to return all instances of any of them by
-# using its name as an attribute. As an additional shortcut,
-# you needn't specify the Win32_; if the first lookup fails
-# it will try again with a Win32_ on the front:
-#
-# <pre class="code">
-# disks = wmi.WMI ().Win32_LogicalDisk ()
-# </pre>
-#
-# In addition, you can specify what would become the WHERE clause
-# as keyword parameters:
-#
-# <pre class="code">
-# fixed_disks = wmi.WMI ().Win32_LogicalDisk (DriveType = 3)
-# </pre>
-# </li>
-#
-# <li>
-# The objects returned by a WMI lookup are wrapped in a Python
-# class which determines their methods and classes and allows
-# you to access them as though they were Python classes. The
-# methods only allow named parameters.
-#
-# <pre class="code">
-# for p in wmi.WMI ().Win32_Process ():
-#   if p.Name.lower () == 'notepad.exe':
-#     p.Terminate (Result=1)
-# </pre>
-# </li>
-#
-# <li>
-#  Doing a print on one of the WMI objects will result in its
-#  GetObjectText_ method being called, which usually produces
-#  a meaningful printout of current values.
-#  The repr of the object will include its full WMI path,
-#  which lets you get directly to it if you need to.
-# </li>
-#
-# <li>
-# You can get the associators and references of an object as
-#  a list of python objects by calling the associators () and
-#  references () methods on a WMI Python object.
-#  NB Don't do this on a Win32_ComputerSystem object; it will
-#  take all day and kill your machine!
-#
-# <pre class="code">
-# for p in wmi.WMI ().Win32_Process ():
-#   if p.Name.lower () == 'notepad.exe':
-#     for r in p.references ():
-#       print r.Name
-# </pre>
-# </li>
-#
-# <li>
-# WMI classes (as opposed to instances) are first-class
-# objects, so you can get hold of a class, and call
-# its methods or set up a watch against it.
-#
-# <pre class="code">
-# process = wmi.WMI ().Win32_Process
-# process.Create (CommandLine="notepad.exe")
-# </pre>
-#
-# </li>
-#
-# <li>
-# To make it easier to use in embedded systems and py2exe-style
-# executable wrappers, the module will not force early Dispatch.
-# To do this, it uses a handy hack by Thomas Heller for easy access
-# to constants.
-# </li>
-#
-# <li>
-# Typical usage will be:
-#
-# <pre class="code">
-# import wmi
-#
-# vodev1 = wmi.WMI ("vodev1")
-# for disk in vodev1.Win32_LogicalDisk ():
-#   if disk.DriveType == 3:
-#     space = 100 * long (disk.FreeSpace) / long (disk.Size)
-#     print "%s has %d%% free" % (disk.Name, space)
-# </pre>
-# </li>
-#
-# </ul>
-#
-# Many thanks, obviously to Mark Hammond for creating the win32all
-# extensions, but also to Alex Martelli and Roger Upole, whose
-# c.l.py postings pointed me in the right direction.
-# Thanks especially in release 1.2 to Paul Tiemann for his code
-# contributions and robust testing.
-#
-# (c) Tim Golden - mail at timgolden.me.uk 5th June 2003
-# Licensed under the (GPL-compatible) MIT License:
-# http://www.opensource.org/licenses/mit-license.php
-#
-# For change history see CHANGELOG.TXT
-##
+"""
+Windows Management Instrumentation (WMI) is Microsoft's answer to
+the DMTF's Common Information Model. It allows you to query just
+about any conceivable piece of information from any computer which
+is running the necessary agent and over which have you the
+necessary authority.
+
+Since the COM implementation doesn't give much away to Python
+programmers, I've wrapped it in some lightweight classes with
+some getattr / setattr magic to ease the way. In particular:
+
+* The :class:`_wmi_namespace` object itself will determine its classes
+  and allow you to return all instances of any of them by
+  using its name as an attribute::
+
+    disks = wmi.WMI ().Win32_LogicalDisk ()
+
+* In addition, you can specify what would become the WHERE clause
+  as keyword parameters::
+
+    fixed_disks = wmi.WMI ().Win32_LogicalDisk (DriveType=3)
+
+* The objects returned by a WMI lookup are wrapped in a Python
+  class which determines their methods and classes and allows
+  you to access them as though they were Python classes. The
+  methods only allow named parameters::
+
+    for p in wmi.WMI ().Win32_Process (Name="notepad.exe"):
+      p.Terminate (Result=1)
+
+* Doing a print on one of the WMI objects will result in its
+  `GetObjectText\_` method being called, which usually produces
+  a meaningful printout of current values.
+  The repr of the object will include its full WMI path,
+  which lets you get directly to it if you need to.
+
+* You can get the associators and references of an object as
+  a list of python objects by calling the associators () and
+  references () methods on a WMI Python object::
+
+    for p in wmi.WMI ().Win32_Process (Name="notepad.exe"):
+      for r in p.references ():
+        print r
+
+  ..  note::
+      Don't do this on a Win32_ComputerSystem object; it will
+      take all day and kill your machine!
+
+
+* WMI classes (as opposed to instances) are first-class
+  objects, so you can get hold of a class, and call
+  its methods or set up a watch against it::
+
+    process = wmi.WMI ().Win32_Process
+    process.Create (CommandLine="notepad.exe")
+
+* To make it easier to use in embedded systems and py2exe-style
+  executable wrappers, the module will not force early Dispatch.
+  To do this, it uses a handy hack by Thomas Heller for easy access
+  to constants.
+
+Typical usage will be::
+
+  import wmi
+
+  vodev1 = wmi.WMI ("vodev1")
+  for disk in vodev1.Win32_LogicalDisk ():
+    if disk.DriveType == 3:
+      space = 100 * long (disk.FreeSpace) / long (disk.Size)
+      print "%s has %d%% free" % (disk.Name, space)
+
+Many thanks, obviously to Mark Hammond for creating the win32all
+extensions, but also to Alex Martelli and Roger Upole, whose
+c.l.py postings pointed me in the right direction.
+Thanks especially in release 1.2 to Paul Tiemann for his code
+contributions and robust testing.
+"""
 __VERSION__ = __version__ = "1.4.2"
 
 _DEBUG = False
@@ -139,29 +94,29 @@ def signed_to_unsigned (signed):
     return unsigned
 
 class SelfDeprecatingDict (object):
-  
+
   dict_only = set (dir (dict)).difference (dir (list))
-  
+
   def __init__ (self, dictlike):
     self.dict = dict (dictlike)
     self.list = list (self.dict)
-    
+
   def __getattr__ (self, attribute):
     if attribute in self.dict_only:
       warnings.warn ("In future this will be a list and not a dictionary", DeprecationWarning)
       return getattr (self.dict, attribute)
     else:
       return getattr (self.list, attribute)
-      
+
   def __iter__ (self):
     return iter (self.list)
-    
+
   def __str__ (self):
     return str (self.list)
-    
+
   def __repr__ (self):
     return repr (self.list)
-    
+
   def __getitem__ (self, item):
     try:
       return self.list[item]
@@ -821,7 +776,7 @@ class _wmi_class (_wmi_object):
     valid_notification_types = ("operation", "creation", "deletion", "modification")
     if notification_type.lower () not in valid_notification_types:
       raise x_wmi ("notification_type must be one of %s" % ", ".join (valid_notification_types))
-    
+
     return self._namespace.watch_for (
       notification_type=notification_type,
       wmi_class=self,
@@ -927,7 +882,7 @@ class _wmi_namespace:
     #
     if find_classes:
       _ = self.classes
- 
+
   def __repr__ (self):
     return "<_wmi_namespace: %s>" % self.wmi
 
@@ -939,7 +894,7 @@ class _wmi_namespace:
       self._classes = self.subclasses_of ()
     return SelfDeprecatingDict (dict.fromkeys (self._classes))
   classes = property (_get_classes)
-  
+
   def get (self, moniker):
     try:
       return _wmi_object (self.wmi.Get (moniker))

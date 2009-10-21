@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wmi – Windows Management Instrumentation &mdash; WMI v1.4.2 documentation</title>
+    <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.4.2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="WMI v1.4.2 documentation" href="index.html" />
+    <link rel="next" title="Changes" href="changes.html" />
+    <link rel="prev" title="wmi Cookbook" href="cookbook.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cookbook.html" title="wmi Cookbook"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="cookbook.html"
+                                  title="previous chapter">wmi Cookbook</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="changes.html"
+                                  title="next chapter">Changes</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/wmi.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-wmi">
+<h1><tt class="xref docutils literal"><span class="pre">wmi</span></tt> &#8211; Windows Management Instrumentation<a class="headerlink" href="#module-wmi" title="Permalink to this headline">¶</a></h1>
+<p>Windows Management Instrumentation (WMI) is Microsoft&#8217;s answer to
+the DMTF&#8217;s Common Information Model. It allows you to query just
+about any conceivable piece of information from any computer which
+is running the necessary agent and over which have you the
+necessary authority.</p>
+<p>Since the COM implementation doesn&#8217;t give much away to Python
+programmers, I&#8217;ve wrapped it in some lightweight classes with
+some getattr / setattr magic to ease the way. In particular:</p>
+<ul>
+<li><p class="first">The <tt class="xref docutils literal"><span class="pre">_wmi_namespace</span></tt> object itself will determine its classes
+and allow you to return all instances of any of them by
+using its name as an attribute:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disks</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">In addition, you can specify what would become the WHERE clause
+as keyword parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fixed_disks</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The objects returned by a WMI lookup are wrapped in a Python
+class which determines their methods and classes and allows
+you to access them as though they were Python classes. The
+methods only allow named parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">):</span>
+  <span class="n">p</span><span class="o">.</span><span class="n">Terminate</span> <span class="p">(</span><span class="n">Result</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Doing a print on one of the WMI objects will result in its
+<cite>GetObjectText_</cite> method being called, which usually produces
+a meaningful printout of current values.
+The repr of the object will include its full WMI path,
+which lets you get directly to it if you need to.</p>
+</li>
+<li><p class="first">You can get the associators and references of an object as
+a list of python objects by calling the associators () and
+references () methods on a WMI Python object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">references</span> <span class="p">():</span>
+    <span class="k">print</span> <span class="n">r</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Don&#8217;t do this on a Win32_ComputerSystem object; it will
+take all day and kill your machine!</p>
+</div>
+</li>
+<li><p class="first">WMI classes (as opposed to instances) are first-class
+objects, so you can get hold of a class, and call
+its methods or set up a watch against it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">process</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_Process</span>
+<span class="n">process</span><span class="o">.</span><span class="n">Create</span> <span class="p">(</span><span class="n">CommandLine</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To make it easier to use in embedded systems and py2exe-style
+executable wrappers, the module will not force early Dispatch.
+To do this, it uses a handy hack by Thomas Heller for easy access
+to constants.</p>
+</li>
+</ul>
+<p>Typical usage will be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
+
+<span class="n">vodev1</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="s">&quot;vodev1&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">vodev1</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">():</span>
+  <span class="k">if</span> <span class="n">disk</span><span class="o">.</span><span class="n">DriveType</span> <span class="o">==</span> <span class="mf">3</span><span class="p">:</span>
+    <span class="n">space</span> <span class="o">=</span> <span class="mf">100</span> <span class="o">*</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">FreeSpace</span><span class="p">)</span> <span class="o">/</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">Size</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> has </span><span class="si">%d%%</span><span class="s"> free&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">space</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Many thanks, obviously to Mark Hammond for creating the win32all
+extensions, but also to Alex Martelli and Roger Upole, whose
+c.l.py postings pointed me in the right direction.
+Thanks especially in release 1.2 to Paul Tiemann for his code
+contributions and robust testing.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cookbook.html" title="wmi Cookbook"
+             >previous</a> |</li>
+        <li><a href="contents.html">WMI v1.4.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Tim Golden.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

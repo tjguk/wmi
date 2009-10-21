@@ -41,6 +41,10 @@ Changes
   It uses only the stdlib WSGI server and makes it easy to explore any of the namespaces
   on the local or a remote machine.
 
+* Removed the rarely-used Win32 autoprefix: previously, if you tried for a class
+  called `Process`, the module would try it again under `Win32_Process` if it failed
+  first time round. This has now been removed to avoid the magic.
+
 1.3
 ---
 

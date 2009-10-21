@@ -9,4 +9,5 @@ Contents
     index
     tutorial
     cookbook
+    wmi
     changes
