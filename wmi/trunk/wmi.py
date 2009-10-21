@@ -545,8 +545,7 @@ class _wmi_object:
       handle_com_error ()
 
   def __setattr__ (self, attribute, value):
-    """
-    If the attribute to be set is valid for the proxied
+    """If the attribute to be set is valid for the proxied
     COM object, set that objects's parameter value; if not,
     raise an exception.
     """
@@ -593,11 +592,13 @@ class _wmi_object:
   keys = property (get_keys)
 
   def put (self):
+    """Push all outstanding property updates back to the
+    WMI database.
+    """
     self.ole_object.Put_ ()
 
   def set (self, **kwargs):
-    """
-    Set several properties of the underlying object
+    """Set several properties of the underlying object
     at one go. This is particularly useful in combination
     with the new () method below. However, an instance
     which has been spawned in this way won't have enough
@@ -621,16 +622,13 @@ class _wmi_object:
         handle_com_error ()
 
   def path (self):
-    """
-    Return the WMI URI to this object. Can be used to
-    determine the path relative to the parent namespace. eg,
+    """Return the WMI URI to this object. Can be used to
+    determine the path relative to the parent namespace::
 
-    <pre class="code">
-    pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
-    print pp0.path ().RelPath
-    </pre>
+      pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
+      print pp0.path ().RelPath
 
-    FIXME: DO more with this
+    ..  Do more with this
     """
     try:
       return self.ole_object.Path_
@@ -639,10 +637,10 @@ class _wmi_object:
 
   def derivation (self):
     """Return a tuple representing the object derivation for
-     this object, with the most specific object first. eg,
+    this object, with the most specific object first::
 
-    pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
-    print ' <- '.join (pp0.derivation ())
+      pp0 = wmi.WMI ().Win32_ParallelPort ()[0]
+      print ' <- '.join (pp0.derivation ())
     """
     try:
       return self.ole_object.Derivation_
