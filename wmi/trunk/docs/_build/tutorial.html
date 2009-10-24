@@ -214,7 +214,7 @@ module makes the difference as transparent as it can. Say you wanted to track ne
 </div>
 <p>Note that you must pass one of &#8220;creation&#8221;, &#8220;deletion&#8221;, &#8220;modification&#8221; or &#8220;operation&#8221; to the .watch_for method. If
 not, slightly odd errors will result.</p>
-<p>
+<p class="versionadded">
 <span class="versionmodified">New in version 1.3.1: </span>If you don&#8217;t specify a notification type to an intrinsic event then
 &#8220;operation&#8221; will be assumed, which triggers on any change to an object of that class.</p>
 </div>
@@ -237,7 +237,7 @@ to stop the (running) RunAs service, whose short name is &#8220;seclogon&#8221;:
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Service</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;seclogon&quot;</span><span class="p">):</span>
   <span class="n">result</span><span class="p">,</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">StopService</span><span class="p">()</span>
-  <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="k">print</span> <span class="s">&quot;Service&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="s">&quot;stopped&quot;</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="k">print</span> <span class="s">&quot;Some problem&quot;</span>
@@ -336,7 +336,7 @@ you can still do whatever post-hoc filtering you want in Python once you&#8217;v
 the resulting list is only one element long, it is still a list. To find all fixed disks:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span><span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mf">3</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span><span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
   <span class="k">print</span> <span class="n">disk</span>
 </pre></div>
 </div>
@@ -349,7 +349,7 @@ parameter to a list of field names. Note that the key field (typically an id or 
 will always be returned:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span><span class="p">([</span><span class="s">&quot;Caption&quot;</span><span class="p">,</span> <span class="s">&quot;Description&quot;</span><span class="p">],</span> <span class="n">DriveType</span><span class="o">=</span><span class="mf">3</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span><span class="p">([</span><span class="s">&quot;Caption&quot;</span><span class="p">,</span> <span class="s">&quot;Description&quot;</span><span class="p">],</span> <span class="n">DriveType</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
   <span class="k">print</span> <span class="n">disk</span>
 </pre></div>
 </div>
@@ -380,8 +380,8 @@ an entire directory structure.</p>
 <p>To watch an event log for errors, say:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">(</span><span class="n">privileges</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Security&quot;</span><span class="p">])</span>
-<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_NTLogEvent</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="s">&quot;creation&quot;</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="n">Type</span><span class="o">=</span><span class="s">&quot;error&quot;</span><span class="p">)</span>
-<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_NTLogEvent</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="s">&quot;creation&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Type</span><span class="o">=</span><span class="s">&quot;error&quot;</span><span class="p">)</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
   <span class="n">error</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">()</span>
   <span class="k">print</span> <span class="s">&quot;Error in </span><span class="si">%s</span><span class="s"> log: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">Logfile</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span>
   <span class="c"># send mail to sysadmin etc.</span>
@@ -417,7 +417,7 @@ you wanted to do something whenever your computer came out of standby, eg to not
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
-<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_PowerManagementEvent</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="n">EventType</span><span class="o">=</span><span class="mf">7</span><span class="p">)</span>
+<span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_PowerManagementEvent</span><span class="o">.</span><span class="n">watch_for</span><span class="p">(</span><span class="n">EventType</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
   <span class="n">event</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">()</span>
   <span class="k">print</span> <span class="s">&quot;resumed&quot;</span>
@@ -427,8 +427,8 @@ you wanted to do something whenever your computer came out of standby, eg to not
   <span class="c">#</span>
   <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="s">&quot;TIME_CREATED&quot;</span><span class="p">):</span>
     <span class="n">ns100</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">TIME_CREATED</span><span class="p">)</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">ns100</span> <span class="o">/</span> <span class="mf">10</span><span class="p">)</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mf">1601</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">ns100</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1601</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">print</span> <span class="s">&quot;Resumed at&quot;</span><span class="p">,</span> <span class="n">base</span>  <span class="o">+</span> <span class="n">offset</span>
 </pre></div>
 </div>
@@ -478,7 +478,7 @@ without getting into threading and queues:</p>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
   <span class="k">for</span> <span class="n">server</span><span class="p">,</span> <span class="n">watcher</span> <span class="ow">in</span> <span class="n">watchers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
-      <span class="n">event</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">(</span><span class="n">timeout_ms</span><span class="o">=</span><span class="mf">10</span><span class="p">)</span>
+      <span class="n">event</span> <span class="o">=</span> <span class="n">watcher</span><span class="p">(</span><span class="n">timeout_ms</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi_timed_out</span><span class="p">:</span>
       <span class="k">pass</span>
     <span class="k">else</span><span class="p">:</span>
@@ -539,8 +539,8 @@ In fact, most of the classes which allow instance creation via WMI offer a
 <cite>Create</cite> method (<cite>Win32_Process</cite>, <cite>Win32_Share</cite> etc.):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
-<span class="n">result</span><span class="p">,</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Share</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">Path</span><span class="o">=</span><span class="s">&quot;c:</span><span class="se">\\</span><span class="s">temp&quot;</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s">&quot;temp&quot;</span><span class="p">,</span> <span class="n">Type</span><span class="o">=</span><span class="mf">0</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+<span class="n">result</span><span class="p">,</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Share</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">Path</span><span class="o">=</span><span class="s">&quot;c:</span><span class="se">\\</span><span class="s">temp&quot;</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s">&quot;temp&quot;</span><span class="p">,</span> <span class="n">Type</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
   <span class="k">print</span> <span class="s">&quot;Share created successfully&quot;</span>
 <span class="k">else</span><span class="p">:</span>
   <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">,</span> <span class="s">&quot;Problem creating share: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">result</span>
@@ -551,7 +551,7 @@ the fly. Typical examples are passing security descriptors to new objects or pro
 process. This example from MSDN can be translated into Python as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
-<span class="n">SW_SHOWNORMAL</span> <span class="o">=</span> <span class="mf">1</span>
+<span class="n">SW_SHOWNORMAL</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
 <span class="n">process_startup</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ProcessStartup</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
@@ -564,7 +564,7 @@ process. This example from MSDN can be translated into Python as follows:</p>
   <span class="n">CommandLine</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">,</span>
   <span class="n">ProcessStartupInformation</span><span class="o">=</span><span class="n">process_startup</span>
 <span class="p">)</span>
-<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mf">0</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
   <span class="k">print</span> <span class="s">&quot;Process started successfully: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">process_id</span>
 <span class="k">else</span><span class="p">:</span>
   <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">,</span> <span class="s">&quot;Problem creating process: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">result</span>
@@ -632,7 +632,7 @@ your system, and which users are in each group:</p>
     <span class="k">print</span> <span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">Caption</span>
 </pre></div>
 </div>
-<p>
+<p class="versionadded">
 <span class="versionmodified">New in version 1.3.1: </span>The <tt class="xref docutils literal"><span class="pre">_wmi_object.associators()</span></tt> method will convert its results to
 a _wmi_object.</p>
 </div>
@@ -739,10 +739,10 @@ you instantiate a WMI object within a thread and then uninitializing afterwards:
     <span class="n">pythoncom</span><span class="o">.</span><span class="n">CoInitialize</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span><span class="p">()</span>
-      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span><span class="p">():</span>
           <span class="k">print</span> <span class="n">process</span><span class="o">.</span><span class="n">ProcessId</span><span class="p">,</span> <span class="n">process</span><span class="o">.</span><span class="n">Name</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
       <span class="n">pythoncom</span><span class="o">.</span><span class="n">CoUninitialize</span><span class="p">()</span>
 
@@ -754,7 +754,7 @@ you instantiate a WMI object within a thread and then uninitializing afterwards:
   <span class="n">Info</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>
+<p class="versionadded">
 <span class="versionmodified">New in version 1.4.1: </span>From v1.4 onwards, the Moniker Syntax Error which usually results from failing
 to initialise threaded WMI access will be caught by the underlying code and a
 <tt class="xref docutils literal"><span class="pre">x_wmi_uninitialised_thread</span></tt> exception will be raised instead.</p>

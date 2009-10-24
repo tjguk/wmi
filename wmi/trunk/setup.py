@@ -22,6 +22,6 @@ setup (
   license = "http://www.opensource.org/licenses/mit-license.php",
   py_modules = ["wmi"],
   scripts = ["wmitest.py", "wmiweb.py", "wmitest.cmd", "wmitest.master.ini"],
-  data_files = ["readme.txt", "changelog.txt"]
+  data_files = ["readme.txt"]
 )
 

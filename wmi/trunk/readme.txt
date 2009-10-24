@@ -43,8 +43,8 @@ python setup.py install
 How do I use it?
 ================
 
-There's a tutorial here: http://timgolden.me.uk/python/wmi-tutorial.html,
-and some examples at: http://timgolden.me.uk/python/wmi_cookbook.html
+There's a tutorial here: http://timgolden.me.uk/python/wmi/tutorial.html,
+and some examples at: http://timgolden.me.uk/python/wmi/cookbook.html
 but as a quick taster, try this, to show all stopped services:
 
 import wmi
