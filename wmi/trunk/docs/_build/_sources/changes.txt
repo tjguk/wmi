@@ -23,18 +23,18 @@ Changes
   and authentication are invalid when connection. A specific exception is now raised for these:
   :exc:`x_wmi_authentication`.
 
-* keys - each :class:`_wmi_object` now has a keys attribute, inferred from the underlying
+* `keys` - each :class:`wmi._wmi_object` now has a `keys` attribute, inferred from the underlying
   WMI class definition, which is the list of attributes which uniquely define an instance of that class.
 
-* associated_classes - each :class:`_wmi_object` has an associated_classes attribute which is
+* `associated_classes` - each :class:`wmi._wmi_object` has an `associated_classes` attribute which is
   a dictionary mapping the names of the other WMI classes which can be associated to this one to their
-  :class:`_wmi_class` objects. This is most immediately of use in the wmiweb browser (qv) but can
+  :class:`wmi._wmi_class` objects. This is most immediately of use in the wmiweb browser (qv) but can
   be used by client code.
 
-* By default, the :func:`wmi` connection function -- the one you call most often -- no longer looks to
+* By default, the :func:`wmi.WMI` connection function -- the one you call most often -- no longer looks to
   find the subclasses of a namespace. This makes for much faster startup times: altho' it was
   always possible to pass `find_classes=False` this was little known, and you now have to pass
-  `find_classes=True` to get this functionality, or use the :attr:`WMI.classes` attribute which
+  `find_classes=True` to get this functionality, or use the :attr:`wmi._wmi_namespace.classes` attribute which
   is now calculated lazily, so things like IPython's attribute lookup still work.
 
 * wmiweb.py - the installation now ships with a small but functional web-based WMI browser.

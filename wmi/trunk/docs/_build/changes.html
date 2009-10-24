@@ -97,16 +97,16 @@ traps this specific case and returns a specific exception: <tt class="xref docut
 <li>More specific checks for invalid connection combinations - certain combinations of identification
 and authentication are invalid when connection. A specific exception is now raised for these:
 <tt class="xref docutils literal"><span class="pre">x_wmi_authentication</span></tt>.</li>
-<li>keys - each <tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt> now has a keys attribute, inferred from the underlying
+<li><cite>keys</cite> - each <a title="wmi._wmi_object" class="reference external" href="wmi.html#wmi._wmi_object"><tt class="xref docutils literal"><span class="pre">wmi._wmi_object</span></tt></a> now has a <cite>keys</cite> attribute, inferred from the underlying
 WMI class definition, which is the list of attributes which uniquely define an instance of that class.</li>
-<li>associated_classes - each <tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt> has an associated_classes attribute which is
+<li><cite>associated_classes</cite> - each <a title="wmi._wmi_object" class="reference external" href="wmi.html#wmi._wmi_object"><tt class="xref docutils literal"><span class="pre">wmi._wmi_object</span></tt></a> has an <cite>associated_classes</cite> attribute which is
 a dictionary mapping the names of the other WMI classes which can be associated to this one to their
-<tt class="xref docutils literal"><span class="pre">_wmi_class</span></tt> objects. This is most immediately of use in the wmiweb browser (qv) but can
+<a title="wmi._wmi_class" class="reference external" href="wmi.html#wmi._wmi_class"><tt class="xref docutils literal"><span class="pre">wmi._wmi_class</span></tt></a> objects. This is most immediately of use in the wmiweb browser (qv) but can
 be used by client code.</li>
-<li>By default, the <tt class="xref docutils literal"><span class="pre">wmi()</span></tt> connection function &#8211; the one you call most often &#8211; no longer looks to
+<li>By default, the <a title="wmi.WMI" class="reference external" href="wmi.html#wmi.WMI"><tt class="xref docutils literal"><span class="pre">wmi.WMI()</span></tt></a> connection function &#8211; the one you call most often &#8211; no longer looks to
 find the subclasses of a namespace. This makes for much faster startup times: altho&#8217; it was
 always possible to pass <cite>find_classes=False</cite> this was little known, and you now have to pass
-<cite>find_classes=True</cite> to get this functionality, or use the <tt class="xref docutils literal"><span class="pre">WMI.classes</span></tt> attribute which
+<cite>find_classes=True</cite> to get this functionality, or use the <tt class="xref docutils literal"><span class="pre">wmi._wmi_namespace.classes</span></tt> attribute which
 is now calculated lazily, so things like IPython&#8217;s attribute lookup still work.</li>
 <li>wmiweb.py - the installation now ships with a small but functional web-based WMI browser.
 It uses only the stdlib WSGI server and makes it easy to explore any of the namespaces

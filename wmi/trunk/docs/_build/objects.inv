@@ -9,7 +9,6 @@ wmi.from_time function wmi.html
 wmi.ProvideConstants class wmi.html
 wmi._wmi_namespace.new_instance_of method wmi.html
 wmi.to_time function wmi.html
-wmi._wmi_class class wmi.html
 wmi._wmi_namespace.fetch_as_lists method wmi.html
 wmi._wmi_method.__call__ method wmi.html
 wmi.x_access_denied exception wmi.html
@@ -21,7 +20,7 @@ wmi.SelfDeprecatingDict class wmi.html
 wmi.x_wmi_uninitialised_thread exception wmi.html
 wmi._wmi_object.set method wmi.html
 wmi.x_wmi_timed_out exception wmi.html
-wmi._wmi_object.get_keys method wmi.html
+wmi._wmi_class class wmi.html
 wmi.WMI function wmi.html
 wmi.x_wmi_authentication exception wmi.html
 wmi._wmi_namespace.watch_for method wmi.html
@@ -37,6 +36,7 @@ wmi._wmi_object.keys attribute wmi.html
 wmi._wmi_method class wmi.html
 wmi.handle_com_error function wmi.html
 wmi._wmi_class.instances method wmi.html
+wmi._wmi_object.get_keys method wmi.html
 wmi._wmi_method.__init__ method wmi.html
 wmi._wmi_object.associators method wmi.html
 wmi._wmi_class.new method wmi.html
