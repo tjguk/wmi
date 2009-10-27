@@ -636,5 +636,22 @@ class TestInstanceCreation (TestWMI):
   def test_create_instance (self):
     self.assert_ (isinstance (self.connection.Win32_ProcessStartup.new (ShowWindow=2), wmi._wmi_object))
 
+class TestAssociations (TestWMI):
+
+  def test_all_properties_available (self):
+    #
+    # An association can contain not only the associated
+    # classes but also extra information as well. Ensure
+    # that both types of data are correctly handled.
+    #
+    for q in self.connection.Win32_DiskQuota ():
+      for p in q.properties:
+        try:
+          getattr (q, p)
+        except wmi.x_wmi:
+          assert False, "Error getting %s from %s" % (p, q)
+      else:
+        assert True
+
 if __name__ == '__main__':
   unittest.main ()

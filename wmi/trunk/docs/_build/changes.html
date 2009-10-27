@@ -79,7 +79,7 @@
           <div class="body">
             
   <div class="section" id="changes">
-<h1>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h1>
+<span id="module-wmi"></span><h1>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
 <h2>1.4<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -87,35 +87,40 @@
 versions but it&#8217;s increasingly onerous and 2.4 is now 5 years old.</li>
 <li>Tests - WMI now comes with a unittest-based set of tests which have been run (and passed)
 against all versions of Python from 2.4 to 3.2 using pywin32 214.</li>
-<li>Exception changes - x_wmi and its subclasses now store the underlying COM error as .com_error instead of returning
+<li>Exception changes - <a title="wmi.x_wmi" class="reference external" href="wmi.html#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> and its subclasses now store the underlying COM error as
+<tt class="xref docutils literal"><span class="pre">x_wmi.com_error</span></tt> instead of returning
 an equivalent string. This should help code which needs to know the exact error which
 occurred and should also make it easier for non-ASCII systems which were experiencing
 difficulties when the code attempted to manipulate non-decoded byte strings.</li>
 <li>Specific trapping of uninitialised threads - like all COM-based code, WMI needs to be initialised if run
 inside a thread. If this isn&#8217;t done, the error message is slightly obscure. The connection maker now
-traps this specific case and returns a specific exception: <tt class="xref docutils literal"><span class="pre">x_wmi_uninitialised_thread</span></tt>.</li>
+traps this specific case and returns a specific exception: <a title="wmi.x_wmi_uninitialised_thread" class="reference external" href="wmi.html#wmi.x_wmi_uninitialised_thread"><tt class="xref docutils literal"><span class="pre">x_wmi_uninitialised_thread</span></tt></a>.</li>
 <li>More specific checks for invalid connection combinations - certain combinations of identification
 and authentication are invalid when connection. A specific exception is now raised for these:
-<tt class="xref docutils literal"><span class="pre">x_wmi_authentication</span></tt>.</li>
-<li><cite>keys</cite> - each <a title="wmi._wmi_object" class="reference external" href="wmi.html#wmi._wmi_object"><tt class="xref docutils literal"><span class="pre">wmi._wmi_object</span></tt></a> now has a <cite>keys</cite> attribute, inferred from the underlying
+<a title="wmi.x_wmi_authentication" class="reference external" href="wmi.html#wmi.x_wmi_authentication"><tt class="xref docutils literal"><span class="pre">x_wmi_authentication</span></tt></a>.</li>
+<li><cite>keys</cite> - each <a title="wmi._wmi_object" class="reference external" href="wmi.html#wmi._wmi_object"><tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt></a> now has a <a title="wmi._wmi_object.keys" class="reference external" href="wmi.html#wmi._wmi_object.keys"><tt class="xref docutils literal"><span class="pre">_wmi_object.keys</span></tt></a> attribute, inferred from the underlying
 WMI class definition, which is the list of attributes which uniquely define an instance of that class.</li>
-<li><cite>associated_classes</cite> - each <a title="wmi._wmi_object" class="reference external" href="wmi.html#wmi._wmi_object"><tt class="xref docutils literal"><span class="pre">wmi._wmi_object</span></tt></a> has an <cite>associated_classes</cite> attribute which is
+<li><cite>associated_classes</cite> - each <a title="wmi._wmi_object" class="reference external" href="wmi.html#wmi._wmi_object"><tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt></a> has an <tt class="xref docutils literal"><span class="pre">_wmi_object.associated_classes</span></tt> attribute which is
 a dictionary mapping the names of the other WMI classes which can be associated to this one to their
-<a title="wmi._wmi_class" class="reference external" href="wmi.html#wmi._wmi_class"><tt class="xref docutils literal"><span class="pre">wmi._wmi_class</span></tt></a> objects. This is most immediately of use in the wmiweb browser (qv) but can
+<a title="wmi._wmi_class" class="reference external" href="wmi.html#wmi._wmi_class"><tt class="xref docutils literal"><span class="pre">_wmi_class</span></tt></a> objects. This is most immediately of use in the wmiweb browser (qv) but can
 be used by client code.</li>
-<li>By default, the <a title="wmi.WMI" class="reference external" href="wmi.html#wmi.WMI"><tt class="xref docutils literal"><span class="pre">wmi.WMI()</span></tt></a> connection function &#8211; the one you call most often &#8211; no longer looks to
+<li>By default, the <a title="wmi.WMI" class="reference external" href="wmi.html#wmi.WMI"><tt class="xref docutils literal"><span class="pre">WMI()</span></tt></a> connection function &#8211; the one you call most often &#8211; no longer looks to
 find the subclasses of a namespace. This makes for much faster startup times: altho&#8217; it was
 always possible to pass <cite>find_classes=False</cite> this was little known, and you now have to pass
-<cite>find_classes=True</cite> to get this functionality, or use the <tt class="xref docutils literal"><span class="pre">wmi._wmi_namespace.classes</span></tt> attribute which
+<cite>find_classes=True</cite> to get this functionality, or use the <tt class="xref docutils literal"><span class="pre">_wmi_namespace.classes</span></tt> attribute which
 is now calculated lazily, so things like IPython&#8217;s attribute lookup still work.</li>
 <li>wmiweb.py - the installation now ships with a small but functional web-based WMI browser.
 It uses only the stdlib WSGI server and makes it easy to explore any of the namespaces
 on the local or a remote machine.</li>
 <li>Removed the rarely-used Win32 autoprefix: previously, if you tried for a class
 called <cite>Process</cite>, the module would try it again under <cite>Win32_Process</cite> if it failed
-first time round. This has now been removed to avoid the magic.</li>
+first time round. This has now been removed to avoid the magic and because I certainly
+never use it, and I&#8217;m not aware of anyone who did.</li>
 <li>Impersonation &amp; Authentication levels now supported when connecting to a remote
 server with specific credentials. Thanks to Matt Mercer for sample code.</li>
+<li>Documentation is now Sphinx-based.</li>
+<li>Association classes no longer try to treat all their attributes as WMI classes.
+(Thanks to Miroslav Ježek for the bug report)</li>
 </ul>
 </div>
 <div class="section" id="id2">

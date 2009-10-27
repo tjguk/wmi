@@ -93,7 +93,7 @@ def signed_to_unsigned (signed):
   when converting a COM error code to the more conventional
   8-digit hex::
 
-  print "%08X" % signed_to_unsigned (-2147023174)
+    print "%08X" % signed_to_unsigned (-2147023174)
   """
   unsigned, = struct.unpack ("L", struct.pack ("l", signed))
   return unsigned
@@ -429,6 +429,18 @@ class _wmi_method:
   def __repr__ (self):
     return "<function %s>" % self.__doc__
 
+class _wmi_property (object):
+
+  def __init__ (self, property):
+    self.property = property
+    self.name = property.Name
+    self.value = property.Value
+    self.qualifiers = dict ((q.Name, q.Value) for q in property.Qualifiers_)
+    self.type = self.qualifiers.get ("CIMTYPE", None)
+
+  def set (self, value):
+    self.property.Value = value
+
 #
 # class _wmi_object
 #
@@ -478,7 +490,7 @@ class _wmi_object:
       _set (self, "qualifiers", {})
       for q in self.ole_object.Qualifiers_:
         self.qualifiers[q.Name] = q.Value
-      _set (self, "is_association", "Association" in self.qualifiers)
+      _set (self, "is_association", self.qualifiers.get ("Association", False))
 
     except pywintypes.com_error:
       handle_com_error ()
@@ -507,7 +519,7 @@ class _wmi_object:
 
   def _cached_properties (self, attribute):
     if self.properties[attribute] is None:
-      self.properties[attribute] = self.ole_object.Properties_ (attribute)
+      self.properties[attribute] = _wmi_property (self.ole_object.Properties_ (attribute))
     return self.properties[attribute]
 
   def _cached_methods (self, attribute):
@@ -525,15 +537,15 @@ class _wmi_object:
     """
     try:
       if attribute in self.properties:
-        factory = self.property_map.get (attribute, lambda x: x)
-        value = factory (self._cached_properties (attribute).Value)
+        property = self._cached_properties (attribute)
+        factory = self.property_map.get (attribute, self.property_map.get (property.type, lambda x: x))
+        value = factory (property.value)
         #
-        # If this is an association, its properties are
-        #  actually the paths to the two aspects of the
-        #  association, so translate them automatically
-        #  into WMI objects.
+        # If this is an association, certain of its properties
+        # are actually the paths to the aspects of the association,
+        # so translate them automatically into WMI objects.
         #
-        if self.is_association:
+        if property.type.startswith ("ref:"):
           return WMI (moniker=value)
         else:
           return value
@@ -609,7 +621,7 @@ class _wmi_object:
       try:
         for attribute, value in kwargs.items ():
           if attribute in self.properties:
-            self._cached_properties (attribute).Value = value
+            self._cached_properties (attribute).set (value)
           else:
             raise AttributeError (attribute)
         #
