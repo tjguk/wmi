@@ -1,7 +1,7 @@
 # Sphinx inventory version 1
 # Project: WMI
 # Version: 1.4
-wmi mod changes.html
+wmi mod wmi.html
 wmi._wmi_namespace.fetch_as_classes method wmi.html
 wmi.x_wmi exception wmi.html
 wmi._wmi_namespace.query method wmi.html
