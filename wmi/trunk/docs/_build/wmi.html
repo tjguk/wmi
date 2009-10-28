@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wmi – Windows Management Instrumentation &mdash; WMI v1.4.4 documentation</title>
+    <title>wmi – Windows Management Instrumentation &mdash; WMI v1.4.5 documentation</title>
     <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.4.4',
+        VERSION:     '1.4.5',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="WMI v1.4.4 documentation" href="index.html" />
+    <link rel="top" title="WMI v1.4.5 documentation" href="index.html" />
     <link rel="next" title="Changes" href="changes.html" />
     <link rel="prev" title="wmi Cookbook" href="cookbook.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="cookbook.html" title="wmi Cookbook"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.4 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -107,7 +107,7 @@ using its name as an attribute:</p>
 </li>
 <li><p class="first">In addition, you can specify what would become the WHERE clause
 as keyword parameters:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">fixed_disks</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mf">3</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fixed_disks</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
@@ -116,7 +116,7 @@ class which determines their methods and classes and allows
 you to access them as though they were Python classes. The
 methods only allow named parameters:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;notepad.exe&quot;</span><span class="p">):</span>
-  <span class="n">p</span><span class="o">.</span><span class="n">Terminate</span> <span class="p">(</span><span class="n">Result</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
+  <span class="n">p</span><span class="o">.</span><span class="n">Terminate</span> <span class="p">(</span><span class="n">Result</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
@@ -159,8 +159,8 @@ to constants.</p>
 
 <span class="n">vodev1</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="s">&quot;vodev1&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">vodev1</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">():</span>
-  <span class="k">if</span> <span class="n">disk</span><span class="o">.</span><span class="n">DriveType</span> <span class="o">==</span> <span class="mf">3</span><span class="p">:</span>
-    <span class="n">space</span> <span class="o">=</span> <span class="mf">100</span> <span class="o">*</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">FreeSpace</span><span class="p">)</span> <span class="o">/</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">Size</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">disk</span><span class="o">.</span><span class="n">DriveType</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="n">space</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">FreeSpace</span><span class="p">)</span> <span class="o">/</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">Size</span><span class="p">)</span>
     <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> has </span><span class="si">%d%%</span><span class="s"> free&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">space</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -403,7 +403,7 @@ either by association class (ie the name of the class which relates
 them) or by result class (ie the name of the class which would be
 retrieved):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="n">pp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+<span class="n">pp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pp</span><span class="o">.</span><span class="n">associators</span> <span class="p">(</span><span class="n">wmi_association_class</span><span class="o">=</span><span class="s">&quot;Win32_PortResource&quot;</span><span class="p">):</span>
   <span class="k">print</span> <span class="n">i</span>
@@ -419,29 +419,10 @@ retrieved):</p>
 <tt class="descname">derivation</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.derivation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a tuple representing the object derivation for
 this object, with the most specific object first:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pp0</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pp0</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="k">print</span> <span class="s">&#39; &lt;- &#39;</span><span class="o">.</span><span class="n">join</span> <span class="p">(</span><span class="n">pp0</span><span class="o">.</span><span class="n">derivation</span> <span class="p">())</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="wmi._wmi_object.get_keys">
-<tt class="descname">get_keys</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.get_keys" title="Permalink to this definition">¶</a></dt>
-<dd><p>A WMI object is uniquely defined by a set of properties
-which constitute its keys. Lazily retrieves the keys for this
-instance or class.</p>
-<p>NB You can get the keys of an instance more directly, via
-Path_.Keys but this doesn&#8217;t apply to classes. The technique
-here appears to work for both.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list of key property names</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -468,7 +449,7 @@ here appears to work for both.</p>
 <tt class="descname">path</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the WMI URI to this object. Can be used to
 determine the path relative to the parent namespace:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pp0</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pp0</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_ParallelPort</span> <span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="k">print</span> <span class="n">pp0</span><span class="o">.</span><span class="n">path</span> <span class="p">()</span><span class="o">.</span><span class="n">RelPath</span>
 </pre></div>
 </div>
@@ -489,7 +470,7 @@ limited by the result class (the name of the association class).</p>
 the string corresponding to the instance of each associated object,
 this module will automatically convert that to the object itself:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span>  <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="n">sp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_SerialPort</span> <span class="p">()[</span><span class="mf">0</span><span class="p">]</span>
+<span class="n">sp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_SerialPort</span> <span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sp</span><span class="o">.</span><span class="n">references</span> <span class="p">():</span>
   <span class="k">print</span> <span class="n">i</span>
@@ -646,7 +627,7 @@ next event:</p>
 
 <span class="n">raw_wql</span> <span class="o">=</span> <span class="s">&quot;SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA &#39;Win32_Process&#39;&quot;</span>
 <span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span><span class="n">raw_wql</span><span class="o">=</span><span class="n">raw_wql</span><span class="p">)</span>
-<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
   <span class="n">process_created</span> <span class="o">=</span> <span class="n">watcher</span> <span class="p">()</span>
   <span class="k">print</span> <span class="n">process_created</span><span class="o">.</span><span class="n">Name</span>
 
@@ -655,7 +636,7 @@ next event:</p>
 <span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span>
   <span class="n">notification_type</span><span class="o">=</span><span class="s">&quot;Creation&quot;</span><span class="p">,</span>
   <span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_Process&quot;</span><span class="p">,</span>
-  <span class="n">delay_secs</span><span class="o">=</span><span class="mf">2</span><span class="p">,</span>
+  <span class="n">delay_secs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
   <span class="n">Name</span><span class="o">=</span><span class="s">&#39;calc.exe&#39;</span>
 <span class="p">)</span>
 <span class="n">calc_created</span> <span class="o">=</span> <span class="n">watcher</span> <span class="p">()</span>
@@ -676,16 +657,16 @@ next event:</p>
   <span class="n">Type</span><span class="o">=</span><span class="s">&quot;warning&quot;</span>
 <span class="p">)</span>
 
-<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
   <span class="k">try</span><span class="p">:</span>
-    <span class="n">error_log</span> <span class="o">=</span> <span class="n">watcher1</span> <span class="p">(</span><span class="mf">500</span><span class="p">)</span>
+    <span class="n">error_log</span> <span class="o">=</span> <span class="n">watcher1</span> <span class="p">(</span><span class="mi">500</span><span class="p">)</span>
   <span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi_timed_out</span><span class="p">:</span>
     <span class="n">pythoncom</span><span class="o">.</span><span class="n">PumpWaitingMessages</span> <span class="p">()</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="k">print</span> <span class="n">error_log</span>
 
   <span class="k">try</span><span class="p">:</span>
-    <span class="n">warning_log</span> <span class="o">=</span> <span class="n">watcher2</span> <span class="p">(</span><span class="mf">500</span><span class="p">)</span>
+    <span class="n">warning_log</span> <span class="o">=</span> <span class="n">watcher2</span> <span class="p">(</span><span class="mi">500</span><span class="p">)</span>
   <span class="k">except</span> <span class="n">wmi</span><span class="o">.</span><span class="n">x_wmi_timed_out</span><span class="p">:</span>
     <span class="n">pythoncom</span><span class="o">.</span><span class="n">PumpWaitingMessages</span> <span class="p">()</span>
   <span class="k">else</span><span class="p">:</span>
@@ -785,7 +766,7 @@ name.</p>
         <li class="right" >
           <a href="cookbook.html" title="wmi Cookbook"
              >previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.4 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

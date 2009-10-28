@@ -440,6 +440,9 @@ class _wmi_property (object):
 
   def set (self, value):
     self.property.Value = value
+    
+  def __getattr__ (self, attr):
+    return getattr (self.property, attr)
 
 #
 # class _wmi_object
@@ -583,25 +586,24 @@ class _wmi_object:
      attribs.extend ([str (x) for x in self.properties.keys ()])
      return attribs
 
-  def get_keys (self):
+  def _get_keys (self):
     """A WMI object is uniquely defined by a set of properties
     which constitute its keys. Lazily retrieves the keys for this
     instance or class.
 
-    NB You can get the keys of an instance more directly, via
-    Path\_.Keys but this doesn't apply to classes. The technique
-    here appears to work for both.
-
     :returns: list of key property names
     """
+    # NB You can get the keys of an instance more directly, via
+    # Path\_.Keys but this doesn't apply to classes. The technique
+    # here appears to work for both.
     if self._keys is None:
       _set (self, "_keys", [])
       for property in self.ole_object.Properties_:
         for qualifier in property.Qualifiers_:
           if qualifier.Name == "key" and qualifier.Value:
             self._keys.append (property.Name)
-    return self._keys
-  keys = property (get_keys)
+    return self._keys  
+  keys = property (_get_keys)
 
   def put (self):
     """Push all outstanding property updates back to the

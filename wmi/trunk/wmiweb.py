@@ -145,6 +145,17 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     doc.append ("</ul>")
   else:
     doc.append ("<p>No methods</p>")
+    
+  doc.append ("<hr>")
+  doc.append ("<h3>Qualifiers</h3>")
+  qualifiers = sorted (klass.qualifiers.items ())
+  if qualifiers:
+    doc.append ("<ul>")
+    for q in qualifiers:
+      doc.append ("<li><b>%s</b>: %s</li>" % q)
+    doc.append ("</ul>")
+  else:
+    doc.append ("<p>No qualifiers</p>")
 
   finish_doc ()
 
