@@ -129,7 +129,7 @@ div.footer a {
 
 /* -- body styles ----------------------------------------------------------- */
 
-p {    
+p {
     margin: 0.8em 0 0.5em 0;
 }
 
@@ -320,4 +320,11 @@ div.versioninfo {
     padding: 8px;
     line-height: 1.3em;
     font-size: 0.9em;
+}
+
+@media print {
+  body {
+    margin : 0 0;
+	background-color : white;
+  }
 }
