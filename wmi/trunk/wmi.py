@@ -489,11 +489,7 @@ class _wmi_object:
 
       _set (self, "_properties", self.properties.keys ())
       _set (self, "_methods", self.methods.keys ())
-
-      _set (self, "qualifiers", {})
-      for q in self.ole_object.Qualifiers_:
-        self.qualifiers[q.Name] = q.Value
-      _set (self, "is_association", self.qualifiers.get ("Association", False))
+      _set (self, "qualifiers", dict ((q.Name, q.Value) for q in self.ole_object.Qualifiers_))
 
     except pywintypes.com_error:
       handle_com_error ()
@@ -669,7 +665,7 @@ class _wmi_object:
         params = {'bClassesOnly' : True}
       try:
         associated_classes = dict (
-          (assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for \
+          (assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for
             assoc in self.ole_object.Associators_ (**params)
         )
         _set (self, "_associated_classes", associated_classes)
@@ -857,10 +853,9 @@ class _wmi_class (_wmi_object):
       )
 
     ..  warning::
-        previous versions of this module, used this function
-        to create new process. This is *not* a good example
-        of its use; it is better handled with something like
-        the example above.
+        previous versions of this docstring illustrated using this function
+        to create a new process. This is *not* a good example of its use; 
+        it is better handled with something like the example above.
     """
     try:
       obj = _wmi_object (self.SpawnInstance_ (), self)
@@ -954,7 +949,7 @@ class _wmi_namespace:
 
   def instances (self, class_name):
     """Return a list of instances of the WMI class. This is
-     (probably) equivalent to querying with no qualifiers::
+    (probably) equivalent to querying with no qualifiers::
 
       wmi.WMI ().instances ("Win32_LogicalDisk")
       # should be the same as
