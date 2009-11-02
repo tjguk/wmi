@@ -1320,7 +1320,7 @@ def connect_server (
   authority = "",
   impersonation_level="",
   authentication_level="",
-  security_flags = 0,
+  security_flags = 0x80,
   named_value_set = None
 ):
   """Return a remote server running WMI
