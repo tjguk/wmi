@@ -32,6 +32,7 @@ import warnings
 
 import pythoncom
 import win32api
+import win32con
 import win32file
 
 import wmi
@@ -124,7 +125,7 @@ class TestBasicConnections (unittest.TestCase):
     if set (["machine", "user", "password"]) <= set (settings):
       self.assert_ (wmi.WMI (computer=settings['machine'], user=settings['user'], password=settings['password']))
     else:
-      warnings.warn ("Skipping test_user_password because not machine, user or password")
+      warnings.warn ("Skipping test_user_password because no machine, user or password")
 
   def test_too_much_authentication (self):
     "Check that user/password plus privs / suffix raises exception"
@@ -133,47 +134,59 @@ class TestBasicConnections (unittest.TestCase):
 
   def test_user_password_with_impersonation_level (self):
     "Check that an impersonation level works with a username / password"
-    self.assert_ (
-      wmi.WMI (
-        computer=settings['machine'],
-        user=settings['user'],
-        password=settings['password'],
-        impersonation_level="impersonate"
+    if not (set (["machine", "user", "password"]) <= set (settings)):
+      warnings.warn ("Skipping test_user_password_with_impersonation_level because no machine, user or password")
+    else:
+      self.assert_ (
+        wmi.WMI (
+          computer=settings['machine'],
+          user=settings['user'],
+          password=settings['password'],
+          impersonation_level="impersonate"
+        )
       )
-    )
 
   def test_user_password_with_invalid_impersonation_level (self):
     "Check that an impersonation level works with a username / password"
-    self.assertRaises (
-      wmi.x_wmi_authentication,
-      wmi.WMI,
-      computer=settings['machine'],
-      user=settings['user'],
-      password=settings['password'],
-      impersonation_level="***"
-    )
-
-  def test_user_password_with_authentication_level (self):
-    "Check that an invalid impersonation level raises x_wmi_authentication"
-    self.assert_ (
-      wmi.WMI (
+    if not (set (["machine", "user", "password"]) <= set (settings)):
+      warnings.warn ("Skipping test_user_password_with_invalid_impersonation_level because no machine, user or password")
+    else:
+      self.assertRaises (
+        wmi.x_wmi_authentication,
+        wmi.WMI,
         computer=settings['machine'],
         user=settings['user'],
         password=settings['password'],
-        authentication_level="pktIntegrity"
+        impersonation_level="***"
       )
-    )
+
+  def test_user_password_with_authentication_level (self):
+    "Check that an invalid impersonation level raises x_wmi_authentication"
+    if not (set (["machine", "user", "password"]) <= set (settings)):
+      warnings.warn ("Skipping test_user_password_with_authentication_level because no machine, user or password")
+    else:
+      self.assert_ (
+        wmi.WMI (
+          computer=settings['machine'],
+          user=settings['user'],
+          password=settings['password'],
+          authentication_level="pktIntegrity"
+        )
+      )
 
   def test_user_password_with_invalid_authentication_level (self):
     "Check that an invalid authentication level raises x_wmi_authentication"
-    self.assertRaises (
-      wmi.x_wmi_authentication,
-      wmi.WMI,
-      computer=settings['machine'],
-      user=settings['user'],
-      password=settings['password'],
-      authentication_level="***"
-    )
+    if not (set (["machine", "user", "password"]) <= set (settings)):
+      warnings.warn ("Skipping test_user_password_with_invalid_authentication_level because no machine, user or password")
+    else:
+      self.assertRaises (
+        wmi.x_wmi_authentication,
+        wmi.WMI,
+        computer=settings['machine'],
+        user=settings['user'],
+        password=settings['password'],
+        authentication_level="***"
+      )
 
   def test_local_user_password (self):
     "Check that user/password for local connection raises exception"
@@ -580,6 +593,15 @@ class TestProperties (TestWMI):
       [p.Value for p in d.Properties_],
       [p.Value for p in d.ole_object.Properties_]
     )
+
+  def test_settable (self):
+    "Check that a writeable property can be written"
+    name = uuid.uuid1 ().hex
+    username = win32api.GetUserNameEx (win32con.NameSamCompatible)
+    for envvar in self.connection ().Win32_Environment (Name=name, UserName=username):
+      raise RuntimeError ("Env Var %s already exists" % name)
+    else:
+      self.connection ().Win32_Environment.new (Name=name, UserName=username, VariableValue=name).put ()
 
 class TestInstances (TestWMI):
 
