@@ -28,7 +28,6 @@ import tempfile
 import threading
 import time
 import unittest
-import uuid
 import warnings
 
 import pythoncom
@@ -597,7 +596,7 @@ class TestProperties (TestWMI):
 
   def test_settable (self):
     "Check that a writeable property can be written"
-    name = uuid.uuid1 ().hex
+    name = str (time.time ()).split (".")[0]
     old_value = "***"
     new_value = "!!!"
     username = win32api.GetUserNameEx (win32con.NameSamCompatible)
