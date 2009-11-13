@@ -75,7 +75,7 @@ c.l.py postings pointed me in the right direction.
 Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.
 """
-__VERSION__ = __version__ = "1.4.5"
+__VERSION__ = __version__ = "1.4.6"
 
 _DEBUG = False
 

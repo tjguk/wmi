@@ -57,6 +57,9 @@ Changes
 * Association classes no longer try to treat all their attributes as WMI classes.
   (Thanks to Miroslav Ježek for the bug report)
 
+* Setting a property's value now works again
+  (Thanks to John Holcomb for the bug report and the detective work)
+
 1.3
 ---
 
