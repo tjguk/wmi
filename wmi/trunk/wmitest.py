@@ -28,6 +28,7 @@ import tempfile
 import threading
 import time
 import unittest
+import uuid
 import warnings
 
 import pythoncom
@@ -597,11 +598,16 @@ class TestProperties (TestWMI):
   def test_settable (self):
     "Check that a writeable property can be written"
     name = uuid.uuid1 ().hex
+    old_value = "***"
+    new_value = "!!!"
     username = win32api.GetUserNameEx (win32con.NameSamCompatible)
-    for envvar in self.connection ().Win32_Environment (Name=name, UserName=username):
-      raise RuntimeError ("Env Var %s already exists" % name)
-    else:
-      self.connection ().Win32_Environment.new (Name=name, UserName=username, VariableValue=name).put ()
+    self.assert_ (not self.connection.Win32_Environment (Name=name, UserName=username))
+    self.connection.Win32_Environment.new (Name=name, UserName=username, VariableValue=old_value).put ()
+    for envvar in self.connection.Win32_Environment (Name=name, UserName=username):
+      self.assertEqual (envvar.VariableValue, old_value)
+      envvar.VariableValue = new_value
+    for envvar in self.connection.Win32_Environment (Name=name, UserName=username):
+      self.assertEqual (envvar.VariableValue, new_value)
 
 class TestInstances (TestWMI):
 

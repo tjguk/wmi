@@ -440,7 +440,7 @@ class _wmi_property (object):
 
   def set (self, value):
     self.property.Value = value
-    
+
   def __getattr__ (self, attr):
     return getattr (self.property, attr)
 
@@ -562,7 +562,7 @@ class _wmi_object:
     """
     try:
       if attribute in self.properties:
-        self._cached_properties (attribute).Value = value
+        self._cached_properties (attribute).set (value)
         if self.ole_object.Path_.Path:
           self.ole_object.Put_ ()
       else:
@@ -598,7 +598,7 @@ class _wmi_object:
         for qualifier in property.Qualifiers_:
           if qualifier.Name == "key" and qualifier.Value:
             self._keys.append (property.Name)
-    return self._keys  
+    return self._keys
   keys = property (_get_keys)
 
   def put (self):
@@ -854,7 +854,7 @@ class _wmi_class (_wmi_object):
 
     ..  warning::
         previous versions of this docstring illustrated using this function
-        to create a new process. This is *not* a good example of its use; 
+        to create a new process. This is *not* a good example of its use;
         it is better handled with something like the example above.
     """
     try:
