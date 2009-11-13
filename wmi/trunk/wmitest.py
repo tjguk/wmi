@@ -605,8 +605,12 @@ class TestProperties (TestWMI):
     for envvar in self.connection.Win32_Environment (Name=name, UserName=username):
       self.assertEqual (envvar.VariableValue, old_value)
       envvar.VariableValue = new_value
-    for envvar in self.connection.Win32_Environment (Name=name, UserName=username):
-      self.assertEqual (envvar.VariableValue, new_value)
+    try:
+      for envvar in self.connection.Win32_Environment (Name=name, UserName=username):
+        self.assertEqual (envvar.VariableValue, new_value)
+    finally:
+      for envvar in self.connection.Win32_Environment (Name=name, UserName=username):
+        envvar.VariableValue = None
 
 class TestInstances (TestWMI):
 
