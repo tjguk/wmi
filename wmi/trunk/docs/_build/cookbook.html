@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wmi Cookbook &mdash; WMI v1.4.5 documentation</title>
+    <title>wmi Cookbook &mdash; WMI v1.4.6 documentation</title>
     <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.4.5',
+        VERSION:     '1.4.6',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="WMI v1.4.5 documentation" href="index.html" />
+    <link rel="top" title="WMI v1.4.6 documentation" href="index.html" />
     <link rel="next" title="wmi – Windows Management Instrumentation" href="wmi.html" />
     <link rel="prev" title="wmi Tutorial" href="tutorial.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="tutorial.html" title="wmi Tutorial"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.5 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -204,7 +204,7 @@ The function which is masquerading as the WMI method has a __doc__ value which s
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
 
-<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mf">3</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">disk</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">(</span><span class="n">DriveType</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
   <span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">Caption</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%0.2f%%</span><span class="s"> free&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mf">100.0</span> <span class="o">*</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">FreeSpace</span><span class="p">)</span> <span class="o">/</span> <span class="nb">long</span> <span class="p">(</span><span class="n">disk</span><span class="o">.</span><span class="n">Size</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -229,7 +229,7 @@ technique on a remote server to run a setup.exe and then, say, reboot once it&#8
 <span class="n">watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span>
   <span class="n">notification_type</span><span class="o">=</span><span class="s">&quot;Deletion&quot;</span><span class="p">,</span>
   <span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_Process&quot;</span><span class="p">,</span>
-  <span class="n">delay_secs</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span>
+  <span class="n">delay_secs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
   <span class="n">ProcessId</span><span class="o">=</span><span class="n">process_id</span>
 <span class="p">)</span>
 
@@ -246,10 +246,10 @@ technique on a remote server to run a setup.exe and then, say, reboot once it&#8
 
 <span class="n">print_job_watcher</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_PrintJob</span><span class="o">.</span><span class="n">watch_for</span> <span class="p">(</span>
   <span class="n">notification_type</span><span class="o">=</span><span class="s">&quot;Creation&quot;</span><span class="p">,</span>
-  <span class="n">delay_secs</span><span class="o">=</span><span class="mf">1</span>
+  <span class="n">delay_secs</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span>
 
-<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
   <span class="n">pj</span> <span class="o">=</span> <span class="n">print_job_watcher</span> <span class="p">()</span>
   <span class="k">print</span> <span class="s">&quot;User </span><span class="si">%s</span><span class="s"> has submitted </span><span class="si">%d</span><span class="s"> pages to printer </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
     <span class="p">(</span><span class="n">pj</span><span class="o">.</span><span class="n">Owner</span><span class="p">,</span> <span class="n">pj</span><span class="o">.</span><span class="n">TotalPages</span><span class="p">,</span> <span class="n">pj</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
@@ -268,7 +268,7 @@ or to specify the parts of it that you need. Use help on wmi.WMI.__init__ to fin
 <span class="c"># other_machine = &quot;machine name of your choice&quot;</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">computer</span><span class="o">=</span><span class="n">other_machine</span><span class="p">,</span> <span class="n">privileges</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;RemoteShutdown&quot;</span><span class="p">])</span>
 
-<span class="n">os</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_OperatingSystem</span> <span class="p">(</span><span class="n">Primary</span><span class="o">=</span><span class="mf">1</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span>
+<span class="n">os</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_OperatingSystem</span> <span class="p">(</span><span class="n">Primary</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">os</span><span class="o">.</span><span class="n">Reboot</span> <span class="p">()</span>
 </pre></div>
 </div>
@@ -278,7 +278,7 @@ or to specify the parts of it that you need. Use help on wmi.WMI.__init__ to fin
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
 
-<span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_NetworkAdapterConfiguration</span> <span class="p">(</span><span class="n">IPEnabled</span><span class="o">=</span><span class="mf">1</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_NetworkAdapterConfiguration</span> <span class="p">(</span><span class="n">IPEnabled</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
   <span class="k">print</span> <span class="n">interface</span><span class="o">.</span><span class="n">Description</span><span class="p">,</span> <span class="n">interface</span><span class="o">.</span><span class="n">MACAddress</span>
   <span class="k">for</span> <span class="n">ip_address</span> <span class="ow">in</span> <span class="n">interface</span><span class="o">.</span><span class="n">IPAddress</span><span class="p">:</span>
     <span class="k">print</span> <span class="n">ip_address</span>
@@ -306,7 +306,7 @@ or to specify the parts of it that you need. Use help on wmi.WMI.__init__ to fin
   <span class="n">wmi_class</span><span class="o">=</span><span class="s">&quot;Win32_NTLogEvent&quot;</span><span class="p">,</span>
   <span class="n">Type</span><span class="o">=</span><span class="s">&quot;error&quot;</span>
 <span class="p">)</span>
-<span class="k">while</span> <span class="mf">1</span><span class="p">:</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
   <span class="n">error</span> <span class="o">=</span> <span class="n">watcher</span> <span class="p">()</span>
   <span class="k">print</span> <span class="s">&quot;Error in </span><span class="si">%s</span><span class="s"> log: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>  <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">Logfile</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span>
   <span class="c"># send mail to sysadmin etc.</span>
@@ -498,7 +498,7 @@ controlled by a control panel applet.</p>
 <span class="kn">import</span> <span class="nn">wmi</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="n">one_minutes_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span> <span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>
+<span class="n">one_minutes_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span> <span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">job_id</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ScheduledJob</span><span class="o">.</span><span class="n">Create</span> <span class="p">(</span>
   <span class="n">Command</span><span class="o">=</span><span class="s">r&quot;cmd.exe /c dir /b c:\ &gt; c:</span><span class="se">\\</span><span class="s">temp.txt&quot;</span><span class="p">,</span>
   <span class="n">StartTime</span><span class="o">=</span><span class="n">wmi</span><span class="o">.</span><span class="n">from_time</span> <span class="p">(</span><span class="n">one_minutes_time</span><span class="p">)</span>
@@ -518,7 +518,7 @@ controlled by a control panel applet.</p>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
-<span class="n">SW_SHOWMINIMIZED</span> <span class="o">=</span> <span class="mf">1</span>
+<span class="n">SW_SHOWMINIMIZED</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
 <span class="n">startup</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_ProcessStartup</span><span class="o">.</span><span class="n">new</span> <span class="p">(</span><span class="n">ShowWindow</span><span class="o">=</span><span class="n">SW_SHOWMINIMIZED</span><span class="p">)</span>
@@ -535,13 +535,13 @@ controlled by a control panel applet.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
 <span class="n">DRIVE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="mf">0</span> <span class="p">:</span> <span class="s">&quot;Unknown&quot;</span><span class="p">,</span>
-  <span class="mf">1</span> <span class="p">:</span> <span class="s">&quot;No Root Directory&quot;</span><span class="p">,</span>
-  <span class="mf">2</span> <span class="p">:</span> <span class="s">&quot;Removable Disk&quot;</span><span class="p">,</span>
-  <span class="mf">3</span> <span class="p">:</span> <span class="s">&quot;Local Disk&quot;</span><span class="p">,</span>
-  <span class="mf">4</span> <span class="p">:</span> <span class="s">&quot;Network Drive&quot;</span><span class="p">,</span>
-  <span class="mf">5</span> <span class="p">:</span> <span class="s">&quot;Compact Disc&quot;</span><span class="p">,</span>
-  <span class="mf">6</span> <span class="p">:</span> <span class="s">&quot;RAM Disk&quot;</span>
+  <span class="mi">0</span> <span class="p">:</span> <span class="s">&quot;Unknown&quot;</span><span class="p">,</span>
+  <span class="mi">1</span> <span class="p">:</span> <span class="s">&quot;No Root Directory&quot;</span><span class="p">,</span>
+  <span class="mi">2</span> <span class="p">:</span> <span class="s">&quot;Removable Disk&quot;</span><span class="p">,</span>
+  <span class="mi">3</span> <span class="p">:</span> <span class="s">&quot;Local Disk&quot;</span><span class="p">,</span>
+  <span class="mi">4</span> <span class="p">:</span> <span class="s">&quot;Network Drive&quot;</span><span class="p">,</span>
+  <span class="mi">5</span> <span class="p">:</span> <span class="s">&quot;Compact Disc&quot;</span><span class="p">,</span>
+  <span class="mi">6</span> <span class="p">:</span> <span class="s">&quot;RAM Disk&quot;</span>
 <span class="p">}</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
@@ -554,11 +554,11 @@ controlled by a control panel applet.</p>
 <h3>List Namespaces<a class="headerlink" href="#list-namespaces" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
-<span class="k">def</span> <span class="nf">enumerate_namespaces</span> <span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s">u&quot;root&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0</span><span class="p">):</span>
-  <span class="k">print</span> <span class="n">level</span> <span class="o">*</span> <span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">.</span><span class="n">split</span> <span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mf">1</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">enumerate_namespaces</span> <span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s">u&quot;root&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+  <span class="k">print</span> <span class="n">level</span> <span class="o">*</span> <span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">.</span><span class="n">split</span> <span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
   <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
   <span class="k">for</span> <span class="n">subnamespace</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">__NAMESPACE</span> <span class="p">():</span>
-    <span class="n">enumerate_namespaces</span> <span class="p">(</span><span class="n">namespace</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">subnamespace</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mf">1</span><span class="p">)</span>
+    <span class="n">enumerate_namespaces</span> <span class="p">(</span><span class="n">namespace</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">subnamespace</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="n">enumerate_namespaces</span> <span class="p">()</span>
 </pre></div>
@@ -585,10 +585,10 @@ also if you&#8217;re running in a service, for example, which is implicitly thre
     <span class="n">pythoncom</span><span class="o">.</span><span class="n">CoInitialize</span> <span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mf">5</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">():</span>
           <span class="k">print</span> <span class="n">process</span><span class="o">.</span><span class="n">ProcessId</span><span class="p">,</span> <span class="n">process</span><span class="o">.</span><span class="n">Name</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span> <span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
       <span class="n">pythoncom</span><span class="o">.</span><span class="n">CoUninitialize</span> <span class="p">()</span>
 
@@ -705,7 +705,7 @@ intrinsic and extrinsic events transparently.</p>
         <li class="right" >
           <a href="tutorial.html" title="wmi Tutorial"
              >previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.5 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

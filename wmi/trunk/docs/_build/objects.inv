@@ -4,8 +4,8 @@
 wmi mod wmi.html
 wmi._wmi_namespace.fetch_as_classes method wmi.html
 wmi.x_wmi exception wmi.html
-wmi._wmi_namespace.query method wmi.html
-wmi.from_time function wmi.html
+wmi.connect_server function wmi.html
+wmi._wmi_class class wmi.html
 wmi.ProvideConstants class wmi.html
 wmi._wmi_namespace.new_instance_of method wmi.html
 wmi.to_time function wmi.html
@@ -20,7 +20,7 @@ wmi.SelfDeprecatingDict class wmi.html
 wmi.x_wmi_uninitialised_thread exception wmi.html
 wmi._wmi_object.set method wmi.html
 wmi.x_wmi_timed_out exception wmi.html
-wmi._wmi_class class wmi.html
+wmi.from_time function wmi.html
 wmi.WMI function wmi.html
 wmi.x_wmi_authentication exception wmi.html
 wmi._wmi_namespace.watch_for method wmi.html
@@ -28,7 +28,7 @@ wmi._wmi_class.query method wmi.html
 wmi._wmi_namespace class wmi.html
 wmi._wmi_object.references method wmi.html
 wmi._wmi_object class wmi.html
-wmi.connect_server function wmi.html
+wmi._wmi_namespace.query method wmi.html
 wmi._wmi_object.derivation method wmi.html
 wmi._wmi_namespace.handle method wmi.html
 wmi._wmi_object.put method wmi.html
