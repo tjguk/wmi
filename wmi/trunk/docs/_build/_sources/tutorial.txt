@@ -592,23 +592,31 @@ NT Security
 
 The user in question has to have some kind of access to the machine whose WMI functionality is being invoked. This
 might either be by virtue of being included in the local Admin group or by specific access granted to a named user.
+
 DCOM Security
+*************
 
 WMI is a DCOM-based technology and so whatever rules apply to DCOM connections apply to WMI. If there's a problem
 authenticating at the DCOM level then, in theory, you ought to have the same problem doing a DispatchEx on
 Word.Application. The program you want to look at is dcomcnfg.exe and that's all I'll say for now.
+
 WMI Security
+************
 
 WMI namespaces are system objects with their own ACLs. If you go to the WMI MMC snap-in(accessed via the Manage
 Computer interface) and access the properties for a namespace, there will be a security tab. The account using WMI
 functionality on the machine should have sufficient access via this security.
+
 WMI and Threads
+***************
 
 WMI is a COM/DCOM-based mechanism so the rules which apply to COM-threading apply to WMI as well. This is true
 whether or not your program explicitly invokes Python threading: if you're running in a service, for example,
 you're probably threading whether you like it or not, since the service control manager seems to run the service
 control code in a different thread from the main service.
+
 CoInitialize & CoUninitialize
+*****************************
 
 Any COM code which wants to use threading must specify a threading model. There is much said out there on the
 subject but unless you have specific requirements you can normally get away with initializing COM threading before
