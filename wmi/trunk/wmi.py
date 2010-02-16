@@ -75,7 +75,7 @@ c.l.py postings pointed me in the right direction.
 Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.
 """
-__VERSION__ = __version__ = "1.4.6"
+__VERSION__ = __version__ = "1.4.7"
 
 _DEBUG = False
 
@@ -1082,8 +1082,8 @@ class _wmi_namespace:
     if raw_wql:
       wql = raw_wql
     else:
-      fields = set (['TargetInstance'] + fields)
-      field_list = ", ".join (fields) or "*"
+      fields = set (['TargetInstance'] + (fields or ["*"]))
+      field_list = ", ".join (fields)
       if is_extrinsic:
         if where_clause:
           where = " WHERE " + " AND ".join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])

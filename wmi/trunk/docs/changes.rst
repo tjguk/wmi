@@ -6,6 +6,9 @@ Changes
 1.4
 ---
 
+* Pull back all fields for an event where none is specified
+  (Thanks to Matt Kosek for the bug report and the detective work)
+
 * WMI now needs Python 2.4+. It wouldn't be impossible to continue to support older
   versions but it's increasingly onerous and 2.4 is now 5 years old.
 
