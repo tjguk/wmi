@@ -1,3 +1,14 @@
+/*
+ * searchtools.js
+ * ~~~~~~~~~~~~~~
+ *
+ * Sphinx JavaScript utilties for the full-text search.
+ *
+ * :copyright: Copyright 2007-2010 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
 /**
  * helper function to return a node containing the
  * search summary for a given text. keywords is a list
@@ -301,7 +312,7 @@ var Search = {
     var tmp = query.split(/\s+/);
     var object = (tmp.length == 1) ? tmp[0].toLowerCase() : null;
     for (var i = 0; i < tmp.length; i++) {
-      if (stopwords.indexOf(tmp[i]) != -1 || tmp[i].match(/^\d+$/)) {
+      if ($u.indexOf(stopwords, tmp[i]) != -1 || tmp[i].match(/^\d+$/)) {
         // skip this word
         continue;
       }

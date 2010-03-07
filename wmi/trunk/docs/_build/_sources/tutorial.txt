@@ -603,9 +603,9 @@ Word.Application. The program you want to look at is dcomcnfg.exe and that's all
 WMI Security
 ************
 
-WMI namespaces are system objects with their own ACLs. If you go to the WMI MMC snap-in(accessed via the Manage
+WMI namespaces are system objects with their own ACLs. If you go to the WMI MMC snap-in (accessed via the Manage
 Computer interface) and access the properties for a namespace, there will be a security tab. The account using WMI
-functionality on the machine should have sufficient access via this security.
+functionality on the machine needs to have sufficient access via this security.
 
 WMI and Threads
 ***************

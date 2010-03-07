@@ -63,7 +63,7 @@ See the :doc:`changes` document
 Copyright & License?
 --------------------
 
-* Copyright Tim Golden <mail@timgolden.me.uk> 2003 - 2009
+* Copyright Tim Golden <mail@timgolden.me.uk> 2003 - 2010
 
 * Licensed under the (GPL-compatible) MIT License:
   http://www.opensource.org/licenses/mit-license.php
