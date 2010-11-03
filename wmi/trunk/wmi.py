@@ -512,7 +512,7 @@ class _wmi_object:
     and the WMI object's own identifying class.
     """
     try:
-      return "<%s: %s>" % (self.__class__.__name__, str (self.Path_.Path))
+      return "<%s: %s>" % (self.__class__.__name__, self.Path_.Path.encode ("ascii", "backslashreplace"))
     except pywintypes.com_error:
       handle_com_error ()
 
