@@ -75,7 +75,7 @@ c.l.py postings pointed me in the right direction.
 Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.
 """
-__VERSION__ = __version__ = "1.4.8"
+__VERSION__ = __version__ = "1.4.9"
 
 _DEBUG = False
 
@@ -783,6 +783,16 @@ class _wmi_class (_wmi_object):
       winmgmts, namespace_moniker, class_name = class_moniker.split (":")
       namespace = _wmi_namespace (GetObject (winmgmts + ":" + namespace_moniker), False)
       _set (self, "_namespace", namespace)
+
+  def __getattr__ (self, attribute):
+    try:
+      if attribute in self.properties:
+        return _wmi_property (self.Properties_ (attribute))
+      else:
+        return _wmi_object.__getattr__ (self, attribute)
+    except pywintypes.com_error:
+      handle_com_error ()
+
 
   def query (self, fields=[], **where_clause):
     """Make it slightly easier to query against the class,
