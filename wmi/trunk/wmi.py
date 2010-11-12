@@ -75,7 +75,7 @@ c.l.py postings pointed me in the right direction.
 Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.
 """
-__VERSION__ = __version__ = "1.4.7"
+__VERSION__ = __version__ = "1.4.8"
 
 _DEBUG = False
 
@@ -441,6 +441,9 @@ class _wmi_property (object):
   def set (self, value):
     self.property.Value = value
 
+  def __repr__ (self):
+    return "<wmi_property: %s>" % self.name
+
   def __getattr__ (self, attr):
     return getattr (self.property, attr)
 
@@ -600,6 +603,12 @@ class _wmi_object:
             self._keys.append (property.Name)
     return self._keys
   keys = property (_get_keys)
+
+  def wmi_property (self, property_name):
+    """Return the cached object representing one property
+    of this object
+    """
+    return _wmi_property (self.ole_object.Properties_ (property_name))
 
   def put (self):
     """Push all outstanding property updates back to the
