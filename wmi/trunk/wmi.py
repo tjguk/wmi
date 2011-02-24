@@ -277,7 +277,11 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   wmi_time += str_or_stars (seconds, 2)
   wmi_time += "."
   wmi_time += str_or_stars (microseconds, 6)
-  wmi_time += "+"
+  if timezone >= 0:
+    wmi_time += "+"
+  else:
+    wmi_time += "-"
+    timezone = abs (timezone)
   wmi_time += str_or_stars (timezone, 3)
 
   return wmi_time
@@ -809,7 +813,7 @@ class _wmi_class (_wmi_object):
       field_list = ", ".join (fields) or "*"
       wql = "SELECT " + field_list + " FROM " + self._class_name
       if where_clause:
-        wql += " WHERE " + " AND ". join (["%s = '%s'" % (k, v) for k, v in where_clause.items ()])
+        wql += " WHERE " + " AND ". join (["%s = %r" % (k, str (v)) for k, v in where_clause.items ()])
       return self._namespace.query (wql, self, fields)
     except pywintypes.com_error:
       handle_com_error ()
