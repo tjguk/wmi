@@ -8,6 +8,12 @@ The watcher tests spawn temporary processes and temporary
 logical drives. These may get left behind.
 """
 
+#
+# TODO:
+# - Test for negative timezone
+# - Test for share name with embedded single quote
+#
+
 import os, sys
 import datetime
 try:
