@@ -13,7 +13,7 @@ classifiers = [
 
 setup (
   name = "WMI",
-  version = 1.4.8,
+  version = "1.4.8",
   description = "Windows Management Instrumentation",
   author = "Tim Golden",
   author_email = "mail@timgolden.me.uk",
