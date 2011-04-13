@@ -7,14 +7,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wmi Cookbook &mdash; WMI v1.4.7 documentation</title>
+    <title>wmi Cookbook &mdash; WMI v1.4.9 documentation</title>
     <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
-        VERSION:     '1.4.7',
-        COLLAPSE_MODINDEX: false,
+        URL_ROOT:    '',
+        VERSION:     '1.4.9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="WMI v1.4.7 documentation" href="index.html" />
+    <link rel="top" title="WMI v1.4.9 documentation" href="index.html" />
     <link rel="next" title="wmi – Windows Management Instrumentation" href="wmi.html" />
     <link rel="prev" title="wmi Tutorial" href="tutorial.html" /> 
   </head>
@@ -34,53 +34,53 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="wmi.html" title="wmi – Windows Management Instrumentation"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="tutorial.html" title="wmi Tutorial"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="contents.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference external" href="#">wmi Cookbook</a><ul>
-<li><a class="reference external" href="#introduction">Introduction</a></li>
-<li><a class="reference external" href="#examples">Examples</a><ul>
-<li><a class="reference external" href="#list-all-running-processes">List all running processes</a></li>
-<li><a class="reference external" href="#list-all-running-notepad-processes">List all running notepad processes</a></li>
-<li><a class="reference external" href="#create-and-then-destroy-a-new-notepad-process">Create and then destroy a new notepad process</a></li>
-<li><a class="reference external" href="#show-the-interface-for-the-create-method-of-a-win32-process-class">Show the interface for the .Create method of a Win32_Process class</a></li>
-<li><a class="reference external" href="#show-all-automatic-services-which-are-not-running">Show all automatic services which are not running</a></li>
-<li><a class="reference external" href="#show-the-percentage-free-space-for-each-fixed-disk">Show the percentage free space for each fixed disk</a></li>
-<li><a class="reference external" href="#run-notepad-wait-until-it-s-closed-and-then-show-its-text">Run notepad, wait until it&#8217;s closed and then show its text</a></li>
-<li><a class="reference external" href="#watch-for-new-print-jobs">Watch for new print jobs</a></li>
-<li><a class="reference external" href="#reboot-a-remote-machine">Reboot a remote machine</a></li>
-<li><a class="reference external" href="#show-the-ip-and-mac-addresses-for-ip-enabled-network-interfaces">Show the IP and MAC addresses for IP-enabled network interfaces</a></li>
-<li><a class="reference external" href="#what-s-running-on-startup-and-from-where">What&#8217;s running on startup and from where?</a></li>
-<li><a class="reference external" href="#watch-for-errors-in-the-event-log">Watch for errors in the event log</a></li>
-<li><a class="reference external" href="#list-registry-keys">List registry keys</a></li>
-<li><a class="reference external" href="#add-a-new-registry-key">Add a new registry key</a></li>
-<li><a class="reference external" href="#add-a-new-registry-value">Add a new registry value</a></li>
-<li><a class="reference external" href="#create-a-new-iis-site">Create a new IIS site</a></li>
-<li><a class="reference external" href="#show-shared-drives">Show shared drives</a></li>
-<li><a class="reference external" href="#show-print-jobs">Show print jobs</a></li>
-<li><a class="reference external" href="#show-disk-partitions">Show disk partitions</a></li>
-<li><a class="reference external" href="#install-a-product">Install a product</a></li>
-<li><a class="reference external" href="#connect-to-another-machine-as-a-named-user">Connect to another machine as a named user</a></li>
-<li><a class="reference external" href="#show-a-method-s-signature">Show a method&#8217;s signature</a></li>
-<li><a class="reference external" href="#schedule-a-job">Schedule a job</a></li>
-<li><a class="reference external" href="#run-a-process-minimised">Run a process minimised</a></li>
-<li><a class="reference external" href="#find-drive-types">Find Drive Types</a></li>
-<li><a class="reference external" href="#list-namespaces">List Namespaces</a></li>
-<li><a class="reference external" href="#use-wmi-in-a-thread">Use WMI in a thread</a></li>
-<li><a class="reference external" href="#monitor-multiple-machines-for-power-events">Monitor multiple machines for power events</a></li>
-<li><a class="reference external" href="#find-the-current-wallpaper">Find the current wallpaper</a></li>
+<li><a class="reference internal" href="#">wmi Cookbook</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#list-all-running-processes">List all running processes</a></li>
+<li><a class="reference internal" href="#list-all-running-notepad-processes">List all running notepad processes</a></li>
+<li><a class="reference internal" href="#create-and-then-destroy-a-new-notepad-process">Create and then destroy a new notepad process</a></li>
+<li><a class="reference internal" href="#show-the-interface-for-the-create-method-of-a-win32-process-class">Show the interface for the .Create method of a Win32_Process class</a></li>
+<li><a class="reference internal" href="#show-all-automatic-services-which-are-not-running">Show all automatic services which are not running</a></li>
+<li><a class="reference internal" href="#show-the-percentage-free-space-for-each-fixed-disk">Show the percentage free space for each fixed disk</a></li>
+<li><a class="reference internal" href="#run-notepad-wait-until-it-s-closed-and-then-show-its-text">Run notepad, wait until it&#8217;s closed and then show its text</a></li>
+<li><a class="reference internal" href="#watch-for-new-print-jobs">Watch for new print jobs</a></li>
+<li><a class="reference internal" href="#reboot-a-remote-machine">Reboot a remote machine</a></li>
+<li><a class="reference internal" href="#show-the-ip-and-mac-addresses-for-ip-enabled-network-interfaces">Show the IP and MAC addresses for IP-enabled network interfaces</a></li>
+<li><a class="reference internal" href="#what-s-running-on-startup-and-from-where">What&#8217;s running on startup and from where?</a></li>
+<li><a class="reference internal" href="#watch-for-errors-in-the-event-log">Watch for errors in the event log</a></li>
+<li><a class="reference internal" href="#list-registry-keys">List registry keys</a></li>
+<li><a class="reference internal" href="#add-a-new-registry-key">Add a new registry key</a></li>
+<li><a class="reference internal" href="#add-a-new-registry-value">Add a new registry value</a></li>
+<li><a class="reference internal" href="#create-a-new-iis-site">Create a new IIS site</a></li>
+<li><a class="reference internal" href="#show-shared-drives">Show shared drives</a></li>
+<li><a class="reference internal" href="#show-print-jobs">Show print jobs</a></li>
+<li><a class="reference internal" href="#show-disk-partitions">Show disk partitions</a></li>
+<li><a class="reference internal" href="#install-a-product">Install a product</a></li>
+<li><a class="reference internal" href="#connect-to-another-machine-as-a-named-user">Connect to another machine as a named user</a></li>
+<li><a class="reference internal" href="#show-a-method-s-signature">Show a method&#8217;s signature</a></li>
+<li><a class="reference internal" href="#schedule-a-job">Schedule a job</a></li>
+<li><a class="reference internal" href="#run-a-process-minimised">Run a process minimised</a></li>
+<li><a class="reference internal" href="#find-drive-types">Find Drive Types</a></li>
+<li><a class="reference internal" href="#list-namespaces">List Namespaces</a></li>
+<li><a class="reference internal" href="#use-wmi-in-a-thread">Use WMI in a thread</a></li>
+<li><a class="reference internal" href="#monitor-multiple-machines-for-power-events">Monitor multiple machines for power events</a></li>
+<li><a class="reference internal" href="#find-the-current-wallpaper">Find the current wallpaper</a></li>
 </ul>
 </li>
 </ul>
@@ -320,7 +320,7 @@ or to specify the parts of it that you need. Use help on wmi.WMI.__init__ to fin
 <h3>List registry keys<a class="headerlink" href="#list-registry-keys" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>This example and the ones below use the convenience function <tt class="xref docutils literal"><span class="pre">Registry()</span></tt>
+<p>This example and the ones below use the convenience function <tt class="xref py py-func docutils literal"><span class="pre">Registry()</span></tt>
 which was added to the wmi package in its early days. It&#8217;s exactly equivalent to:</p>
 <div class="last highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s">&quot;DEFAULT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">StdRegProv</span>
@@ -613,7 +613,7 @@ multiple machines was just a practical example of using threads.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Note the use of CoInitialize and CoUninitialize in the thread control code.
-Note also the simplified use of <tt class="xref docutils literal"><span class="pre">_wmi_class.watch_for()</span></tt> which will work for
+Note also the simplified use of <tt class="xref py py-meth docutils literal"><span class="pre">_wmi_class.watch_for()</span></tt> which will work for
 intrinsic and extrinsic events transparently.</p>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pythoncom</span>
@@ -700,7 +700,7 @@ intrinsic and extrinsic events transparently.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="wmi.html" title="wmi – Windows Management Instrumentation"
@@ -708,12 +708,12 @@ intrinsic and extrinsic events transparently.</p>
         <li class="right" >
           <a href="tutorial.html" title="wmi Tutorial"
              >previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009, Tim Golden.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

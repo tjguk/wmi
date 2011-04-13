@@ -24,11 +24,9 @@ Where do I get it?
 ------------------
 
 * **Subversion**: http://svn.timgolden.me.uk/wmi/trunk/
-* **Windows installer**: http://timgolden.me.uk/python/downloads/WMI-1.4.6.win32.exe
-* **Zipped-up source**: http://timgolden.me.uk/python/downloads/WMI-1.4.6.zip
+* **Windows installer** and **zip**: http://pypi.python.org/pypi/WMI/#downloads
 
 * **Older Versions**: http://timgolden.me.uk/python/downloads
-
 
 
 How do I install it?

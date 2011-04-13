@@ -6,6 +6,12 @@ Changes
 1.4
 ---
 
+* Ensure moniker is correct when a parameter includes an embedded quote
+  (Thanks to Wim Hoekman for the bug report)
+
+* Ensure :func:`from_time` copes with negative timezones
+  (Thanks to Zlatko Lovevic for the bug report)
+
 * Pull back all fields for an event where none is specified
   (Thanks to Matt Kosek for the bug report and the detective work)
 

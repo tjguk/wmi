@@ -1,44 +1,5 @@
-# Sphinx inventory version 1
+# Sphinx inventory version 2
 # Project: WMI
 # Version: 1.4
-wmi mod wmi.html
-wmi._wmi_namespace.fetch_as_classes method wmi.html
-wmi.x_wmi exception wmi.html
-wmi._wmi_namespace.query method wmi.html
-wmi.from_time function wmi.html
-wmi.ProvideConstants class wmi.html
-wmi._wmi_namespace.new_instance_of method wmi.html
-wmi.to_time function wmi.html
-wmi._wmi_namespace.fetch_as_lists method wmi.html
-wmi._wmi_method.__call__ method wmi.html
-wmi.x_access_denied exception wmi.html
-wmi._wmi_namespace.instances method wmi.html
-wmi.Registry function wmi.html
-wmi.x_wmi_invalid_query exception wmi.html
-wmi._set function wmi.html
-wmi.SelfDeprecatingDict class wmi.html
-wmi.x_wmi_uninitialised_thread exception wmi.html
-wmi._wmi_object.set method wmi.html
-wmi.x_wmi_timed_out exception wmi.html
-wmi._wmi_class class wmi.html
-wmi.WMI function wmi.html
-wmi.x_wmi_authentication exception wmi.html
-wmi._wmi_namespace.watch_for method wmi.html
-wmi._wmi_class.query method wmi.html
-wmi._wmi_namespace class wmi.html
-wmi._wmi_object.references method wmi.html
-wmi._wmi_object class wmi.html
-wmi.connect_server function wmi.html
-wmi._wmi_object.derivation method wmi.html
-wmi._wmi_namespace.handle method wmi.html
-wmi._wmi_object.put method wmi.html
-wmi._wmi_object.keys attribute wmi.html
-wmi._wmi_method class wmi.html
-wmi.handle_com_error function wmi.html
-wmi._wmi_class.instances method wmi.html
-wmi._wmi_method.__init__ method wmi.html
-wmi._wmi_object.associators method wmi.html
-wmi._wmi_class.new method wmi.html
-wmi._wmi_namespace.new method wmi.html
-wmi._wmi_object.path method wmi.html
-wmi.x_wmi_no_namespace exception wmi.html
+# The remainder of this file is compressed using zlib.
+xÚ•T»nã0ìý.­…s›6iR.Å•MŽ$ÞQ¤Ž\ùñ÷¡DÚ°ŸH7‚DÍrgvg··R‰SåI>k¾‡®¶»j8oûô£î¨×?ªw+Gêm:Ú´0w‚.§)"B=¸ÝÏì3>x‹°†`È/á—ÓðT½¤ïÍ±Wés©ý¬DÇM‹„‹§Û§j;ájÌð~àuãž	Í½‡ŸïuVV»jÂ§\1øÄR*œRÖÜCž‚˜‡;ÀMðf4âè™Ðœ}BÆ—;°gJ"höÄ§Ò¬¿‰4825Ç	0Û¬k$ËHõ(¢}§ŽZyÊTq¿kÆ×š±\Ý¹ðžÉ`-Èl¾‘»hÏðú…6wçœôÙ¡ ®•dÿFÄuF”¹÷ÆÂ»¥…—‰Ç0]ŠTHî!u¼°"vÿ'ø²NT26Ÿ] ™){yãl_dšßïoeÅå#ua´•à3îÁ~ùdÆÆºÎ3T_›˜A_säÇ/Û¡CÞ|71Œv)ñÄFÂ©Ãµ¦¥bë`F©±ò	Ý¼bp˜zfÚWU"$ÑF*×ðç¹–œÈ©ýHÈì˜UQÁÀpÎ>°­K·ÊrÛM£›Ûv·bC"+'ë|±™Ãº¨»eøK«8u%ÛÃØå°o§éupv€£c‡ß	Ý

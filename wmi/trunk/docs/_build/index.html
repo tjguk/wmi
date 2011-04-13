@@ -7,14 +7,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>WMI - Windows Management Instrumentation &mdash; WMI v1.4.7 documentation</title>
+    <title>WMI - Windows Management Instrumentation &mdash; WMI v1.4.9 documentation</title>
     <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
-        VERSION:     '1.4.7',
-        COLLAPSE_MODINDEX: false,
+        URL_ROOT:    '',
+        VERSION:     '1.4.9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="WMI v1.4.7 documentation" href="#" />
+    <link rel="top" title="WMI v1.4.9 documentation" href="#" />
     <link rel="next" title="wmi Tutorial" href="tutorial.html" />
     <link rel="prev" title="Contents" href="contents.html" /> 
   </head>
@@ -34,33 +34,33 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="tutorial.html" title="wmi Tutorial"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="contents.html" title="Contents"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="contents.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference external" href="#">WMI - Windows Management Instrumentation</a><ul>
-<li><a class="reference external" href="#what-is-it">What is it?</a></li>
-<li><a class="reference external" href="#where-do-i-get-it">Where do I get it?</a></li>
-<li><a class="reference external" href="#how-do-i-install-it">How do I install it?</a></li>
-<li><a class="reference external" href="#how-do-i-use-it">How do I use it?</a></li>
-<li><a class="reference external" href="#what-s-changed">What&#8217;s Changed?</a></li>
-<li><a class="reference external" href="#copyright-license">Copyright &amp; License?</a></li>
-<li><a class="reference external" href="#prerequisites">Prerequisites</a><ul>
-<li><a class="reference external" href="#windows">Windows</a></li>
-<li><a class="reference external" href="#python">Python</a></li>
-<li><a class="reference external" href="#pywin32-was-win32all">pywin32 (was win32all)</a></li>
-<li><a class="reference external" href="#makepy">makepy</a></li>
+<li><a class="reference internal" href="#">WMI - Windows Management Instrumentation</a><ul>
+<li><a class="reference internal" href="#what-is-it">What is it?</a></li>
+<li><a class="reference internal" href="#where-do-i-get-it">Where do I get it?</a></li>
+<li><a class="reference internal" href="#how-do-i-install-it">How do I install it?</a></li>
+<li><a class="reference internal" href="#how-do-i-use-it">How do I use it?</a></li>
+<li><a class="reference internal" href="#what-s-changed">What&#8217;s Changed?</a></li>
+<li><a class="reference internal" href="#copyright-license">Copyright &amp; License?</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+<li><a class="reference internal" href="#python">Python</a></li>
+<li><a class="reference internal" href="#pywin32-was-win32all">pywin32 (was win32all)</a></li>
+<li><a class="reference internal" href="#makepy">makepy</a></li>
 </ul>
 </li>
 </ul>
@@ -117,8 +117,7 @@ version of pywin32.</p>
 <h2>Where do I get it?<a class="headerlink" href="#where-do-i-get-it" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><strong>Subversion</strong>: <a class="reference external" href="http://svn.timgolden.me.uk/wmi/trunk/">http://svn.timgolden.me.uk/wmi/trunk/</a></li>
-<li><strong>Windows installer</strong>: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.6.win32.exe">http://timgolden.me.uk/python/downloads/WMI-1.4.6.win32.exe</a></li>
-<li><strong>Zipped-up source</strong>: <a class="reference external" href="http://timgolden.me.uk/python/downloads/WMI-1.4.6.zip">http://timgolden.me.uk/python/downloads/WMI-1.4.6.zip</a></li>
+<li><strong>Windows installer</strong> and <strong>zip</strong>: <a class="reference external" href="http://pypi.python.org/pypi/WMI/#downloads">http://pypi.python.org/pypi/WMI/#downloads</a></li>
 <li><strong>Older Versions</strong>: <a class="reference external" href="http://timgolden.me.uk/python/downloads">http://timgolden.me.uk/python/downloads</a></li>
 </ul>
 </div>
@@ -131,7 +130,7 @@ version of pywin32.</p>
 </div>
 <div class="section" id="how-do-i-use-it">
 <h2>How do I use it?<a class="headerlink" href="#how-do-i-use-it" title="Permalink to this headline">¶</a></h2>
-<p>Have a look at the <a class="reference external" href="tutorial.html"><em>wmi Tutorial</em></a> or the <a class="reference external" href="cookbook.html"><em>wmi Cookbook</em></a>. As a quick
+<p>Have a look at the <a class="reference internal" href="tutorial.html"><em>wmi Tutorial</em></a> or the <a class="reference internal" href="cookbook.html"><em>wmi Cookbook</em></a>. As a quick
 taster, try this, to find all Automatic services which are not running
 and offer the option to restart each one:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
@@ -145,7 +144,7 @@ and offer the option to restart each one:</p>
 </div>
 <div class="section" id="what-s-changed">
 <h2>What&#8217;s Changed?<a class="headerlink" href="#what-s-changed" title="Permalink to this headline">¶</a></h2>
-<p>See the <a class="reference external" href="changes.html"><em>Changes</em></a> document</p>
+<p>See the <a class="reference internal" href="changes.html"><em>Changes</em></a> document</p>
 </div>
 <div class="section" id="copyright-license">
 <h2>Copyright &amp; License?<a class="headerlink" href="#copyright-license" title="Permalink to this headline">¶</a></h2>
@@ -210,7 +209,7 @@ click [OK].</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="tutorial.html" title="wmi Tutorial"
@@ -218,12 +217,12 @@ click [OK].</p>
         <li class="right" >
           <a href="contents.html" title="Contents"
              >previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009, Tim Golden.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

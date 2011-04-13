@@ -7,14 +7,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wmi – Windows Management Instrumentation &mdash; WMI v1.4.7 documentation</title>
+    <title>wmi – Windows Management Instrumentation &mdash; WMI v1.4.9 documentation</title>
     <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
-        VERSION:     '1.4.7',
-        COLLAPSE_MODINDEX: false,
+        URL_ROOT:    '',
+        VERSION:     '1.4.9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="WMI v1.4.7 documentation" href="index.html" />
+    <link rel="top" title="WMI v1.4.9 documentation" href="index.html" />
     <link rel="next" title="Changes" href="changes.html" />
     <link rel="prev" title="wmi Cookbook" href="cookbook.html" /> 
   </head>
@@ -34,26 +34,26 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="changes.html" title="Changes"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="cookbook.html" title="wmi Cookbook"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="contents.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">wmi</span></tt> &#8211; Windows Management Instrumentation</a><ul>
-<li><a class="reference external" href="#exceptions">Exceptions</a></li>
-<li><a class="reference external" href="#support-classes-functions">Support Classes &amp; Functions</a></li>
-<li><a class="reference external" href="#implementation">Implementation</a></li>
-<li><a class="reference external" href="#main-entry-points">Main Entry Points</a></li>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">wmi</span></tt> &#8211; Windows Management Instrumentation</a><ul>
+<li><a class="reference internal" href="#exceptions">Exceptions</a></li>
+<li><a class="reference internal" href="#support-classes-functions">Support Classes &amp; Functions</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+<li><a class="reference internal" href="#main-entry-points">Main Entry Points</a></li>
 </ul>
 </li>
 </ul>
@@ -91,7 +91,7 @@
           <div class="body">
             
   <div class="section" id="module-wmi">
-<h1><a title="" class="reference external" href="#module-wmi"><tt class="xref docutils literal"><span class="pre">wmi</span></tt></a> &#8211; Windows Management Instrumentation<a class="headerlink" href="#module-wmi" title="Permalink to this headline">¶</a></h1>
+<span id="wmi-windows-management-instrumentation"></span><h1><a class="reference internal" href="#module-wmi" title="wmi"><tt class="xref py py-mod docutils literal"><span class="pre">wmi</span></tt></a> &#8211; Windows Management Instrumentation<a class="headerlink" href="#module-wmi" title="Permalink to this headline">¶</a></h1>
 <p>Windows Management Instrumentation (WMI) is Microsoft&#8217;s answer to
 the DMTF&#8217;s Common Information Model. It allows you to query just
 about any conceivable piece of information from any computer which
@@ -101,7 +101,7 @@ necessary authority.</p>
 programmers, I&#8217;ve wrapped it in some lightweight classes with
 some getattr / setattr magic to ease the way. In particular:</p>
 <ul>
-<li><p class="first">The <a title="wmi._wmi_namespace" class="reference internal" href="#wmi._wmi_namespace"><tt class="xref docutils literal"><span class="pre">_wmi_namespace</span></tt></a> object itself will determine its classes
+<li><p class="first">The <a class="reference internal" href="#wmi._wmi_namespace" title="wmi._wmi_namespace"><tt class="xref py py-class docutils literal"><span class="pre">_wmi_namespace</span></tt></a> object itself will determine its classes
 and allow you to return all instances of any of them by
 using its name as an attribute:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">disks</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span><span class="o">.</span><span class="n">Win32_LogicalDisk</span> <span class="p">()</span>
@@ -174,11 +174,11 @@ Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.</p>
 <div class="section" id="exceptions">
 <h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
-<p>All COM-related exceptions are wrapped in <a title="wmi.x_wmi" class="reference internal" href="#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> or one of its
-subclasses. Therefore you can safely trap <a title="wmi.x_wmi" class="reference internal" href="#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> as a root
+<p>All COM-related exceptions are wrapped in <a class="reference internal" href="#wmi.x_wmi" title="wmi.x_wmi"><tt class="xref py py-exc docutils literal"><span class="pre">x_wmi</span></tt></a> or one of its
+subclasses. Therefore you can safely trap <a class="reference internal" href="#wmi.x_wmi" title="wmi.x_wmi"><tt class="xref py py-exc docutils literal"><span class="pre">x_wmi</span></tt></a> as a root
 exception.</p>
 <p>From v1.4 onwards exceptions now contain the underlying COM error
-(if any) as their <tt class="xref docutils literal"><span class="pre">x_wmi.com_error</span></tt> attribute:</p>
+(if any) as their <tt class="xref py py-attr docutils literal"><span class="pre">x_wmi.com_error</span></tt> attribute:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wmi</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -190,77 +190,86 @@ exception.</p>
 <dl class="exception">
 <dt id="wmi.x_wmi">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi" title="Permalink to this definition">¶</a></dt>
-<dd>Ancestor of all wmi-related exceptions. Keeps track of
+<dd><p>Ancestor of all wmi-related exceptions. Keeps track of
 an info message and the underlying COM error if any, exposed
-as the <tt class="xref docutils literal"><span class="pre">com_error</span></tt> attribute.</dd></dl>
+as the <tt class="xref py py-attr docutils literal"><span class="pre">com_error</span></tt> attribute.</p>
+</dd></dl>
 
 <dl class="exception">
 <dt id="wmi.x_wmi_invalid_query">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_invalid_query</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_invalid_query" title="Permalink to this definition">¶</a></dt>
-<dd>Raised when a WMI returns <cite>wbemErrInvalidQuery</cite></dd></dl>
+<dd><p>Raised when a WMI returns <cite>wbemErrInvalidQuery</cite></p>
+</dd></dl>
 
 <dl class="exception">
 <dt id="wmi.x_wmi_timed_out">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_timed_out</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_timed_out" title="Permalink to this definition">¶</a></dt>
-<dd>Raised when a watcher times out</dd></dl>
+<dd><p>Raised when a watcher times out</p>
+</dd></dl>
 
 <dl class="exception">
 <dt id="wmi.x_wmi_no_namespace">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_no_namespace</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_no_namespace" title="Permalink to this definition">¶</a></dt>
-<dd>Raised when an attempt is made to query or watch
-from a class without a namespace.</dd></dl>
+<dd><p>Raised when an attempt is made to query or watch
+from a class without a namespace.</p>
+</dd></dl>
 
 <dl class="exception">
 <dt id="wmi.x_access_denied">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_access_denied</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_access_denied" title="Permalink to this definition">¶</a></dt>
-<dd>Raised when WMI raises 80070005</dd></dl>
+<dd><p>Raised when WMI raises 80070005</p>
+</dd></dl>
 
 <dl class="exception">
 <dt id="wmi.x_wmi_authentication">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_authentication</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_authentication" title="Permalink to this definition">¶</a></dt>
-<dd>Raised when an invalid combination of authentication properties is attempted when connecting</dd></dl>
+<dd><p>Raised when an invalid combination of authentication properties is attempted when connecting</p>
+</dd></dl>
 
 <dl class="exception">
 <dt id="wmi.x_wmi_uninitialised_thread">
 <em class="property">exception </em><tt class="descclassname">wmi.</tt><tt class="descname">x_wmi_uninitialised_thread</tt><big>(</big><em>info=''</em>, <em>com_error=None</em><big>)</big><a class="headerlink" href="#wmi.x_wmi_uninitialised_thread" title="Permalink to this definition">¶</a></dt>
-<dd>Raised when WMI returns 800401E4 on connection, usually
-indicating that no COM threading model has been initialised</dd></dl>
+<dd><p>Raised when WMI returns 800401E4 on connection, usually
+indicating that no COM threading model has been initialised</p>
+</dd></dl>
 
 </div>
 <div class="section" id="support-classes-functions">
 <h2>Support Classes &amp; Functions<a class="headerlink" href="#support-classes-functions" title="Permalink to this headline">¶</a></h2>
 <p>These classes and functions are provided internally to the
 module to support various operations internally. Certain of
-them, in particular <a title="wmi.from_time" class="reference internal" href="#wmi.from_time"><tt class="xref docutils literal"><span class="pre">from_time()</span></tt></a> and <a title="wmi.to_time" class="reference internal" href="#wmi.to_time"><tt class="xref docutils literal"><span class="pre">to_time()</span></tt></a>
+them, in particular <a class="reference internal" href="#wmi.from_time" title="wmi.from_time"><tt class="xref py py-func docutils literal"><span class="pre">from_time()</span></tt></a> and <a class="reference internal" href="#wmi.to_time" title="wmi.to_time"><tt class="xref py py-func docutils literal"><span class="pre">to_time()</span></tt></a>
 could well be used externally.</p>
 <dl class="class">
 <dt id="wmi.SelfDeprecatingDict">
 <em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">SelfDeprecatingDict</tt><big>(</big><em>dictlike</em><big>)</big><a class="headerlink" href="#wmi.SelfDeprecatingDict" title="Permalink to this definition">¶</a></dt>
-<dd>Provides for graceful degradation of objects which
+<dd><p>Provides for graceful degradation of objects which
 are currently dictionaries (and therefore accessed via
 <cite>.keys</cite>, <cite>.items</cite>, etc.) into lists. Wraps an existing
 <cite>dict</cite> and allows it to be addressed as a <cite>dict</cite> or as a
 <cite>list</cite> during an interregnum, issuing a <cite>DeprecationWarning</cite>
-if accessed as a <cite>dict</cite>.</dd></dl>
+if accessed as a <cite>dict</cite>.</p>
+</dd></dl>
 
 <dl class="class">
 <dt id="wmi.ProvideConstants">
 <em class="property">class </em><tt class="descclassname">wmi.</tt><tt class="descname">ProvideConstants</tt><big>(</big><em>comobj</em><big>)</big><a class="headerlink" href="#wmi.ProvideConstants" title="Permalink to this definition">¶</a></dt>
-<dd>When called on a <tt class="docutils literal"><span class="pre">win32com.client.Dispatch</span></tt> object,
+<dd><p>When called on a <tt class="docutils literal"><span class="pre">win32com.client.Dispatch</span></tt> object,
 provides lazy access to constants defined in the typelib.
-They can then be accessed as attributes of the <tt class="xref docutils literal"><span class="pre">_constants</span></tt>
-property. (From Thomas Heller on c.l.py).</dd></dl>
+They can then be accessed as attributes of the <tt class="xref py py-attr docutils literal"><span class="pre">_constants</span></tt>
+property. (From Thomas Heller on c.l.py).</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="wmi.handle_com_error">
 <tt class="descclassname">wmi.</tt><tt class="descname">handle_com_error</tt><big>(</big><em>err=None</em><big>)</big><a class="headerlink" href="#wmi.handle_com_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience wrapper for displaying all manner of COM errors.
-Raises a <a title="wmi.x_wmi" class="reference internal" href="#wmi.x_wmi"><tt class="xref docutils literal"><span class="pre">x_wmi</span></tt></a> exception with more useful information attached</p>
+Raises a <a class="reference internal" href="#wmi.x_wmi" title="wmi.x_wmi"><tt class="xref py py-exc docutils literal"><span class="pre">x_wmi</span></tt></a> exception with more useful information attached</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>err</em> &#8211; The structure attached to a <cite>pywintypes.com_error</cite></td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>err</strong> &#8211; The structure attached to a <cite>pywintypes.com_error</cite></td>
 </tr>
 </tbody>
 </table>
@@ -278,14 +287,14 @@ by a series of stars of the appropriate length.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><em>year</em> &#8211; The year element of the date/time</li>
-<li><em>month</em> &#8211; The month element of the date/time</li>
-<li><em>day</em> &#8211; The day element of the date/time</li>
-<li><em>hours</em> &#8211; The hours element of the date/time</li>
-<li><em>minutes</em> &#8211; The minutes element of the date/time</li>
-<li><em>seconds</em> &#8211; The seconds element of the date/time</li>
-<li><em>microseconds</em> &#8211; The microseconds element of the date/time</li>
-<li><em>timezone</em> &#8211; The timeezone element of the date/time</li>
+<li><strong>year</strong> &#8211; The year element of the date/time</li>
+<li><strong>month</strong> &#8211; The month element of the date/time</li>
+<li><strong>day</strong> &#8211; The day element of the date/time</li>
+<li><strong>hours</strong> &#8211; The hours element of the date/time</li>
+<li><strong>minutes</strong> &#8211; The minutes element of the date/time</li>
+<li><strong>seconds</strong> &#8211; The seconds element of the date/time</li>
+<li><strong>microseconds</strong> &#8211; The microseconds element of the date/time</li>
+<li><strong>timezone</strong> &#8211; The timeezone element of the date/time</li>
 </ul>
 </td>
 </tr>
@@ -307,7 +316,7 @@ stars.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>wmi_time</em> &#8211; The WMI datetime string in <cite>yyyymmddHHMMSS.mmmmmm+UUU</cite> format</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>wmi_time</strong> &#8211; The WMI datetime string in <cite>yyyymmddHHMMSS.mmmmmm+UUU</cite> format</td>
 </tr>
 <tr class="field"><th class="field-name">Returns:</th><td class="field-body">A 9-tuple of (year, month, day, hours, minutes, seconds, microseconds, timezone)</td>
 </tr>
@@ -325,9 +334,9 @@ dictionary, bypassing possible <cite>__getattr__</cite> calls</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>obj</em> &#8211; Any python object</li>
-<li><em>attribute</em> &#8211; String containing attribute name</li>
-<li><em>value</em> &#8211; Any python object</li>
+<li><strong>obj</strong> &#8211; Any python object</li>
+<li><strong>attribute</strong> &#8211; String containing attribute name</li>
+<li><strong>value</strong> &#8211; Any python object</li>
 </ul>
 </td>
 </tr>
@@ -361,8 +370,8 @@ special privileges are required to call the method.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>ole_object</em> &#8211; The WMI class/instance whose method is to be called</li>
-<li><em>method_name</em> &#8211; The name of the method to be called</li>
+<li><strong>ole_object</strong> &#8211; The WMI class/instance whose method is to be called</li>
+<li><strong>method_name</strong> &#8211; The name of the method to be called</li>
 </ul>
 </td>
 </tr>
@@ -373,9 +382,10 @@ special privileges are required to call the method.</p>
 <dl class="method">
 <dt id="wmi._wmi_method.__call__">
 <tt class="descname">__call__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_method.__call__" title="Permalink to this definition">¶</a></dt>
-<dd>Execute the call to a WMI method, returning
+<dd><p>Execute the call to a WMI method, returning
 a tuple (even if is of only one value) containing
-the out and return parameters.</dd></dl>
+the out and return parameters.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -385,8 +395,8 @@ the out and return parameters.</dd></dl>
 <dd><p>The heart of the WMI module: wraps the objects returned by COM
 ISWbemObject interface and provide readier access to their properties
 and methods resulting in a more Pythonic interface. Not usually
-instantiated directly, rather as a result of calling a <a title="wmi._wmi_class" class="reference internal" href="#wmi._wmi_class"><tt class="xref docutils literal"><span class="pre">_wmi_class</span></tt></a>
-on the parent <a title="wmi._wmi_namespace" class="reference internal" href="#wmi._wmi_namespace"><tt class="xref docutils literal"><span class="pre">_wmi_namespace</span></tt></a>.</p>
+instantiated directly, rather as a result of calling a <a class="reference internal" href="#wmi._wmi_class" title="wmi._wmi_class"><tt class="xref py py-class docutils literal"><span class="pre">_wmi_class</span></tt></a>
+on the parent <a class="reference internal" href="#wmi._wmi_namespace" title="wmi._wmi_namespace"><tt class="xref py py-class docutils literal"><span class="pre">_wmi_namespace</span></tt></a>.</p>
 <p>If you get hold of a WMI-related COM object from some other
 source than this module, you can wrap it in one of these objects
 to get the benefits of the module:</p>
@@ -458,8 +468,9 @@ determine the path relative to the parent namespace:</p>
 <dl class="method">
 <dt id="wmi._wmi_object.put">
 <tt class="descname">put</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_object.put" title="Permalink to this definition">¶</a></dt>
-<dd>Push all outstanding property updates back to the
-WMI database.</dd></dl>
+<dd><p>Push all outstanding property updates back to the
+WMI database.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_object.references">
@@ -484,12 +495,20 @@ this module will automatically convert that to the object itself:</p>
 <dl class="method">
 <dt id="wmi._wmi_object.set">
 <tt class="descname">set</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_object.set" title="Permalink to this definition">¶</a></dt>
-<dd>Set several properties of the underlying object
+<dd><p>Set several properties of the underlying object
 at one go. This is particularly useful in combination
 with the new () method below. However, an instance
 which has been spawned in this way won&#8217;t have enough
 information to write pack, so only try if the
-instance has a path.</dd></dl>
+instance has a path.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wmi._wmi_object.wmi_property">
+<tt class="descname">wmi_property</tt><big>(</big><em>property_name</em><big>)</big><a class="headerlink" href="#wmi._wmi_object.wmi_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cached object representing one property
+of this object</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -509,7 +528,8 @@ which will form the WHERE clause:</p>
 <dl class="method">
 <dt id="wmi._wmi_class.instances">
 <tt class="descname">instances</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_class.instances" title="Permalink to this definition">¶</a></dt>
-<dd>Return a list of instances of the WMI class</dd></dl>
+<dd><p>Return a list of instances of the WMI class</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_class.new">
@@ -548,9 +568,10 @@ it is better handled with something like the example above.</p>
 <dl class="method">
 <dt id="wmi._wmi_class.query">
 <tt class="descname">query</tt><big>(</big><em>fields=</em><span class="optional">[</span><span class="optional">]</span>, <em>**where_clause</em><big>)</big><a class="headerlink" href="#wmi._wmi_class.query" title="Permalink to this definition">¶</a></dt>
-<dd>Make it slightly easier to query against the class,
+<dd><p>Make it slightly easier to query against the class,
 by calling the namespace&#8217;s query with the class preset.
-Won&#8217;t work if the class has been instantiated directly.</dd></dl>
+Won&#8217;t work if the class has been instantiated directly.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -579,14 +600,16 @@ each class returned.</p>
 <dl class="method">
 <dt id="wmi._wmi_namespace.fetch_as_lists">
 <tt class="descname">fetch_as_lists</tt><big>(</big><em>wmi_classname</em>, <em>fields</em>, <em>**where_clause</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.fetch_as_lists" title="Permalink to this definition">¶</a></dt>
-<dd>Build and execute a wql query to fetch the specified list of fields from
+<dd><p>Build and execute a wql query to fetch the specified list of fields from
 the specified wmi_classname + where_clause, then return the results as
-a list of lists whose values correspond to field_list.</dd></dl>
+a list of lists whose values correspond to field_list.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_namespace.handle">
 <tt class="descname">handle</tt><big>(</big><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.handle" title="Permalink to this definition">¶</a></dt>
-<dd>The raw OLE object representing the WMI namespace</dd></dl>
+<dd><p>The raw OLE object representing the WMI namespace</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_namespace.instances">
@@ -603,18 +626,21 @@ a list of lists whose values correspond to field_list.</dd></dl>
 <dl class="method">
 <dt id="wmi._wmi_namespace.new">
 <tt class="descname">new</tt><big>(</big><em>wmi_class</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.new" title="Permalink to this definition">¶</a></dt>
-<dd>This is now implemented by a call to <a title="wmi._wmi_class.new" class="reference internal" href="#wmi._wmi_class.new"><tt class="xref docutils literal"><span class="pre">_wmi_class.new()</span></tt></a></dd></dl>
+<dd><p>This is now implemented by a call to <a class="reference internal" href="#wmi._wmi_class.new" title="wmi._wmi_class.new"><tt class="xref py py-meth docutils literal"><span class="pre">_wmi_class.new()</span></tt></a></p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_namespace.new_instance_of">
 <tt class="descname">new_instance_of</tt><big>(</big><em>wmi_class</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.new_instance_of" title="Permalink to this definition">¶</a></dt>
-<dd>This is now implemented by a call to <a title="wmi._wmi_class.new" class="reference internal" href="#wmi._wmi_class.new"><tt class="xref docutils literal"><span class="pre">_wmi_class.new()</span></tt></a></dd></dl>
+<dd><p>This is now implemented by a call to <a class="reference internal" href="#wmi._wmi_class.new" title="wmi._wmi_class.new"><tt class="xref py py-meth docutils literal"><span class="pre">_wmi_class.new()</span></tt></a></p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_namespace.query">
 <tt class="descname">query</tt><big>(</big><em>wql</em>, <em>instance_of=None</em>, <em>fields=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#wmi._wmi_namespace.query" title="Permalink to this definition">¶</a></dt>
-<dd>Perform an arbitrary query against a WMI object, and return
-a list of _wmi_object representations of the results.</dd></dl>
+<dd><p>Perform an arbitrary query against a WMI object, and return
+a list of _wmi_object representations of the results.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="wmi._wmi_namespace.watch_for">
@@ -713,15 +739,15 @@ name.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>server</em> &#8211; name of the server</li>
-<li><em>namespace</em> &#8211; namespace to connect to - defaults to whatever&#8217;s defined as default</li>
-<li><em>user</em> &#8211; username to connect as, either local or domain (domname or <a class="reference external" href="mailto:user&#37;&#52;&#48;domain">user<span>&#64;</span>domain</a> for XP)</li>
-<li><em>password</em> &#8211; leave blank to use current context</li>
-<li><em>locale</em> &#8211; desired locale in form MS_XXXX (eg MS_409 for Am En)</li>
-<li><em>authority</em> &#8211; either &#8220;Kerberos:&#8221; or an NT domain. Not needed if included in user</li>
-<li><em>impersonation_level</em> &#8211; valid WMI impersonation level</li>
-<li><em>security_flags</em> &#8211; if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins</li>
-<li><em>named_value_set</em> &#8211; typically empty, otherwise a context-specific <cite>SWbemNamedValueSet</cite></li>
+<li><strong>server</strong> &#8211; name of the server</li>
+<li><strong>namespace</strong> &#8211; namespace to connect to - defaults to whatever&#8217;s defined as default</li>
+<li><strong>user</strong> &#8211; username to connect as, either local or domain (domname or <a class="reference external" href="mailto:user&#37;&#52;&#48;domain">user<span>&#64;</span>domain</a> for XP)</li>
+<li><strong>password</strong> &#8211; leave blank to use current context</li>
+<li><strong>locale</strong> &#8211; desired locale in form MS_XXXX (eg MS_409 for Am En)</li>
+<li><strong>authority</strong> &#8211; either &#8220;Kerberos:&#8221; or an NT domain. Not needed if included in user</li>
+<li><strong>impersonation_level</strong> &#8211; valid WMI impersonation level</li>
+<li><strong>security_flags</strong> &#8211; if 0, connect will wait forever; if 0x80, connect will timeout at 2 mins</li>
+<li><strong>named_value_set</strong> &#8211; typically empty, otherwise a context-specific <cite>SWbemNamedValueSet</cite></li>
 </ul>
 </td>
 </tr>
@@ -757,7 +783,7 @@ name.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="changes.html" title="Changes"
@@ -765,12 +791,12 @@ name.</p>
         <li class="right" >
           <a href="cookbook.html" title="wmi Cookbook"
              >previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009, Tim Golden.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

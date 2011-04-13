@@ -4,7 +4,7 @@
  *
  * Sphinx stylesheet -- basic theme.
  *
- * :copyright: Copyright 2007-2010 by the Sphinx team, see AUTHORS.
+ * :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
  * :license: BSD, see LICENSE for details.
  *
  */
@@ -213,6 +213,37 @@ p.rubric {
     font-weight: bold;
 }
 
+img.align-left, .figure.align-left, object.align-left {
+    clear: left;
+    float: left;
+    margin-right: 1em;
+}
+
+img.align-right, .figure.align-right, object.align-right {
+    clear: right;
+    float: right;
+    margin-left: 1em;
+}
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+    text-align: left;
+}
+
+.align-center {
+    clear: both;
+    text-align: center;
+}
+
+.align-right {
+    text-align: right;
+}
+
 /* -- sidebars -------------------------------------------------------------- */
 
 div.sidebar {
@@ -296,7 +327,36 @@ th {
     padding-right: 5px;
 }
 
+table.citation {
+    border-left: solid 1px gray;
+    margin-left: 1px;
+}
+
+table.citation td {
+    border-bottom: none;
+}
+
 /* -- other body styles ----------------------------------------------------- */
+
+ol.arabic {
+    list-style: decimal;
+}
+
+ol.loweralpha {
+    list-style: lower-alpha;
+}
+
+ol.upperalpha {
+    list-style: upper-alpha;
+}
+
+ol.lowerroman {
+    list-style: lower-roman;
+}
+
+ol.upperroman {
+    list-style: upper-roman;
+}
 
 dl {
     margin-bottom: 15px;
@@ -316,7 +376,7 @@ dd {
     margin-left: 30px;
 }
 
-dt:target, .highlight {
+dt:target, .highlighted {
     background-color: #fbe54e;
 }
 
@@ -353,7 +413,7 @@ dl.glossary dt {
 }
 
 .footnote:target  {
-    background-color: #ffa
+    background-color: #ffa;
 }
 
 .line-block {
@@ -368,10 +428,23 @@ dl.glossary dt {
     margin-left: 1.5em;
 }
 
+.guilabel, .menuselection {
+    font-family: sans-serif;
+}
+
+.accelerator {
+    text-decoration: underline;
+}
+
+.classifier {
+    font-style: oblique;
+}
+
 /* -- code displays --------------------------------------------------------- */
 
 pre {
     overflow: auto;
+    overflow-y: hidden;  /* fixes display issues on Chrome browsers */
 }
 
 td.linenos pre {
@@ -406,6 +479,20 @@ tt.xref, a tt {
 
 h1 tt, h2 tt, h3 tt, h4 tt, h5 tt, h6 tt {
     background-color: transparent;
+}
+
+.viewcode-link {
+    float: right;
+}
+
+.viewcode-back {
+    float: right;
+    font-family: sans-serif;
+}
+
+div.viewcode-block:target {
+    margin: -1px -10px;
+    padding: 0 10px;
 }
 
 /* -- math display ---------------------------------------------------------- */

@@ -4,7 +4,7 @@
  *
  * Sphinx JavaScript utilties for all documentation.
  *
- * :copyright: Copyright 2007-2010 by the Sphinx team, see AUTHORS.
+ * :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
  * :license: BSD, see LICENSE for details.
  *
  */
@@ -17,14 +17,15 @@ $u = _.noConflict();
 /**
  * make the code below compatible with browsers without
  * an installed firebug like debugger
- */
 if (!window.console || !console.firebug) {
-  var names = ["log", "debug", "info", "warn", "error", "assert", "dir", "dirxml",
-      "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd"];
+  var names = ["log", "debug", "info", "warn", "error", "assert", "dir",
+    "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace",
+    "profile", "profileEnd"];
   window.console = {};
   for (var i = 0; i < names.length; ++i)
     window.console[names[i]] = function() {};
 }
+ */
 
 /**
  * small helper function to urldecode strings
@@ -81,7 +82,7 @@ jQuery.fn.highlightText = function(text, className) {
     if (node.nodeType == 3) {
       var val = node.nodeValue;
       var pos = val.toLowerCase().indexOf(text);
-      if (pos >= 0 && !jQuery.className.has(node.parentNode, className)) {
+      if (pos >= 0 && !jQuery(node.parentNode).hasClass(className)) {
         var span = document.createElement("span");
         span.className = className;
         span.appendChild(document.createTextNode(val.substr(pos, text.length)));
@@ -110,7 +111,7 @@ var Documentation = {
   init : function() {
     this.fixFirefoxAnchorBug();
     this.highlightSearchWords();
-    this.initModIndex();
+    this.initIndexTable();
   },
 
   /**
@@ -121,7 +122,7 @@ var Documentation = {
   LOCALE : 'unknown',
 
   // gettext and ngettext don't access this so that the functions
-  // can savely bound to a different name (_ = Documentation.gettext)
+  // can safely bound to a different name (_ = Documentation.gettext)
   gettext : function(string) {
     var translated = Documentation.TRANSLATIONS[string];
     if (typeof translated == 'undefined')
@@ -181,7 +182,7 @@ var Documentation = {
       var body = $('div.body');
       window.setTimeout(function() {
         $.each(terms, function() {
-          body.highlightText(this.toLowerCase(), 'highlight');
+          body.highlightText(this.toLowerCase(), 'highlighted');
         });
       }, 10);
       $('<li class="highlight-link"><a href="javascript:Documentation.' +
@@ -191,19 +192,19 @@ var Documentation = {
   },
 
   /**
-   * init the modindex toggle buttons
+   * init the domain index toggle buttons
    */
-  initModIndex : function() {
+  initIndexTable : function() {
     var togglers = $('img.toggler').click(function() {
       var src = $(this).attr('src');
       var idnum = $(this).attr('id').substr(7);
-      console.log($('tr.cg-' + idnum).toggle());
+      $('tr.cg-' + idnum).toggle();
       if (src.substr(-9) == 'minus.png')
         $(this).attr('src', src.substr(0, src.length-9) + 'plus.png');
       else
         $(this).attr('src', src.substr(0, src.length-8) + 'minus.png');
     }).css('display', '');
-    if (DOCUMENTATION_OPTIONS.COLLAPSE_MODINDEX) {
+    if (DOCUMENTATION_OPTIONS.COLLAPSE_INDEX) {
         togglers.click();
     }
   },
@@ -213,7 +214,7 @@ var Documentation = {
    */
   hideSearchWords : function() {
     $('.sidebar .this-page-menu li.highlight-link').fadeOut(300);
-    $('span.highlight').removeClass('highlight');
+    $('span.highlighted').removeClass('highlighted');
   },
 
   /**

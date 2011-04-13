@@ -13,8 +13,7 @@ computer system.
 The Python WMI module is a lightweight wrapper on top of the pywin32
 extensions, and hides some of the messy plumbing needed to get Python to
 talk to the WMI API. It's pure Python and should work with any version of
-Python from 2.1 onwards (list comprehensions) and any recent version of
-pywin32.
+Python from 2.4 onwards and any recent version of pywin32.
 
 
 Where do I get it?
@@ -60,7 +59,7 @@ but as a quick taster, try this, to show all stopped services::
 Prerequisites
 =============
 
-If you're running a recent Python (2.1+) on a recent Windows (2k, 2k3, XP)
+If you're running a recent Python (2.4+) on a recent Windows (2k, 2k3, XP)
 and you have Mark Hammond's win32 extensions installed, you're probably
 up-and-running already. Otherwise...
 

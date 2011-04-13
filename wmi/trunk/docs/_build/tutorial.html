@@ -7,14 +7,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wmi Tutorial &mdash; WMI v1.4.7 documentation</title>
+    <title>wmi Tutorial &mdash; WMI v1.4.9 documentation</title>
     <link rel="stylesheet" href="_static/wmi.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
-        VERSION:     '1.4.7',
-        COLLAPSE_MODINDEX: false,
+        URL_ROOT:    '',
+        VERSION:     '1.4.9',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="WMI v1.4.7 documentation" href="index.html" />
+    <link rel="top" title="WMI v1.4.9 documentation" href="index.html" />
     <link rel="next" title="wmi Cookbook" href="cookbook.html" />
     <link rel="prev" title="WMI - Windows Management Instrumentation" href="index.html" /> 
   </head>
@@ -34,85 +34,85 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="cookbook.html" title="wmi Cookbook"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="WMI - Windows Management Instrumentation"
              accesskey="P">previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="contents.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference external" href="#">wmi Tutorial</a><ul>
-<li><a class="reference external" href="#introduction">Introduction</a></li>
-<li><a class="reference external" href="#the-basics">The Basics</a><ul>
-<li><a class="reference external" href="#connecting">Connecting</a></li>
-<li><a class="reference external" href="#querying">Querying</a></li>
-<li><a class="reference external" href="#monitoring">Monitoring</a></li>
-<li><a class="reference external" href="#updating">Updating</a></li>
-<li><a class="reference external" href="#methods">Methods</a></li>
+<li><a class="reference internal" href="#">wmi Tutorial</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#the-basics">The Basics</a><ul>
+<li><a class="reference internal" href="#connecting">Connecting</a></li>
+<li><a class="reference internal" href="#querying">Querying</a></li>
+<li><a class="reference internal" href="#monitoring">Monitoring</a></li>
+<li><a class="reference internal" href="#updating">Updating</a></li>
+<li><a class="reference internal" href="#methods">Methods</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#advanced-stuff">Advanced Stuff</a><ul>
-<li><a class="reference external" href="#advanced-connecting">Advanced Connecting</a><ul>
-<li><a class="reference external" href="#connecting-to-a-remote-machine">Connecting to a remote machine</a></li>
-<li><a class="reference external" href="#connecting-to-a-remote-machine-as-a-named-user">Connecting to a remote machine as a named user</a></li>
-<li><a class="reference external" href="#connecting-to-a-particular-namespace">Connecting to a particular namespace</a></li>
-<li><a class="reference external" href="#specifying-the-full-moniker">Specifying the full moniker</a></li>
-<li><a class="reference external" href="#connecting-to-a-specific-class-or-object">Connecting to a specific class or object</a></li>
+<li><a class="reference internal" href="#advanced-stuff">Advanced Stuff</a><ul>
+<li><a class="reference internal" href="#advanced-connecting">Advanced Connecting</a><ul>
+<li><a class="reference internal" href="#connecting-to-a-remote-machine">Connecting to a remote machine</a></li>
+<li><a class="reference internal" href="#connecting-to-a-remote-machine-as-a-named-user">Connecting to a remote machine as a named user</a></li>
+<li><a class="reference internal" href="#connecting-to-a-particular-namespace">Connecting to a particular namespace</a></li>
+<li><a class="reference internal" href="#specifying-the-full-moniker">Specifying the full moniker</a></li>
+<li><a class="reference internal" href="#connecting-to-a-specific-class-or-object">Connecting to a specific class or object</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#advanced-querying">Advanced Querying</a><ul>
-<li><a class="reference external" href="#filtering-the-returned-list">Filtering the returned list</a></li>
-<li><a class="reference external" href="#selecting-only-certain-fields">Selecting only certain fields</a></li>
-<li><a class="reference external" href="#performing-arbitrary-wql-queries">Performing arbitrary WQL queries</a></li>
+<li><a class="reference internal" href="#advanced-querying">Advanced Querying</a><ul>
+<li><a class="reference internal" href="#filtering-the-returned-list">Filtering the returned list</a></li>
+<li><a class="reference internal" href="#selecting-only-certain-fields">Selecting only certain fields</a></li>
+<li><a class="reference internal" href="#performing-arbitrary-wql-queries">Performing arbitrary WQL queries</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#advanced-monitoring">Advanced Monitoring</a><ul>
-<li><a class="reference external" href="#intrinsic-events">Intrinsic events</a></li>
-<li><a class="reference external" href="#extrinsic-events">Extrinsic events</a></li>
-<li><a class="reference external" href="#watchers-with-timeouts">Watchers with timeouts</a></li>
+<li><a class="reference internal" href="#advanced-monitoring">Advanced Monitoring</a><ul>
+<li><a class="reference internal" href="#intrinsic-events">Intrinsic events</a></li>
+<li><a class="reference internal" href="#extrinsic-events">Extrinsic events</a></li>
+<li><a class="reference internal" href="#watchers-with-timeouts">Watchers with timeouts</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#more-about-methods">More About Methods</a><ul>
-<li><a class="reference external" href="#determing-available-methods">Determing available methods</a></li>
-<li><a class="reference external" href="#showing-method-signatures">Showing method signatures</a></li>
-<li><a class="reference external" href="#finding-a-method-s-win32-api-equivalent">Finding a method&#8217;s Win32 API equivalent</a></li>
+<li><a class="reference internal" href="#more-about-methods">More About Methods</a><ul>
+<li><a class="reference internal" href="#determing-available-methods">Determing available methods</a></li>
+<li><a class="reference internal" href="#showing-method-signatures">Showing method signatures</a></li>
+<li><a class="reference internal" href="#finding-a-method-s-win32-api-equivalent">Finding a method&#8217;s Win32 API equivalent</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#more-advanced-topics-bits-pieces">More Advanced Topics: Bits &amp; Pieces</a><ul>
-<li><a class="reference external" href="#creating-wmi-objects">Creating WMI Objects</a></li>
+<li><a class="reference internal" href="#more-advanced-topics-bits-pieces">More Advanced Topics: Bits &amp; Pieces</a><ul>
+<li><a class="reference internal" href="#creating-wmi-objects">Creating WMI Objects</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#wmi-classes-objects">WMI Classes/Objects</a><ul>
-<li><a class="reference external" href="#class-object-details">Class/Object details</a></li>
-<li><a class="reference external" href="#the-object-hierarchy">The object hierarchy</a></li>
-<li><a class="reference external" href="#comparing-two-wmi-objects-for-equality">Comparing two WMI objects for equality</a></li>
-<li><a class="reference external" href="#associators">Associators</a></li>
+<li><a class="reference internal" href="#wmi-classes-objects">WMI Classes/Objects</a><ul>
+<li><a class="reference internal" href="#class-object-details">Class/Object details</a></li>
+<li><a class="reference internal" href="#the-object-hierarchy">The object hierarchy</a></li>
+<li><a class="reference internal" href="#comparing-two-wmi-objects-for-equality">Comparing two WMI objects for equality</a></li>
+<li><a class="reference internal" href="#associators">Associators</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#caveats-troubleshooting-and-performance">Caveats, Troubleshooting and Performance</a><ul>
-<li><a class="reference external" href="#speeding-things-up">Speeding things up</a></li>
-<li><a class="reference external" href="#turning-off-introspection">Turning off introspection</a></li>
-<li><a class="reference external" href="#pre-cache-class-and-method-wrappers">Pre-cache class and method wrappers</a></li>
-<li><a class="reference external" href="#specifying-fields-in-the-query">Specifying fields in the query</a></li>
+<li><a class="reference internal" href="#caveats-troubleshooting-and-performance">Caveats, Troubleshooting and Performance</a><ul>
+<li><a class="reference internal" href="#speeding-things-up">Speeding things up</a></li>
+<li><a class="reference internal" href="#turning-off-introspection">Turning off introspection</a></li>
+<li><a class="reference internal" href="#pre-cache-class-and-method-wrappers">Pre-cache class and method wrappers</a></li>
+<li><a class="reference internal" href="#specifying-fields-in-the-query">Specifying fields in the query</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#security">Security</a><ul>
-<li><a class="reference external" href="#nt-security">NT Security</a></li>
-<li><a class="reference external" href="#dcom-security">DCOM Security</a></li>
-<li><a class="reference external" href="#wmi-security">WMI Security</a></li>
-<li><a class="reference external" href="#wmi-and-threads">WMI and Threads</a></li>
-<li><a class="reference external" href="#coinitialize-couninitialize">CoInitialize &amp; CoUninitialize</a></li>
+<li><a class="reference internal" href="#security">Security</a><ul>
+<li><a class="reference internal" href="#nt-security">NT Security</a></li>
+<li><a class="reference internal" href="#dcom-security">DCOM Security</a></li>
+<li><a class="reference internal" href="#wmi-security">WMI Security</a></li>
+<li><a class="reference internal" href="#wmi-and-threads">WMI and Threads</a></li>
+<li><a class="reference internal" href="#coinitialize-couninitialize">CoInitialize &amp; CoUninitialize</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#links">Links</a></li>
+<li><a class="reference internal" href="#links">Links</a></li>
 </ul>
 </li>
 </ul>
@@ -157,12 +157,12 @@
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>From the Wikipedia entry for WMI:</p>
 <blockquote>
-Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
+<div>Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
 operating system interface through which instrumented components can provide information and notification. WMI is
 Microsoft&#8217;s implementation of the Web-Based Enterprise Management(WBEM) Standard from the Distributed Management
 Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
 servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows
-Me, and Windows 2000.</blockquote>
+Me, and Windows 2000.</div></blockquote>
 <p>This tutorial covers accessing WMI specifically using the Python programming language and assumes you have
 downloaded and installed Python itself, the pywin32 extensions and the WMI Python module. Python is able to use WMI
 by means of COM-enabling packages such as Mark Hammond&#8217;s pywin32 extensions or the comtypes spinoff from Thomas
@@ -395,11 +395,11 @@ an entire directory structure.</p>
 </pre></div>
 </div>
 <p>A caveat here: this is polling, and at the frequency you&#8217;ve specified. It is possible to miss events this way.</p>
-<p>The return from a watcher is in fact a special <tt class="xref docutils literal"><span class="pre">_wmi_event</span> <span class="pre">object</span></tt>,
-subclass of a conventional <tt class="xref docutils literal"><span class="pre">_wmi_object</span></tt>, and which includes, for
+<p>The return from a watcher is in fact a special <tt class="xref py py-class docutils literal"><span class="pre">_wmi_event</span> <span class="pre">object</span></tt>,
+subclass of a conventional <tt class="xref py py-class docutils literal"><span class="pre">_wmi_object</span></tt>, and which includes, for
 intrinsic events, the event type, timestamp and previous value for a
-modification as attributes: <tt class="xref docutils literal"><span class="pre">_wmi_event.event_type</span></tt>, <tt class="xref docutils literal"><span class="pre">_wmi_event.timestamp</span></tt>
-and <tt class="xref docutils literal"><span class="pre">_wmi_event.previous</span></tt> respectively.</p>
+modification as attributes: <tt class="xref py py-attr docutils literal"><span class="pre">_wmi_event.event_type</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">_wmi_event.timestamp</span></tt>
+and <tt class="xref py py-attr docutils literal"><span class="pre">_wmi_event.previous</span></tt> respectively.</p>
 </div>
 <div class="section" id="extrinsic-events">
 <h4>Extrinsic events<a class="headerlink" href="#extrinsic-events" title="Permalink to this headline">¶</a></h4>
@@ -538,7 +538,7 @@ covers when you call a WMI method (not, unfortunately, for a property). This is 
 <h3>More Advanced Topics: Bits &amp; Pieces<a class="headerlink" href="#more-advanced-topics-bits-pieces" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="creating-wmi-objects">
 <h4>Creating WMI Objects<a class="headerlink" href="#creating-wmi-objects" title="Permalink to this headline">¶</a></h4>
-<p>WMI exposes a SpawnInstance_ method which is wrapped as the <tt class="xref docutils literal"><span class="pre">_wmi_object.new()</span></tt> method
+<p>WMI exposes a SpawnInstance_ method which is wrapped as the <tt class="xref py py-meth docutils literal"><span class="pre">_wmi_object.new()</span></tt> method
 of the Python WMI classes. But you&#8217;ll use
 this method far less often than you think. If you want to create a new disk share, for example, rather than using
 <cite>Win32_Share.new</cite>, you&#8217;ll actually call the <cite>Win32_Share</cite> class&#8217;s <cite>Create</cite> method.
@@ -612,7 +612,7 @@ To find all extrinsic event classes other than the builtin ones (indicated by a 
 </div>
 <div class="section" id="comparing-two-wmi-objects-for-equality">
 <h4>Comparing two WMI objects for equality<a class="headerlink" href="#comparing-two-wmi-objects-for-equality" title="Permalink to this headline">¶</a></h4>
-<p>The <tt class="xref docutils literal"><span class="pre">_wmi_object.__eq__()</span></tt> operator is overridden in wrapped WMI classes and
+<p>The <tt class="xref py py-meth docutils literal"><span class="pre">_wmi_object.__eq__()</span></tt> operator is overridden in wrapped WMI classes and
 calls the underlying .CompareTo method, so comparing two WMI objects for equality
 should do The Right Thing.</p>
 </div>
@@ -640,7 +640,7 @@ your system, and which users are in each group:</p>
 </pre></div>
 </div>
 <p class="versionadded">
-<span class="versionmodified">New in version 1.3.1: </span>The <tt class="xref docutils literal"><span class="pre">_wmi_object.associators()</span></tt> method will convert its results to
+<span class="versionmodified">New in version 1.3.1: </span>The <tt class="xref py py-meth docutils literal"><span class="pre">_wmi_object.associators()</span></tt> method will convert its results to
 a _wmi_object.</p>
 </div>
 </div>
@@ -673,9 +673,9 @@ above to search, for example, for the performances classes available on a given 
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">From v1.4 onwards, the <cite>find_classes</cite> parameter is False by default: it has
-to be turned on specifically. But... the <tt class="xref docutils literal"><span class="pre">classes</span></tt> attribute now does
+to be turned on specifically. But... the <tt class="xref py py-attr docutils literal"><span class="pre">classes</span></tt> attribute now does
 a lazy lookup, so if you do call it directly or indirectly, eg by using IPython
-which invokes its attribute lookup magic method <tt class="xref docutils literal"><span class="pre">_wmi_object._getAttributes()</span></tt>
+which invokes its attribute lookup magic method <tt class="xref py py-meth docutils literal"><span class="pre">_wmi_object._getAttributes()</span></tt>
 it will return the full list of classes in the naeepsace.</p>
 </div>
 </div>
@@ -772,7 +772,7 @@ you instantiate a WMI object within a thread and then uninitializing afterwards:
 <p class="versionadded">
 <span class="versionmodified">New in version 1.4.1: </span>From v1.4 onwards, the Moniker Syntax Error which usually results from failing
 to initialise threaded WMI access will be caught by the underlying code and a
-<tt class="xref docutils literal"><span class="pre">x_wmi_uninitialised_thread</span></tt> exception will be raised instead.</p>
+<tt class="xref py py-exc docutils literal"><span class="pre">x_wmi_uninitialised_thread</span></tt> exception will be raised instead.</p>
 </div>
 </div>
 <div class="section" id="links">
@@ -838,7 +838,7 @@ via WMI</dd>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="cookbook.html" title="wmi Cookbook"
@@ -846,12 +846,12 @@ via WMI</dd>
         <li class="right" >
           <a href="index.html" title="WMI - Windows Management Instrumentation"
              >previous</a> |</li>
-        <li><a href="contents.html">WMI v1.4.7 documentation</a> &raquo;</li> 
+        <li><a href="contents.html">WMI v1.4.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009, Tim Golden.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
