@@ -551,7 +551,7 @@ above to search, for example, for the performances classes available on a given 
     to be turned on specifically. But... the :attr:`classes` attribute now does
     a lazy lookup, so if you do call it directly or indirectly, eg by using IPython
     which invokes its attribute lookup magic method :meth:`_wmi_object._getAttributes`
-    it will return the full list of classes in the naeepsace.
+    it will return the full list of classes in the namespace.
 
 Pre-cache class and method wrappers
 ***********************************
