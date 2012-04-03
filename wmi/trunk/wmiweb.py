@@ -141,11 +141,11 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
   if methods:
     doc.append ("<ul>")
     for m in methods:
-      doc.append ('<li>%s<br>%s</li>' % (m, escape (str (getattr (klass, m)))))
+      doc.append ('<li><b>%s</b><br>%s</li>' % (m, escape (str (getattr (klass, m)))))
     doc.append ("</ul>")
   else:
     doc.append ("<p>No methods</p>")
-    
+
   doc.append ("<hr>")
   doc.append ("<h3>Qualifiers</h3>")
   qualifiers = sorted (klass.qualifiers.items ())
