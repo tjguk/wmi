@@ -80,6 +80,7 @@ __VERSION__ = __version__ = "1.4.9"
 _DEBUG = False
 
 import sys
+import csv
 import datetime
 import re
 import struct
@@ -797,6 +798,19 @@ class _wmi_class (_wmi_object):
     except pywintypes.com_error:
       handle_com_error ()
 
+
+  def to_csv (self, filepath=None):
+    """Generate a csv listing all the instances of this class with the class
+    name as a header.
+    """
+    if filepath is None:
+      filepath = self._class_name + ".csv"
+    fields = list (p.Name for p in self.ole_object.Properties_)
+    with open (filepath, "wb") as f:
+      writer = csv.writer (f)
+      writer.writerow (fields)
+      for instance in self.query ():
+        writer.writerow ([getattr (instance, field) for field in fields])
 
   def query (self, fields=[], **where_clause):
     """Make it slightly easier to query against the class,
