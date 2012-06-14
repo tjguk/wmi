@@ -672,21 +672,21 @@ class _wmi_object:
       handle_com_error ()
 
   def _cached_associated_classes (self):
-    if self._associated_classes is None:
-      if isinstance (self, _wmi_class):
-        params = {'bSchemaOnly' : True}
-      else:
-        params = {'bClassesOnly' : True}
+    if isinstance (self, _wmi_class):
+      obj = self
+    else:
+      obj = self._instance_of
+    if obj._associated_classes is None:
       try:
         associated_classes = dict (
           (assoc.Path_.Class, _wmi_class (self._namespace, assoc)) for
-            assoc in self.ole_object.Associators_ (**params)
+            assoc in obj.ole_object.Associators_ (bSchemaOnly=True)
         )
-        _set (self, "_associated_classes", associated_classes)
+        _set (obj, "_associated_classes", associated_classes)
       except pywintypes.com_error:
         handle_com_error ()
 
-    return self._associated_classes
+    return obj._associated_classes
   associated_classes = property (_cached_associated_classes)
 
   def associators (self, wmi_association_class="", wmi_result_class=""):
