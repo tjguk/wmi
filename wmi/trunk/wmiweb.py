@@ -37,6 +37,7 @@ def start_doc (title):
   td {padding-right : 1em; font-size : 84%%;}
   h1, h2, h3 {font-family : Tahoma, sans-serif;}
   h2 a {text-decoration : none;}
+  span.tooltip {border-bottom : 1px dotted #777;}
   </style>
   </head>
   <body>
@@ -48,20 +49,26 @@ def finish_doc ():
   </html>
   """ % locals ())
 
-def doc_table (items, n_cols=3):
+def doc_table (items, n_cols=3, callback=None):
   n_rows, n_spare_cols = divmod (len (items), n_cols)
   doc.append ('<table cellspacing=0 class="items">')
 
   for n_row in range (n_rows):
     doc.append ("<tr>")
     for n_col in range (n_cols):
-      doc.append ("<td><li>%s</li></td>" % items[n_cols * n_col + n_row])
+      item = items[n_cols * n_col + n_row]
+      if callback:
+        item = callback(item)
+      doc.append ("<td><li>%s</li></td>" % item)
     doc.append ("</tr>")
 
   if n_spare_cols:
     doc.append ("<tr>")
     for n_col in reversed (range (n_spare_cols)):
-      doc.append ("<td><li>%s</li></td>" % items[len (items) - 1 - n_col])
+      item = items[len (items) - 1 - n_col]
+      if callback:
+        item = callback(item)
+      doc.append ("<td><li>%s</li></td>" % item)
     doc.append ("</tr>")
 
   doc.append ("</table>")
@@ -73,12 +80,21 @@ def doc_breadcrumbs (computer, namespace, wmi_class=None):
     doc.append (' &rarr; %s' % (link (wmi_class, computer, namespace, wmi_class)))
   doc.append ('</p>')
 
+
 def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
   start_doc ("WMI: Class %(wmi_class)s in namespace %(namespace)s on %(computer)s" % locals ())
   doc_breadcrumbs (computer, namespace, wmi_class)
   doc.append ("<h2>%(wmi_class)s</h2>" % locals ())
   klass = getattr (wmi_connection, wmi_class)
 
+  def property_callback(property_name):
+    property = klass.wmi_property(property_name)
+    mapping = property.qualifiers.get("MappingStrings")
+    if mapping is None:
+      return property_name
+    else:
+      return '<span class="tooltip" title="%s">%s</span>' % ("\n".join (mapping), property_name)
+    
   doc.append ("<hr>")
   doc.append ("<h3>Ancestors</h3>")
   ancestors = klass.derivation ()
@@ -116,13 +132,13 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
   if n_properties == 0:
     doc.append ("<p>No properties</p>")
   if 1 <= n_properties <= 10:
-    doc_table (properties, 1)
+    doc_table (properties, 1, property_callback)
   elif 10 < n_properties <= 20:
-    doc_table (properties, 2)
+    doc_table (properties, 2, property_callback)
   elif 20 < n_properties <= 30:
-    doc_table (properties, 3)
+    doc_table (properties, 3, property_callback)
   else:
-    doc_table (properties, 4)
+    doc_table (properties, 4, property_callback)
 
   doc.append ("<hr>")
   doc.append ("<h3>Keys</h3>")
