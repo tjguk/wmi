@@ -1113,15 +1113,16 @@ class _wmi_namespace:
         else:
           print warning_log
     """
-    if isinstance (wmi_class, _wmi_class):
-      class_name = wmi_class._class_name
-    else:
-      class_name = wmi_class
-      wmi_class = getattr (self, class_name)
-    is_extrinsic = "__ExtrinsicEvent" in wmi_class.derivation ()
     if raw_wql:
       wql = raw_wql
+      is_extrinsic = False
     else:
+      if isinstance (wmi_class, _wmi_class):
+        class_name = wmi_class._class_name
+      else:
+        class_name = wmi_class
+        wmi_class = getattr (self, class_name)
+      is_extrinsic = "__ExtrinsicEvent" in wmi_class.derivation ()
       fields = set (['TargetInstance'] + (fields or ["*"]))
       field_list = ", ".join (fields)
       if is_extrinsic:
