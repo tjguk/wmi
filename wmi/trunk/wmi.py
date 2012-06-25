@@ -442,6 +442,7 @@ class _wmi_property (object):
     self.value = property.Value
     self.qualifiers = dict ((q.Name, q.Value) for q in property.Qualifiers_)
     self.type = self.qualifiers.get ("CIMTYPE", None)
+    self.provenance = "\n".join (self.qualifiers.get ("MappingStrings", []))
 
   def set (self, value):
     self.property.Value = value

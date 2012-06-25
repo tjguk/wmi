@@ -93,8 +93,8 @@ def doc_wmi_class (computer, namespace, wmi_class, wmi_connection):
     if mapping is None:
       return property_name
     else:
-      return '<span class="tooltip" title="%s">%s</span>' % ("\n".join (mapping), property_name)
-    
+      return '<span class="tooltip" title="%s">%s</span>' % (property.provenance, property_name)
+
   doc.append ("<hr>")
   doc.append ("<h3>Ancestors</h3>")
   ancestors = klass.derivation ()
