@@ -1149,6 +1149,22 @@ class _wmi_namespace:
     except pywintypes.com_error:
       handle_com_error ()
 
+   def __nonzero__(self):
+    """This is called each time this object is an argument to a conditional
+    statement. If this method is not present, __getattr__ would be called
+    instead. That would cause an endless recursive call.
+    Strangely, this was not an issue before.
+
+    Error encountered running:
+    conn = wmi.WMI(moniker='//./root/MSCluster')
+    conn.MSCluster_Cluster
+
+    Also, this should improve performance as well, since it avoids useless
+    recursive calls.
+    """
+
+    return True
+
   def __getattr__ (self, attribute):
     """Offer WMI classes as simple attributes. Pass through any untrapped
     unattribute to the underlying OLE object. This means that new or
