@@ -866,7 +866,7 @@ class _wmi_class(_wmi_object):
             field_list = ", ".join(fields) or "*"
             wql = "SELECT " + field_list + " FROM " + self._class_name
             if where_clause:
-                wql += " WHERE " + " AND ". join(["%s = %r" %(k, str(v)) for k, v in where_clause.items()])
+                wql += " WHERE " + " AND ". join(["%s = %r" % (k, str(v)) for k, v in where_clause.items()])
             return self._namespace.query(wql, self, fields)
         except pywintypes.com_error:
             handle_com_error()
