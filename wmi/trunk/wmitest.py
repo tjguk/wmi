@@ -439,7 +439,7 @@ class TestWatcher (TestWMI):
 
   @staticmethod
   def create (new_letter):
-    print "about to create drive with letter", new_letter
+    #~ print("about to create drive with letter", new_letter)
     here = os.path.dirname (os.path.abspath (__file__))
     win32file.DefineDosDevice (0, new_letter, here)
     try:
@@ -475,12 +475,18 @@ class TestWatcher (TestWMI):
       warnings.warn ("Unable to find a spare drive letter to map.")
       return
 
+    #
+    # This watcher will return *any* logical disk with some activity. To
+    # make sure there is at least some, we'll create a new logical disk
+    # but there's no guarantee that this will be the one returned, as
+    # activity on, eg, the C: drive will be enough to trigger the event.
+    #
     watcher = self.connection.Win32_LogicalDisk.watch_for ()
     t = threading.Timer (2, self.create, (new_letter,))
     t.start ()
     found_disk = watcher (timeout_ms=20000)
     self.assert_ (isinstance (found_disk, wmi._wmi_object))
-    self.assertEqual (found_disk.Caption, new_letter)
+    self.assertEqual(found_disk.path().Class, "Win32_LogicalDisk")
     t.join ()
 
   def test_valid_notification_types (self):

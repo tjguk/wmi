@@ -1,5 +1,5 @@
-"""
-Windows Management Instrumentation (WMI) is Microsoft's answer to
+# -*- coding: utf-8 -*-
+"""Windows Management Instrumentation (WMI) is Microsoft's answer to
 the DMTF's Common Information Model. It allows you to query just
 about any conceivable piece of information from any computer which
 is running the necessary agent and over which have you the
@@ -74,7 +74,16 @@ extensions, but also to Alex Martelli and Roger Upole, whose
 c.l.py postings pointed me in the right direction.
 Thanks especially in release 1.2 to Paul Tiemann for his code
 contributions and robust testing.
+
+Copyright Tim Golden - mail at timgolden.me.uk 2003 - 2015
+
+Licensed under the (GPL-compatible) MIT License:
+
+http://www.opensource.org/licenses/mit-license.php
+
+For change history see CHANGELOG.TXT
 """
+from __future__ import with_statement
 __VERSION__ = __version__ = "1.4.9"
 
 _DEBUG = False
@@ -100,7 +109,7 @@ def signed_to_unsigned (signed):
   return unsigned
 
 class SelfDeprecatingDict (object):
-  """Provides for graceful degradation of objects which
+  """Provide for graceful degradation of objects which
   are currently dictionaries (and therefore accessed via
   `.keys`, `.items`, etc.) into lists. Wraps an existing
   `dict` and allows it to be addressed as a `dict` or as a
@@ -278,11 +287,19 @@ def from_time (year=None, month=None, day=None, hours=None, minutes=None, second
   wmi_time += str_or_stars (seconds, 2)
   wmi_time += "."
   wmi_time += str_or_stars (microseconds, 6)
-  if timezone >= 0:
+  if timezone is None:
     wmi_time += "+"
   else:
-    wmi_time += "-"
-    timezone = abs (timezone)
+    try:
+      int(timezone)
+    except ValueError:
+      wmi_time += "+"
+    else:
+      if timezone >= 0:
+        wmi_time += "+"
+      else:
+        wmi_time += "-"
+        timezone = abs (timezone)
   wmi_time += str_or_stars (timezone, 3)
 
   return wmi_time
@@ -343,6 +360,23 @@ class _wmi_method:
     :param ole_object: The WMI class/instance whose method is to be called
     :param method_name: The name of the method to be called
     """
+    
+    #
+    # FIXME: make use of this function, copied from a defunct branch
+    #
+    def parameter_names (method_parameters):
+      parameter_names = []
+      for param in method_parameters.Properties_:
+        name, is_array = param.Name, param.IsArray
+        datatype = bitmap = None
+        for qualifier in param.Qualifiers_:
+          if qualifier.Name == "CIMTYPE":
+            datatype = qualifier.Value
+          elif qualifier.Name == "BitMap":
+            bitmap = [int (b) for b in qualifier.Value]
+        parameter_names.append ((name, is_array, datatype, bitmap))
+      return parameter_names
+      
     try:
       self.ole_object = Dispatch (ole_object)
       self.method = ole_object.Methods_ (method_name)
@@ -499,6 +533,7 @@ class _wmi_object:
       _set (self, "_properties", self.properties.keys ())
       _set (self, "_methods", self.methods.keys ())
       _set (self, "qualifiers", dict ((q.Name, q.Value) for q in self.ole_object.Qualifiers_))
+      _set (self, "is_association", "Association" in self.qualifiers)
 
     except pywintypes.com_error:
       handle_com_error ()
@@ -516,8 +551,7 @@ class _wmi_object:
       handle_com_error ()
 
   def __repr__ (self):
-    """
-    Indicate both the fact that this is a wrapped WMI object
+    """Indicate both the fact that this is a wrapped WMI object
     and the WMI object's own identifying class.
     """
     try:
@@ -536,8 +570,7 @@ class _wmi_object:
     return self.methods[attribute]
 
   def __getattr__ (self, attribute):
-    """
-    Attempt to pass attribute calls to the proxied COM object.
+    """Attempt to pass attribute calls to the proxied COM object.
     If the attribute is recognised as a property, return its value;
     if it is recognised as a method, return a method wrapper which
     can then be called with parameters; otherwise pass the lookup
@@ -805,7 +838,10 @@ class _wmi_class (_wmi_object):
     name as a header.
     """
     def _to_utf8 (item):
-      return item.encode ("utf8") if isinstance (item, unicode) else str (item)
+      if isinstance(item, unicode):
+        return item.encode("utf-8")
+      else:
+        return str(item)
     if filepath is None:
       filepath = self._class_name + ".csv"
     fields = list (p.Name for p in self.ole_object.Properties_)
