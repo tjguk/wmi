@@ -1159,7 +1159,7 @@ class _wmi_namespace(object):
                 class_name = wmi_class
                 wmi_class = getattr(self, class_name)
             is_extrinsic = "__ExtrinsicEvent" in wmi_class.derivation()
-            fields = set(['TargetInstance'] +(fields or ["*"]))
+            fields = set(['TargetInstance'] + (fields or ["*"]))
             field_list = ", ".join(fields)
             if is_extrinsic:
                 if where_clause:
