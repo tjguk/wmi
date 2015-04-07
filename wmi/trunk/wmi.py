@@ -67,7 +67,7 @@ Typical usage will be::
     for disk in vodev1.Win32_LogicalDisk():
         if disk.DriveType == 3:
             space = 100 * long(disk.FreeSpace) / long(disk.Size)
-            print "%s has %d%% free" %(disk.Name, space)
+            print("%s has %d%% free" %(disk.Name, space))
 
 Many thanks, obviously to Mark Hammond for creating the win32all
 extensions, but also to Alex Martelli and Roger Upole, whose
@@ -103,7 +103,7 @@ def signed_to_unsigned(signed):
     when converting a COM error code to the more conventional
     8-digit hex::
 
-        print "%08X" % signed_to_unsigned(-2147023174)
+        print("%08X" % signed_to_unsigned(-2147023174))
     """
     unsigned, = struct.unpack("L", struct.pack("l", signed))
     return unsigned
@@ -343,7 +343,7 @@ def _set(obj, attribute, value):
     """
     obj.__dict__[attribute] = value
 
-class _wmi_method:
+class _wmi_method(object):
     """A currying sort of wrapper around a WMI method name. It
     abstract's the method's parameters and can be called like
     a normal Python object passing in the parameter values.
@@ -490,7 +490,7 @@ class _wmi_property(object):
 #
 # class _wmi_object
 #
-class _wmi_object:
+class _wmi_object(object):
     """The heart of the WMI module: wraps the objects returned by COM
     ISWbemObject interface and provide readier access to their properties
     and methods resulting in a more Pythonic interface. Not usually
@@ -506,7 +506,7 @@ class _wmi_object:
 
         wmiobj = win32com.client.GetObject("winmgmts:Win32_LogicalDisk.DeviceID='C:'")
         c_drive = wmi._wmi_object(wmiobj)
-        print c_drive
+        print(c_drive)
     """
 
     def __init__(self, ole_object, instance_of=None, fields=[], property_map={}):
@@ -542,7 +542,7 @@ class _wmi_object:
         return self.id < other.id
 
     def __str__(self):
-        """For a call to print [object] return the OLE description
+        """For a call to print([object]) return the OLE description
         of the properties / values of the object
         """
         try:
@@ -684,7 +684,7 @@ class _wmi_object:
         determine the path relative to the parent namespace::
 
             pp0 = wmi.WMI().Win32_ParallelPort()[0]
-            print pp0.path().RelPath
+            print(pp0.path().RelPath)
 
         ..    Do more with this
         """
@@ -698,7 +698,7 @@ class _wmi_object:
         this object, with the most specific object first::
 
             pp0 = wmi.WMI().Win32_ParallelPort()[0]
-            print ' <- '.join(pp0.derivation())
+            print(' <- '.join(pp0.derivation()))
         """
         try:
             return self.ole_object.Derivation_
@@ -733,10 +733,10 @@ class _wmi_object:
             pp = c.Win32_ParallelPort()[0]
 
             for i in pp.associators(wmi_association_class="Win32_PortResource"):
-                print i
+                print(i)
 
             for i in pp.associators(wmi_result_class="Win32_PnPEntity"):
-                print i
+                print(i)
         """
         try:
             return [
@@ -761,10 +761,10 @@ class _wmi_object:
             sp = c.Win32_SerialPort()[0]
 
             for i in sp.references():
-                print i
+                print(i)
 
             for i in sp.references(wmi_class="Win32_SerialPortSetting"):
-                print i
+                print(i)
         """
         #
         # FIXME: Allow an actual class to be passed in, using
@@ -943,7 +943,7 @@ class _wmi_class(_wmi_object):
 #
 # class _wmi_result
 #
-class _wmi_result:
+class _wmi_result(object):
     """Simple, data only result for targeted WMI queries which request
     data only result classes via fetch_as_classes.
     """
@@ -959,7 +959,7 @@ class _wmi_result:
 #
 # class WMI
 #
-class _wmi_namespace:
+class _wmi_namespace(object):
     """A WMI root of a computer system. The classes attribute holds a list
     of the classes on offer. This means you can explore a bit with
     things like this::
@@ -967,7 +967,7 @@ class _wmi_namespace:
         c = wmi.WMI()
         for i in c.classes:
             if "user" in i.lower():
-                print i
+                print(i)
     """
     def __init__(self, namespace, find_classes):
         _set(self, "_namespace", namespace)
@@ -1106,7 +1106,7 @@ class _wmi_namespace:
             watcher = c.watch_for(raw_wql=raw_wql)
             while 1:
                 process_created = watcher()
-                print process_created.Name
+                print(process_created.Name)
 
             # or
 
@@ -1140,14 +1140,14 @@ class _wmi_namespace:
                 except wmi.x_wmi_timed_out:
                     pythoncom.PumpWaitingMessages()
                 else:
-                    print error_log
+                    print(error_log)
 
                 try:
                     warning_log = watcher2(500)
                 except wmi.x_wmi_timed_out:
                     pythoncom.PumpWaitingMessages()
                 else:
-                    print warning_log
+                    print(warning_log)
         """
         if raw_wql:
             wql = raw_wql
@@ -1217,7 +1217,7 @@ class _wmi_namespace:
 #
 # class _wmi_watcher
 #
-class _wmi_watcher:
+class _wmi_watcher(object):
     """Helper class for WMI.watch_for below(qv)"""
 
     _event_property_map = {
@@ -1489,7 +1489,7 @@ def Registry(
 if __name__ == '__main__':
     system = WMI()
     for my_computer in system.Win32_ComputerSystem():
-        print("Disks on", my_computer.Name)
+        print("Disks on %s" % my_computer.Name)
         for disk in system.Win32_LogicalDisk():
-            print(disk.Caption, disk.Description, disk.ProviderName or "")
+            print("%s; %s; %s" % (disk.Caption, disk.Description, disk.ProviderName or ""))
 
