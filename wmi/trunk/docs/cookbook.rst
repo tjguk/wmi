@@ -29,11 +29,11 @@ List all running processes
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for process in c.Win32_Process ():
-    print process.ProcessId, process.Name
+    for process in c.Win32_Process():
+        print(process.ProcessId, process.Name)
 
 
 List all running notepad processes
@@ -41,11 +41,11 @@ List all running notepad processes
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for process in c.Win32_Process (name="notepad.exe"):
-    print process.ProcessId, process.Name
+    for process in c.Win32_Process(name="notepad.exe"):
+        print(process.ProcessId, process.Name)
 
 
 Create and then destroy a new notepad process
@@ -53,14 +53,14 @@ Create and then destroy a new notepad process
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  process_id, return_value = c.Win32_Process.Create (CommandLine="notepad.exe")
-  for process in c.Win32_Process (ProcessId=process_id):
-    print process.ProcessId, process.Name
+    process_id, return_value = c.Win32_Process.Create(CommandLine="notepad.exe")
+    for process in c.Win32_Process(ProcessId=process_id):
+        print(process.ProcessId, process.Name)
 
-  result = process.Terminate ()
+    result = process.Terminate()
 
 
 Show the interface for the .Create method of a Win32_Process class
@@ -72,36 +72,36 @@ The function which is masquerading as the WMI method has a __doc__ value which s
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  print c.Win32_Process.Create
+    print(c.Win32_Process.Create)
 
 Show all automatic services which are not running
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  stopped_services = c.Win32_Service (StartMode="Auto", State="Stopped")
-  if stopped_services:
-    for s in stopped_services:
-      print s.Caption, "service is not running"
-  else:
-    print "No auto services stopped"
+    stopped_services = c.Win32_Service(StartMode="Auto", State="Stopped")
+    if stopped_services:
+        for s in stopped_services:
+            print(s.Caption, "service is not running")
+    else:
+        print "No auto services stopped"
 
 Show the percentage free space for each fixed disk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for disk in c.Win32_LogicalDisk (DriveType=3):
-    print disk.Caption, "%0.2f%% free" % (100.0 * long (disk.FreeSpace) / long (disk.Size))
+    for disk in c.Win32_LogicalDisk(DriveType=3):
+        print(disk.Caption, "%0.2f%% free" % (100.0 * long (disk.FreeSpace) / long (disk.Size)))
 
 Run notepad, wait until it's closed and then show its text
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,40 +117,40 @@ Run notepad, wait until it's closed and then show its text
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  filename = r"c:\temp\temp.txt"
-  process = c.Win32_Process
-  process_id, result = process.Create (CommandLine="notepad.exe " + filename)
-  watcher = c.watch_for (
-    notification_type="Deletion",
-    wmi_class="Win32_Process",
-    delay_secs=1,
-    ProcessId=process_id
-  )
+    filename = r"c:\temp\temp.txt"
+    process = c.Win32_Process
+    process_id, result = process.Create(CommandLine="notepad.exe " + filename)
+    watcher = c.watch_for(
+        notification_type="Deletion",
+        wmi_class="Win32_Process",
+        delay_secs=1,
+        ProcessId=process_id
+    )
 
-  watcher ()
-  print "This is what you wrote:"
-  print open (filename).read ()
+    watcher()
+    print "This is what you wrote:"
+    print open(filename).read()
 
 Watch for new print jobs
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  print_job_watcher = c.Win32_PrintJob.watch_for (
-    notification_type="Creation",
-    delay_secs=1
-  )
+    print_job_watcher = c.Win32_PrintJob.watch_for(
+        notification_type="Creation",
+        delay_secs=1
+    )
 
-  while 1:
-    pj = print_job_watcher ()
-    print "User %s has submitted %d pages to printer %s" % \
-      (pj.Owner, pj.TotalPages, pj.Name)
+    while 1:
+        pj = print_job_watcher()
+        print("User %s has submitted %d pages to printer %s" % \
+        (pj.Owner, pj.TotalPages, pj.Name))
 
 Reboot a remote machine
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,55 +162,55 @@ Reboot a remote machine
 
 ::
 
-  import wmi
-  # other_machine = "machine name of your choice"
-  c = wmi.WMI (computer=other_machine, privileges=["RemoteShutdown"])
+    import wmi
+    # other_machine = "machine name of your choice"
+    c = wmi.WMI(computer=other_machine, privileges=["RemoteShutdown"])
 
-  os = c.Win32_OperatingSystem (Primary=1)[0]
-  os.Reboot ()
+    os = c.Win32_OperatingSystem(Primary=1)[0]
+    os.Reboot()
 
 Show the IP and MAC addresses for IP-enabled network interfaces
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for interface in c.Win32_NetworkAdapterConfiguration (IPEnabled=1):
-    print interface.Description, interface.MACAddress
-    for ip_address in interface.IPAddress:
-      print ip_address
-    print
+    for interface in c.Win32_NetworkAdapterConfiguration(IPEnabled=1):
+        print(interface.Description, interface.MACAddress)
+        for ip_address in interface.IPAddress:
+            print ip_address
+        print()
 
 What's running on startup and from where?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for s in c.Win32_StartupCommand ():
-    print "[%s] %s <%s>" % (s.Location, s.Caption, s.Command)
+    for s in c.Win32_StartupCommand():
+        print("[%s] %s <%s>" % (s.Location, s.Caption, s.Command))
 
 Watch for errors in the event log
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI (privileges=["Security"])
+    import wmi
+    c = wmi.WMI(privileges=["Security"])
 
-  watcher = c.watch_for (
-    notification_type="Creation",
-    wmi_class="Win32_NTLogEvent",
-    Type="error"
-  )
-  while 1:
-    error = watcher ()
-    print "Error in %s log: %s" %  (error.Logfile, error.Message)
-    # send mail to sysadmin etc.
+    watcher = c.watch_for(
+        notification_type="Creation",
+        wmi_class="Win32_NTLogEvent",
+        Type="error"
+    )
+    while 1:
+        error = watcher()
+        print("Error in %s log: %s" % (error.Logfile, error.Message))
+        # send mail to sysadmin etc.
 
 
 List registry keys
@@ -220,103 +220,100 @@ List registry keys
     which was added to the wmi package in its early days. It's exactly equivalent to::
 
       import wmi
-      r = wmi.WMI (namespace="DEFAULT").StdRegProv
+      r = wmi.WMI(namespace="DEFAULT").StdRegProv
 
 ::
 
-  import _winreg
-  import wmi
+    import _winreg
+    import wmi
 
-  r = wmi.Registry ()
-  result, names = r.EnumKey (
-    hDefKey=_winreg.HKEY_LOCAL_MACHINE,
-    sSubKeyName="Software"
-  )
-  for key in names:
-    print key
+    r = wmi.Registry()
+    result, names = r.EnumKey(
+        hDefKey=_winreg.HKEY_LOCAL_MACHINE,
+        sSubKeyName="Software"
+    )
+    for key in names:
+        print key
 
 Add a new registry key
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import _winreg
-  import wmi
+    import _winreg
+    import wmi
 
-  r = wmi.Registry ()
-  result, = r.CreateKey (
-    hDefKey=_winreg.HKEY_LOCAL_MACHINE,
-    sSubKeyName=r"Software\TJG"
-  )
+    r = wmi.Registry()
+    result, = r.CreateKey(
+        hDefKey=_winreg.HKEY_LOCAL_MACHINE,
+        sSubKeyName=r"Software\TJG"
+    )
 
 Add a new registry value
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import _winreg
-  import wmi
+    import _winreg
+    import wmi
 
-  r = wmi.Registry ()
-  result, = r.SetStringValue (
-    hDefKey=_winreg.HKEY_LOCAL_MACHINE,
-    sSubKeyName=r"Software\TJG",
-    sValueName="ApplicationName",
-    sValue="TJG App"
-  )
+    r = wmi.Registry()
+    result, = r.SetStringValue(
+        hDefKey=_winreg.HKEY_LOCAL_MACHINE,
+        sSubKeyName=r"Software\TJG",
+        sValueName="ApplicationName",
+        sValue="TJG App"
+    )
 
 Create a new IIS site
 ~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI (namespace="MicrosoftIISv2")
+    import wmi
+    c = wmi.WMI(namespace="MicrosoftIISv2")
 
-  #
-  # Could as well be achieved by doing:
-  #  web_server = c.IISWebService (Name="W3SVC")[0]
-  #
-  for web_server in c.IIsWebService (Name="W3SVC"):
-    break
+    #
+    # Could as well be achieved by doing:
+    #  web_server = c.IISWebService (Name="W3SVC")[0]
+    #
+    for web_server in c.IIsWebService (Name="W3SVC"):
+        break
 
-  binding = c.new ("ServerBinding")
-  binding.IP = ""
-  binding.Port = "8383"
-  binding.Hostname = ""
-  result, = web_server.CreateNewSite (
-    PathOfRootVirtualDir=r"c:\inetpub\wwwroot",
-    ServerComment="My Web Site",
-    ServerBindings= [binding.ole_object]
-  )
+    binding = c.new("ServerBinding")
+    binding.IP = ""
+    binding.Port = "8383"
+    binding.Hostname = ""
+    result, = web_server.CreateNewSite(
+        PathOfRootVirtualDir=r"c:\inetpub\wwwroot",
+        ServerComment="My Web Site",
+        ServerBindings= [binding.ole_object]
+    )
 
 Show shared drives
 ~~~~~~~~~~~~~~~~~~
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for share in c.Win32_Share ():
-    print share.Name, share.Path
+    for share in c.Win32_Share():
+        print share.Name, share.Path
 
 Show print jobs
 ~~~~~~~~~~~~~~~
 
-..  note::
-    This page at Microsoft is quite a good starting point for handling printer matters with WMI.
-
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for printer in c.Win32_Printer ():
-    print printer.Caption
-    for job in c.Win32_PrintJob (DriverName=printer.DriverName):
-      print "  ", job.Document
-    print
+    for printer in c.Win32_Printer():
+        print(printer.Caption)
+        for job in c.Win32_PrintJob(DriverName=printer.DriverName):
+            print("  ", job.Document)
+        print()
 
 
 Show disk partitions
@@ -324,13 +321,13 @@ Show disk partitions
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  for physical_disk in c.Win32_DiskDrive ():
-    for partition in physical_disk.associators ("Win32_DiskDriveToDiskPartition"):
-      for logical_disk in partition.associators ("Win32_LogicalDiskToPartition"):
-        print physical_disk.Caption, partition.Caption, logical_disk.Caption
+    for physical_disk in c.Win32_DiskDrive():
+        for partition in physical_disk.associators("Win32_DiskDriveToDiskPartition"):
+            for logical_disk in partition.associators("Win32_LogicalDiskToPartition"):
+                print(physical_disk.Caption, partition.Caption, logical_disk.Caption)
 
 
 Install a product
@@ -341,13 +338,13 @@ Install a product
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
+    import wmi
+    c = wmi.WMI()
 
-  c.Win32_Product.Install (
-    PackageLocation="c:/temp/python-2.4.2.msi",
-    AllUsers=False
-  )
+    c.Win32_Product.Install(
+        PackageLocation="c:/temp/python-2.4.2.msi",
+        AllUsers=False
+    )
 
 
 Connect to another machine as a named user
@@ -359,26 +356,26 @@ Connect to another machine as a named user
 
 ::
 
-  import wmi
+    import wmi
 
-  #
-  # Using wmi module before 1.0rc3
-  #
-  connection = wmi.connect_server (
-    server="other_machine",
-    user="tim",
-    password="secret"
-  )
-  c = wmi.WMI (wmi=connection)
+    #
+    # Using wmi module before 1.0rc3
+    #
+    connection = wmi.connect_server(
+        server="other_machine",
+        user="tim",
+        password="secret"
+    )
+    c = wmi.WMI(wmi=connection)
 
-  #
-  # Using wmi module at least 1.0rc3
-  #
-  c = wmi.WMI (
-    computer="other_machine",
-    user="tim",
-    password="secret"
-  )
+    #
+    # Using wmi module at least 1.0rc3
+    #
+    c = wmi.WMI(
+        computer="other_machine",
+        user="tim",
+        password="secret"
+    )
 
 
 Show a method's signature
@@ -386,14 +383,13 @@ Show a method's signature
 
 ::
 
-  import wmi
-  c = wmi.WMI ()
-  for opsys in c.Win32_OperatingSystem ():
-    break
+    import wmi
+    c = wmi.WMI()
+    for opsys in c.Win32_OperatingSystem():
+        break
 
-  print opsys.Reboot
-  print opsys.Shutdown
-
+    print(opsys.Reboot)
+    print(opsys.Shutdown)
 
 
 Schedule a job
@@ -406,19 +402,19 @@ Schedule a job
 
 ::
 
-  import os
-  import wmi
+    import os
+    import wmi
 
-  c = wmi.WMI ()
-  one_minutes_time = datetime.datetime.now () + datetime.timedelta (minutes=1)
-  job_id, result = c.Win32_ScheduledJob.Create (
-    Command=r"cmd.exe /c dir /b c:\ > c:\\temp.txt",
-    StartTime=wmi.from_time (one_minutes_time)
-  )
-  print job_id
+    c = wmi.WMI()
+    one_minutes_time = datetime.datetime.now() + datetime.timedelta(minutes=1)
+    job_id, result = c.Win32_ScheduledJob.Create(
+        Command=r"cmd.exe /c dir /b c:\ > c:\\temp.txt",
+        StartTime=wmi.from_time(one_minutes_time)
+    )
+    print(job_id)
 
-  for line in os.popen ("at"):
-    print line
+    for line in os.popen("at"):
+        print line
 
 
 
@@ -429,17 +425,17 @@ Run a process minimised
 
 ::
 
-  import wmi
+    import wmi
 
-  SW_SHOWMINIMIZED = 1
+    SW_SHOWMINIMIZED = 1
 
-  c = wmi.WMI ()
-  startup = c.Win32_ProcessStartup.new (ShowWindow=SW_SHOWMINIMIZED)
-  pid, result = c.Win32_Process.Create (
-    CommandLine="notepad.exe",
-    ProcessStartupInformation=startup
-  )
-  print pid
+    c = wmi.WMI()
+    startup = c.Win32_ProcessStartup.new(ShowWindow=SW_SHOWMINIMIZED)
+    pid, result = c.Win32_Process.Create(
+        CommandLine="notepad.exe",
+        ProcessStartupInformation=startup
+    )
+    print(pid)
 
 
 Find Drive Types
@@ -447,21 +443,21 @@ Find Drive Types
 
 ::
 
-  import wmi
+    import wmi
 
-  DRIVE_TYPES = {
-    0 : "Unknown",
-    1 : "No Root Directory",
-    2 : "Removable Disk",
-    3 : "Local Disk",
-    4 : "Network Drive",
-    5 : "Compact Disc",
-    6 : "RAM Disk"
-  }
+    DRIVE_TYPES = {
+        0 : "Unknown",
+        1 : "No Root Directory",
+        2 : "Removable Disk",
+        3 : "Local Disk",
+        4 : "Network Drive",
+        5 : "Compact Disc",
+        6 : "RAM Disk"
+    }
 
-  c = wmi.WMI ()
-  for drive in c.Win32_LogicalDisk ():
-    print drive.Caption, DRIVE_TYPES[drive.DriveType]
+    c = wmi.WMI()
+    for drive in c.Win32_LogicalDisk():
+        print(drive.Caption, DRIVE_TYPES[drive.DriveType])
 
 
 List Namespaces
@@ -469,15 +465,15 @@ List Namespaces
 
 ::
 
-  import wmi
+    import wmi
 
-  def enumerate_namespaces (namespace=u"root", level=0):
-    print level * "  ", namespace.split ("/")[-1]
-    c = wmi.WMI (namespace=namespace)
-    for subnamespace in c.__NAMESPACE ():
-      enumerate_namespaces (namespace + "/" + subnamespace.Name, level + 1)
+    def enumerate_namespaces(namespace=u"root", level=0):
+        print level * "  ", namespace.split ("/")[-1]
+        c = wmi.WMI(namespace=namespace)
+        for subnamespace in c.__NAMESPACE():
+            enumerate_namespaces(namespace + "/" + subnamespace.Name, level + 1)
 
-  enumerate_namespaces ()
+    enumerate_namespaces()
 
 
 Use WMI in a thread
@@ -490,32 +486,32 @@ Use WMI in a thread
 
 ::
 
-  import pythoncom
-  import wmi
-  import threading
-  import time
+    import pythoncom
+    import wmi
+    import threading
+    import time
 
-  class Info (threading.Thread):
-    def __init__ (self):
-      threading.Thread.__init__ (self)
-    def run (self):
-      print 'In Another Thread...'
-      pythoncom.CoInitialize ()
-      try:
-        c = wmi.WMI ()
-        for i in range (5):
-          for process in c.Win32_Process ():
-            print process.ProcessId, process.Name
-          time.sleep (2)
-      finally:
-        pythoncom.CoUninitialize ()
+    class Info(threading.Thread):
+        def __init__(self):
+            threading.Thread.__init__(self)
+        def run(self):
+            print('In Another Thread...')
+            pythoncom.CoInitialize()
+            try:
+                c = wmi.WMI()
+                for i in range(5):
+                    for process in c.Win32_Process():
+                        print process.ProcessId, process.Name
+                    time.sleep(2)
+            finally:
+                pythoncom.CoUninitialize()
 
-  if __name__ == '__main__':
-    print 'In Main Thread'
-    c = wmi.WMI ()
-    for process in c.Win32_Process ():
-      print process.ProcessId, process.Name
-    Info ().start ()
+    if __name__ == '__main__':
+        print('In Main Thread')
+        c = wmi.WMI()
+        for process in c.Win32_Process():
+            print(process.ProcessId, process.Name)
+        Info().start()
 
 
 Monitor multiple machines for power events
@@ -532,56 +528,56 @@ multiple machines was just a practical example of using threads.
 
 ::
 
-  import pythoncom
-  import wmi
-  import threading
-  import Queue
+    import pythoncom
+    import wmi
+    import threading
+    import Queue
 
-  class Server (threading.Thread):
+    class Server(threading.Thread):
 
-    def __init__ (self, results, server, user, password):
-      threading.Thread.__init__ (self)
-      self.results = results
-      self.server = server
-      self.user = user
-      self.password = password
-      self.setDaemon (True)
+        def __init__(self, results, server, user, password):
+            threading.Thread.__init__(self)
+            self.results = results
+            self.server = server
+            self.user = user
+            self.password = password
+            self.setDaemon(True)
 
-    def run (self):
-      pythoncom.CoInitialize ()
-      try:
-        #
-        # If you don't want to use explicit logons, remove
-        # the user= and password= params here and ensure
-        # that the user running *this* script has sufficient
-        # privs on the remote machines.
-        #
-        c = wmi.WMI (self.server, user=self.user, password=self.password)
-        power_watcher = c.Win32_PowerManagementEvent.watch_for ()
+        def run(self):
+            pythoncom.CoInitialize()
+            try:
+                #
+                # If you don't want to use explicit logons, remove
+                # the user= and password= params here and ensure
+                # that the user running *this* script has sufficient
+                # privs on the remote machines.
+                #
+                c = wmi.WMI(self.server, user=self.user, password=self.password)
+                power_watcher = c.Win32_PowerManagementEvent.watch_for()
+                while True:
+                    self.results.put((self.server, power_watcher()))
+            finally:
+                pythoncom.CoUninitialize()
+
+    #
+    # Obviously, change these to match the machines
+    # in your network which probably won't be named
+    # after Harry Potter characters. And which hopefully
+    # use a less obvious admin password.
+    #
+    servers = [
+        ("goyle", "administrator", "secret"),
+        ("malfoy", "administrator", "secret")
+    ]
+    if __name__ == '__main__':
+        power_events = Queue.Queue()
+        for server, user, password in servers:
+            print("Watching for", server)
+            Server(power_events, server, user, password).start()
+
         while True:
-          self.results.put ((self.server, power_watcher ()))
-      finally:
-        pythoncom.CoUninitialize ()
-
-  #
-  # Obviously, change these to match the machines
-  # in your network which probably won't be named
-  # after Harry Potter characters. And which hopefully
-  # use a less obvious admin password.
-  #
-  servers = [
-    ("goyle", "administrator", "secret"),
-    ("malfoy", "administrator", "secret")
-  ]
-  if __name__ == '__main__':
-    power_events = Queue.Queue ()
-    for server, user, password in servers:
-      print "Watching for", server
-      Server (power_events, server, user, password).start ()
-
-    while True:
-      server, power_event = power_events.get ()
-      print server, "=>", power_event.EventType
+            server, power_event = power_events.get()
+            print(server, "=>", power_event.EventType)
 
 
 Find the current wallpaper
@@ -589,13 +585,14 @@ Find the current wallpaper
 
 ::
 
-  import wmi
-  import win32api
-  import win32con
+    import wmi
+    import win32api
+    import win32con
 
-  c = wmi.WMI ()
-  full_username = win32api.GetUserNameEx (win32con.NameSamCompatible)
-  for desktop in c.Win32_Desktop (Name=full_username):
-    print \
-      desktop.Wallpaper or "[No Wallpaper]", \
-      desktop.WallpaperStretched, desktop.WallpaperTiled
+    c = wmi.WMI()
+    full_username = win32api.GetUserNameEx(win32con.NameSamCompatible)
+    for desktop in c.Win32_Desktop(Name=full_username):
+        print(
+            desktop.Wallpaper or "[No Wallpaper]",
+            desktop.WallpaperStretched, desktop.WallpaperTiled
+        )

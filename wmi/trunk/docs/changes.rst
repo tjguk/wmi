@@ -8,6 +8,8 @@ Changes
 
 * Drop support for Python 2.4. Supported versions are now: 2.5+ and 3.x
 
+* PEP8 compliance
+
 1.4
 ---
 
