@@ -360,7 +360,7 @@ class _wmi_method(object):
         :param ole_object: The WMI class/instance whose method is to be called
         :param method_name: The name of the method to be called
         """
-        
+
         #
         # FIXME: make use of this function, copied from a defunct branch
         #
@@ -376,7 +376,7 @@ class _wmi_method(object):
                         bitmap = [int(b) for b in qualifier.Value]
                 parameter_names.append((name, is_array, datatype, bitmap))
             return parameter_names
-            
+
         try:
             self.ole_object = Dispatch(ole_object)
             self.method = ole_object.Methods_(method_name)
@@ -1193,7 +1193,7 @@ class _wmi_namespace(object):
         #
         # Don't try to match against known classes as was previously
         # done since the list may not have been requested
-        #(find_classes=False).
+        # (find_classes=False).
         #
         try:
             return self._cached_classes(attribute)

@@ -7,7 +7,7 @@ From the Wikipedia entry for WMI:
 
   Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
   operating system interface through which instrumented components can provide information and notification. WMI is
-  Microsoft's implementation of the Web-Based Enterprise Management(WBEM) Standard from the Distributed Management
+  Microsoft's implementation of the Web-Based Enterprise Management (WBEM) Standard from the Distributed Management
   Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
   servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows
   Me, and Windows 2000.
@@ -48,7 +48,7 @@ determining which WMI class to interrogate and then treating that as an attribut
     import wmi
     c = wmi.WMI()
     for os in c.Win32_OperatingSystem():
-        print os.Caption
+        print(os.Caption)
 
 The "which WMI class to interrogate" part of that earlier sentence is not always so easy as it sounds. However,
 with a good search engine at your disposal, you can be pretty much assured that someone somewhere has done the same
@@ -71,7 +71,7 @@ module makes the difference as transparent as it can. Say you wanted to track ne
     process_watcher = c.Win32_Process.watch_for("creation")
     while True:
         new_process = process_watcher()
-        print new_process.Caption
+        print(new_process.Caption)
 
 
 Note that you must pass one of "creation", "deletion", "modification" or "operation" to the .watch_for method. If
@@ -105,12 +105,12 @@ to stop the (running) RunAs service, whose short name is "seclogon"::
     for service in c.Win32_Service(Name="seclogon"):
         result, = service.StopService()
         if result == 0:
-            print "Service", service.Name, "stopped"
+            print("Service", service.Name, "stopped")
         else:
-            print "Some problem"
+            print("Some problem")
         break
     else:
-        print "Service not found"
+        print("Service not found")
 
 
 Advanced Stuff
@@ -154,7 +154,7 @@ Connecting to a particular namespace
 
 WMI classes are organised into a namespace hierarchy. The majority of the useful ones are under the cimv2
 namespace, which is the default. But add-on providers may supply extra namespaces, for example MicrosoftIISv2 or
-DEFAULT/StdRegProv. To use a different namespace from the default(which is, incidentally, not the one named
+DEFAULT/StdRegProv. To use a different namespace from the default (which is, incidentally, not the one named
 default!) specify it via the namespace parameter. All namespaces are assumed to start from root so it need not be
 specified, although if you want to specify the root namespace itself, you can do::
 
@@ -209,7 +209,7 @@ the resulting list is only one element long, it is still a list. To find all fix
     import wmi
     c = wmi.WMI()
     for disk in c.Win32_LogicalDisk(DriveType=3):
-        print disk
+        print(disk)
 
 
 Selecting only certain fields
@@ -223,7 +223,7 @@ will always be returned::
     import wmi
     c = wmi.WMI()
     for disk in c.Win32_LogicalDisk(["Caption", "Description"], DriveType=3):
-        print disk
+        print(disk)
 
 
 Performing arbitrary WQL queries
@@ -236,7 +236,7 @@ the namespace. To list all non-fixed disks, for example::
     c = wmi.WMI()
     wql = "SELECT Caption, Description FROM Win32_LogicalDisk WHERE DriveType <> 3"
     for disk in c.query(wql):
-        print disk
+        print(disk)
 
 
 Advanced Monitoring
@@ -259,7 +259,7 @@ To watch an event log for errors, say::
     watcher = c.Win32_NTLogEvent.watch_for("creation", 2, Type="error")
     while 1:
         error = watcher()
-        print "Error in %s log: %s" % (error.Logfile, error.Message)
+        print("Error in %s log: %s" % (error.Logfile, error.Message))
         # send mail to sysadmin etc.
 
 A caveat here: this is polling, and at the frequency you've specified. It is possible to miss events this way.
@@ -278,14 +278,14 @@ classes are extrinsic events by examining their derivation and looking for `__Ex
 
     import wmi
     c = wmi.WMI()
-    print c.Win32_PowerManagementEvent.derivation()
+    print(c.Win32_PowerManagementEvent.derivation())
 
 Alternatively, you can go top down and look for subclasses of __ExtrinsicEvent::
 
     import wmi
     c = wmi.WMI()
     for i in c.subclasses_of("__ExtrinsicEvent"):
-        print i
+        print(i)
 
 You use extrinsic events in much the same way as intrinsic ones. The difference is that any event type and delay
 are ignored since WMI isn't polling on your behalf, but waiting on the underlying subsystem. The return from the
@@ -298,7 +298,7 @@ you wanted to do something whenever your computer came out of standby, eg to not
     watcher = c.Win32_PowerManagementEvent.watch_for(EventType=7)
     while True:
         event = watcher()
-        print "resumed"
+        print("resumed")
         #
         # Number of 100-ns intervals since 1st Jan 1601!
         # TIME_CREATED doesn't seem to be provided on Win2K
@@ -307,7 +307,7 @@ you wanted to do something whenever your computer came out of standby, eg to not
             ns100 = int(event.TIME_CREATED)
             offset = datetime.timedelta(microseconds=ns100 / 10)
             base = datetime.datetime(1601, 1, 1)
-            print "Resumed at", base    + offset
+            print("Resumed at", base    + offset)
 
 For an intrinsic modification event, you could compare the before and after values of the trigger instance::
 
@@ -315,18 +315,18 @@ For an intrinsic modification event, you could compare the before and after valu
     c = wmi.WMI()
     watcher = c.Win32_Process.watch_for("modification")
     event = watcher()
-    print "Modification occurred at", event.timestamp
+    print("Modification occurred at", event.timestamp)
 
-    print event.path()
+    print(event.path())
     prev = event.previous
     curr = event
     for p in prev.properties:
         pprev = getattr(prev, p)
         pcurr = getattr(curr, p)
         if pprev != pcurr:
-            print p
-            print "    Previous:", pprev
-            print "     Current:", pcurr
+            print(p)
+            print("    Previous:", pprev)
+            print("     Current:", pcurr)
 
 Watchers with timeouts
 **********************
@@ -338,15 +338,15 @@ without getting into threading and queues::
     import wmi
 
     def wmi_connection(server, username, password):
-        print "attempting connection with", server
+        print("attempting connection with", server)
         if username:
             return wmi.WMI(server, user=username, password=password)
         else:
             return wmi.WMI(server)
 
     servers = [
-     (".", "", ""),
-     ("goyle", "wmiuser", "secret")
+        (".", "", ""),
+        ("goyle", "wmiuser", "secret")
     ]
     watchers = {}
     for server, username, password in servers:
@@ -360,8 +360,8 @@ without getting into threading and queues::
             except wmi.x_wmi_timed_out:
                 pass
             else:
-                print "print job added on", server
-                print event
+                print("print job added on", server)
+                print(event)
 
 More About Methods
 ~~~~~~~~~~~~~~~~~~
@@ -387,7 +387,7 @@ additional privileges, this is also indicated::
     os = c.Win32_OperatingSystem
     for method_name in os.methods:
         method = getattr(os, method_name)
-        print method
+        print(method)
 
 
 Note that if a parameter is expected to be a list it will be suffixed with "[]". Note also that the return values
@@ -402,7 +402,7 @@ covers when you call a WMI method (not, unfortunately, for a property). This is 
 
     import wmi
     c = wmi.WMI()
-    print c.Win32_Process.Create.provenance
+    print(c.Win32_Process.Create.provenance)
 
 More Advanced Topics: Bits & Pieces
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -421,9 +421,9 @@ In fact, most of the classes which allow instance creation via WMI offer a
     c = wmi.WMI()
     result, = c.Win32_Share.Create(Path="c:\\temp", Name="temp", Type=0)
     if result == 0:
-        print "Share created successfully"
+        print("Share created successfully")
     else:
-        raise RuntimeError, "Problem creating share: %d" % result
+        raise RuntimeError("Problem creating share: %d" % result)
 
 The times you will need to spawn a new instance are when you need to feed one WMI object with another created on
 the fly. Typical examples are passing security descriptors to new objects or process startup information to a new
@@ -445,9 +445,9 @@ process. This example from MSDN can be translated into Python as follows::
         ProcessStartupInformation=process_startup
     )
     if result == 0:
-        print "Process started successfully: %d" % process_id
+        print("Process started successfully: %d" % process_id)
     else:
-        raise RuntimeError, "Problem creating process: %d" % result
+        raise RuntimeError("Problem creating process: %d" % result)
 
 
 WMI Classes/Objects
@@ -460,9 +460,9 @@ Each class and object will return a readable version of its structure when rende
 
     import wmi
     c = wmi.WMI()
-    print c.Win32_OperatingSystem
+    print(c.Win32_OperatingSystem)
     for os in c.Win32_OperatingSystem():
-        print os
+        print(os)
 
 The object hierarchy
 ********************
@@ -471,7 +471,7 @@ WMI objects occur within a hierarchy of classes. Each object knows its own ances
 
     import wmi
     c = wmi.WMI()
-    print c.Win32_Process.derivation()
+    print(c.Win32_Process.derivation())
 
 You can also look down the tree by finding all the subclasses of a named class, optionally filtering via a regex.
 To find all extrinsic event classes other than the builtin ones (indicated by a leading underscore)::
@@ -479,8 +479,8 @@ To find all extrinsic event classes other than the builtin ones (indicated by a 
     import wmi
     c = wmi.WMI()
     for extrinsic_event in c.subclasses_of("__ExtrinsicEvent", "[^_].*"):
-        print extrinsic_event
-        print "    ", " < ".join(getattr(c, extrinsic_event).derivation())
+        print(extrinsic_event)
+        print("    ", " < ".join(getattr(c, extrinsic_event).derivation()))
 
 Comparing two WMI objects for equality
 **************************************
@@ -499,9 +499,9 @@ your system, and which users are in each group::
     c = wmi.WMI()
 
     for group in c.Win32_Group():
-        print group.Caption
+        print(group.Caption)
         for user in group.associators(wmi_result_class="Win32_UserAccount"):
-            print "    ", user.Caption
+            print("    ", user.Caption)
 
 which can also be written in terms of the associator classes::
 
@@ -509,9 +509,9 @@ which can also be written in terms of the associator classes::
     c = wmi.WMI()
 
     for group in c.Win32_Group():
-        print group.Caption
+        print(group.Caption)
         for user in group.associators("Win32_GroupUser"):
-            print "    ", user.Caption
+            print("    ", user.Caption)
 
 ..  versionadded:: 1.3.1
     The :meth:`_wmi_object.associators` method will convert its results to
@@ -523,7 +523,7 @@ Caveats, Troubleshooting and Performance
 Speeding things up
 ******************
 
-Thanks to a useful collaboration last summer with Paul Tiemann, the module was able to speed things up considerably
+Thanks to a useful collaboration one summer with Paul Tiemann, the module was able to speed things up considerably
 if needed with a combination of caching and lightweight calls where needed. Not all of that is covered here, but
 the most straightforward improvements combine removing runtime introspection and caching so that wrappers are
 generated only on demand and can be pre-cached.
@@ -576,7 +576,7 @@ for performance or other realtime data in classes such as `Win32_Process`::
     import wmi
     c = wmi.WMI(find_classes=False)
     for i in c.Win32_Process(["Caption", "ProcessID"]):
-        print i
+        print(i)
 
 Security
 ~~~~~~~~
@@ -631,22 +631,22 @@ you instantiate a WMI object within a thread and then uninitializing afterwards:
         def __init__(self):
             threading.Thread.__init__(self)
         def run(self):
-            print 'In Another Thread...'
+            print('In Another Thread...')
             pythoncom.CoInitialize()
             try:
                 c = wmi.WMI()
                 for i in range(5):
                     for process in c.Win32_Process():
-                        print process.ProcessId, process.Name
+                        print(process.ProcessId, process.Name)
                     time.sleep(2)
             finally:
                 pythoncom.CoUninitialize()
 
     if __name__ == '__main__':
-        print 'In Main Thread'
+        print('In Main Thread')
         c = wmi.WMI()
         for process in c.Win32_Process():
-            print process.ProcessId, process.Name
+            print(process.ProcessId, process.Name)
         Info().start()
 
 ..  versionadded:: 1.4.1

@@ -7,7 +7,7 @@ From the Wikipedia entry for WMI:
 
   Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
   operating system interface through which instrumented components can provide information and notification. WMI is
-  Microsoft's implementation of the Web-Based Enterprise Management(WBEM) Standard from the Distributed Management
+  Microsoft's implementation of the Web-Based Enterprise Management (WBEM) Standard from the Distributed Management
   Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
   servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows
   Me, and Windows 2000.
@@ -154,7 +154,7 @@ Connecting to a particular namespace
 
 WMI classes are organised into a namespace hierarchy. The majority of the useful ones are under the cimv2
 namespace, which is the default. But add-on providers may supply extra namespaces, for example MicrosoftIISv2 or
-DEFAULT/StdRegProv. To use a different namespace from the default(which is, incidentally, not the one named
+DEFAULT/StdRegProv. To use a different namespace from the default (which is, incidentally, not the one named
 default!) specify it via the namespace parameter. All namespaces are assumed to start from root so it need not be
 specified, although if you want to specify the root namespace itself, you can do::
 
@@ -345,8 +345,8 @@ without getting into threading and queues::
             return wmi.WMI(server)
 
     servers = [
-     (".", "", ""),
-     ("goyle", "wmiuser", "secret")
+        (".", "", ""),
+        ("goyle", "wmiuser", "secret")
     ]
     watchers = {}
     for server, username, password in servers:
@@ -523,7 +523,7 @@ Caveats, Troubleshooting and Performance
 Speeding things up
 ******************
 
-Thanks to a useful collaboration last summer with Paul Tiemann, the module was able to speed things up considerably
+Thanks to a useful collaboration one summer with Paul Tiemann, the module was able to speed things up considerably
 if needed with a combination of caching and lightweight calls where needed. Not all of that is covered here, but
 the most straightforward improvements combine removing runtime introspection and caching so that wrappers are
 generated only on demand and can be pre-cached.

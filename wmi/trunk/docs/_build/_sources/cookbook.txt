@@ -13,11 +13,11 @@ To connect to a remote machine, simply specify the remote machine name in the WM
 of DCOM, all should be well::
 
    import wmi
-   c = wmi.WMI ("some_other_machine")
+   c = wmi.WMI("some_other_machine")
 
 ..  note::
     The examples are designed to be complete and can be cut-and-pasted straight into a .py file, or
-    even onto an open Python interpreter window (at least running under CMD on Win2000; that's how I test them). Just
+    even onto an open Python interpreter window (that's how I test them). Just
     select the code, including the final blank line, right-click [Copy], select your Python interpreter window, and
     right-click.
 
@@ -101,7 +101,7 @@ Show the percentage free space for each fixed disk
     c = wmi.WMI()
 
     for disk in c.Win32_LogicalDisk(DriveType=3):
-        print(disk.Caption, "%0.2f%% free" % (100.0 * long (disk.FreeSpace) / long (disk.Size)))
+        print(disk.Caption, "%0.2f%% free" % (100.0 * long(disk.FreeSpace) / long(disk.Size)))
 
 Run notepad, wait until it's closed and then show its text
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -275,9 +275,9 @@ Create a new IIS site
 
     #
     # Could as well be achieved by doing:
-    #  web_server = c.IISWebService (Name="W3SVC")[0]
+    #  web_server = c.IISWebService(Name="W3SVC")[0]
     #
-    for web_server in c.IIsWebService (Name="W3SVC"):
+    for web_server in c.IIsWebService(Name="W3SVC"):
         break
 
     binding = c.new("ServerBinding")
@@ -468,7 +468,7 @@ List Namespaces
     import wmi
 
     def enumerate_namespaces(namespace=u"root", level=0):
-        print level * "  ", namespace.split ("/")[-1]
+        print level * "  ", namespace.split("/")[-1]
         c = wmi.WMI(namespace=namespace)
         for subnamespace in c.__NAMESPACE():
             enumerate_namespaces(namespace + "/" + subnamespace.Name, level + 1)
