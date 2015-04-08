@@ -614,7 +614,7 @@ class _wmi_object(object):
 
     def __eq__(self, other):
         try:
-            return self.ole_object.CompareTo(other.ole_object)
+            return self.ole_object.CompareTo_(other.ole_object)
         except AttributeError:
             return False
 
