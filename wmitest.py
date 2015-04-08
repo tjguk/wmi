@@ -35,6 +35,10 @@ import threading
 import time
 import unittest
 import warnings
+try:
+    import _winreg
+except ImportError:
+    import winreg as _winreg
 
 import pythoncom
 import win32api
@@ -721,6 +725,14 @@ class TestAssociations(TestWMI):
                     assert False, "Error getting %s from %s" % (p, q)
             else:
                 assert True
+
+class TestDatatypes(TestWMI):
+
+    def test_uint32(self):
+        "Test that a uint32 can be to a WMI method"
+        registry = wmi.WMI(namespace="DEFAULT").StdRegProv
+        result, names = registry.EnumKey(_winreg.HKEY_LOCAL_MACHINE, "Software")
+        self.assertEquals(result, 0)
 
 if __name__ == '__main__':
     unittest.main()
