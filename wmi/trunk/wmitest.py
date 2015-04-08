@@ -654,6 +654,12 @@ class TestInstances(TestWMI):
         "Ensure instances compare equal"
         self.assertEqual(self.logical_disks, self.logical_disks)
 
+    def test_not_equal_to_anything_else(self):
+        "Ensure WMI instances are not equal to non-WMI instances"
+        for d in self.logical_disks:
+            break
+        self.assertNotEqual(d, d.Caption)
+
     def test_sortable(self):
         "Ensure instances sort by full path/key"
         self.assertEqual(

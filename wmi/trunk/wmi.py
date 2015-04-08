@@ -613,7 +613,10 @@ class _wmi_object(object):
             handle_com_error()
 
     def __eq__(self, other):
-        return self.id == other.id
+        try:
+            return self.ole_object.CompareTo(other.ole_object)
+        except AttributeError:
+            return False
 
     def __hash__(self):
         return hash(self.id)
