@@ -559,7 +559,8 @@ class TestMethods(TestWMI):
             self.connection.Win32_ProcessStartup.new(ShowWindow=0)
         )
         time.sleep(0.5)
-        self.assertEqual(open(os.path.join(dir, filename)).read(), contents + " \n")
+        with open(os.path.join(dir, filename)) as f:
+            self.assertEqual(f.read(), contents + " \n")
 
     def test_named_params(self):
         dir = tempfile.mkdtemp()
@@ -571,7 +572,8 @@ class TestMethods(TestWMI):
             CommandLine="cmd /c echo %s > %s" %(contents, filename)
         )
         time.sleep(0.5)
-        self.assertEqual(open(os.path.join(dir, filename)).read(), contents + " \n")
+        with open(os.path.join(dir, filename)) as f:
+            self.assertEqual(f.read(), contents + " \n")
 
     def test_in_params_with_array(self):
         "Check that the names and arrayness of params are picked up when arrays"
@@ -725,14 +727,6 @@ class TestAssociations(TestWMI):
                     assert False, "Error getting %s from %s" % (p, q)
             else:
                 assert True
-
-class TestDatatypes(TestWMI):
-
-    def test_uint32(self):
-        "Test that a uint32 can be to a WMI method"
-        registry = wmi.WMI(namespace="DEFAULT").StdRegProv
-        result, names = registry.EnumKey(_winreg.HKEY_LOCAL_MACHINE, "Software")
-        self.assertEquals(result, 0)
 
 if __name__ == '__main__':
     unittest.main()
