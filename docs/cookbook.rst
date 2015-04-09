@@ -224,12 +224,12 @@ List registry keys
 
 ::
 
-    import _winreg
+    import win32con
     import wmi
 
     r = wmi.Registry()
     result, names = r.EnumKey(
-        hDefKey=_winreg.HKEY_LOCAL_MACHINE,
+        hDefKey=win32con.HKEY_LOCAL_MACHINE,
         sSubKeyName="Software"
     )
     for key in names:
@@ -240,12 +240,12 @@ Add a new registry key
 
 ::
 
-    import _winreg
+    import win32con
     import wmi
 
     r = wmi.Registry()
     result, = r.CreateKey(
-        hDefKey=_winreg.HKEY_LOCAL_MACHINE,
+        hDefKey=win32con.HKEY_LOCAL_MACHINE,
         sSubKeyName=r"Software\TJG"
     )
 
@@ -254,12 +254,12 @@ Add a new registry value
 
 ::
 
-    import _winreg
+    import win32con
     import wmi
 
     r = wmi.Registry()
     result, = r.SetStringValue(
-        hDefKey=_winreg.HKEY_LOCAL_MACHINE,
+        hDefKey=win32con.HKEY_LOCAL_MACHINE,
         sSubKeyName=r"Software\TJG",
         sValueName="ApplicationName",
         sValue="TJG App"

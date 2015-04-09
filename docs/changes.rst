@@ -10,6 +10,10 @@ Changes
 
 * PEP8 compliance
 
+* Switch back to a home-brewed equality check which can also support hashing.
+  The CompareTo method doesn't appear to consider equal two instances of the
+  same operating system!
+
 1.4
 ---
 

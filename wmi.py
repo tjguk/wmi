@@ -9,18 +9,18 @@ Since the COM implementation doesn't give much away to Python
 programmers, I've wrapped it in some lightweight classes with
 some getattr / setattr magic to ease the way. In particular:
 
-* The :class:`_wmi_namespace` object itself will determine its classes
+*   The :class:`_wmi_namespace` object itself will determine its classes
     and allow you to return all instances of any of them by
     using its name as an attribute::
 
         disks = wmi.WMI().Win32_LogicalDisk()
 
-* In addition, you can specify what would become the WHERE clause
+*   In addition, you can specify what would become the WHERE clause
     as keyword parameters::
 
         fixed_disks = wmi.WMI().Win32_LogicalDisk(DriveType=3)
 
-* The objects returned by a WMI lookup are wrapped in a Python
+*   The objects returned by a WMI lookup are wrapped in a Python
     class which determines their methods and classes and allows
     you to access them as though they were Python classes. The
     methods only allow named parameters::
@@ -28,13 +28,13 @@ some getattr / setattr magic to ease the way. In particular:
         for p in wmi.WMI().Win32_Process(Name="notepad.exe"):
             p.Terminate(Result=1)
 
-* Doing a print on one of the WMI objects will result in its
+*   Doing a print on one of the WMI objects will result in its
     `GetObjectText\_` method being called, which usually produces
     a meaningful printout of current values.
     The repr of the object will include its full WMI path,
     which lets you get directly to it if you need to.
 
-* You can get the associators and references of an object as
+*   You can get the associators and references of an object as
     a list of python objects by calling the associators() and
     references() methods on a WMI Python object::
 
@@ -47,14 +47,14 @@ some getattr / setattr magic to ease the way. In particular:
             take all day and kill your machine!
 
 
-* WMI classes (as opposed to instances) are first-class
+*   WMI classes (as opposed to instances) are first-class
     objects, so you can get hold of a class, and call
     its methods or set up a watch against it::
 
         process = wmi.WMI().Win32_Process
         process.Create(CommandLine="notepad.exe")
 
-* To make it easier to use in embedded systems and py2exe-style
+*   To make it easier to use in embedded systems and py2exe-style
     executable wrappers, the module will not force early Dispatch.
     To do this, it uses a handy hack by Thomas Heller for easy access
     to constants.
@@ -614,7 +614,7 @@ class _wmi_object(object):
 
     def __eq__(self, other):
         try:
-            return self.ole_object.CompareTo_(other.ole_object)
+            return self.id == other.id
         except AttributeError:
             return False
 
