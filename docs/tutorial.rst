@@ -5,10 +5,10 @@ Introduction
 ------------
 From the Wikipedia entry for WMI:
 
-  Windows Management Instrumentation(WMI) is a set of extensions to the Windows Driver Model that provides an
+  Windows Management Instrumentation (WMI) is a set of extensions to the Windows Driver Model that provides an
   operating system interface through which instrumented components can provide information and notification. WMI is
   Microsoft's implementation of the Web-Based Enterprise Management (WBEM) Standard from the Distributed Management
-  Task Force(DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
+  Task Force (DMTF). WMI allows scripting languages like VBScript to manage Microsoft Windows personal computers and
   servers, both locally and remotely. WMI is preinstalled in Windows Vista, Windows Server 2003, Windows XP, Windows
   Me, and Windows 2000.
 
@@ -123,7 +123,7 @@ somewhere on the web and thinking "How do I do this in Python?".
 Advanced Connecting
 ~~~~~~~~~~~~~~~~~~~
 
-The .connect function(aliased as .WMI) has quite a few parameters, most of which are optional and can safely be
+The .connect function (aliased as .WMI) has quite a few parameters, most of which are optional and can safely be
 ignored. For the majority of them, I would refer you to the MS documentation on WMI monikers into which they slot
 fairly straightforwardly. We will introduce here a few of the more common requirements.
 
