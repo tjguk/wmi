@@ -1,6 +1,6 @@
 import os
 import re
-from distutils.core import setup
+from setuptools import setup
 
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -13,25 +13,59 @@ classifiers = [
     'Topic :: System :: Systems Administration'
 ]
 
-HERE = os.path.dirname(__file__)
-#
-# Slight hack to avoid importing the module
-# when setup is run
-#
-wmi_filepath = os.path.join(HERE, "wmi.py")
-version = re.search(r'__version__ = "([a-z0-9\.]+)"', open(wmi_filepath).read()).group(1)
+base_dir = os.path.dirname(__file__)
 
-setup (
-    name = "WMI",
-    version = version,
-    description = "Windows Management Instrumentation",
-    author = "Tim Golden",
-    author_email = "mail@timgolden.me.uk",
-    url = "http://timgolden.me.uk/python/wmi.html",
-    license = "http://www.opensource.org/licenses/mit-license.php",
-    py_modules = ["wmi"],
-    scripts = ["wmitest.py", "wmiweb.py", "wmitest.cmd", "wmitest.master.ini"],
-    data_files = ["readme.rst"],
-    long_description = open(os.path.join(HERE, "readme.rst")).read()
+DUNDER_ASSIGN_RE = re.compile(r"""^__\w+__\s*=\s*['"].+['"]$""")
+about = {}
+with open(os.path.join(base_dir, "wmi.py"), encoding="utf8") as f:
+    for line in f:
+        if DUNDER_ASSIGN_RE.search(line):
+            exec(line, about)
+changes = ""
+
+TO_STRIP = set([":class:", ":mod:", ":meth:", ":func:", ":doc:"])
+with open(os.path.join(base_dir, "README.rst"), encoding="utf8") as f:
+    readme = f.read()
+    for s in TO_STRIP:
+        readme = readme.replace(s, "")
+
+
+install_requires = [
+    "pywin32"
+]
+extras_require = {
+    "tests": [
+        "pytest",
+    ],
+    "docs": ["sphinx"],
+    "package": [
+        # Wheel building and PyPI uploading
+        "wheel",
+        "twine",
+    ],
+}
+extras_require["dev"] = (
+    extras_require["tests"]
+    + extras_require["docs"]
+    + extras_require["package"]
+)
+extras_require["all"] = list(
+    {req for extra, reqs in extras_require.items() for req in reqs}
 )
 
+setup (
+    name=about["__title__"],
+    version=about["__version__"],
+    description=about["__description__"],
+    long_description="{}\n\n{}".format(readme, changes),
+    long_description_content_type = "text/x-rst",
+    author=about["__author__"],
+    author_email=about["__email__"],
+    url=about["__url__"],
+    license=about["__license__"],
+    py_modules = ["wmi"],
+    install_requires=install_requires,
+    extras_require=extras_require,
+    scripts = ["wmitest.py", "wmiweb.py", "wmitest.cmd", "wmitest.master.ini"],
+    data_files = ["readme.rst"]
+)

@@ -84,7 +84,14 @@ http://www.opensource.org/licenses/mit-license.php
 For change history see CHANGELOG.TXT
 """
 from __future__ import with_statement
-__VERSION__ = __version__ = "1.5"
+__version__ = "1.5"
+__VERSION__ = __version__
+__title__ = "WMI"
+__description__ = "Windows Management Instrumentation"
+__author__ = "Tim Golden"
+__email__ = "mail@timgolden.me.uk"
+__url__ = "http://timgolden.me.uk/python/wmi.html"
+__license__ = "http://www.opensource.org/licenses/mit-license.php"
 
 _DEBUG = False
 
