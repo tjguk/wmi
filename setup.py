@@ -17,15 +17,15 @@ base_dir = os.path.dirname(__file__)
 
 DUNDER_ASSIGN_RE = re.compile(r"""^__\w+__\s*=\s*['"].+['"]$""")
 about = {}
-with open(os.path.join(base_dir, "wmi.py"), encoding="utf8") as f:
-    for line in f:
+with open(os.path.join(base_dir, "wmi.py"), "rb") as f:
+    for line in f.read().decode("utf-8").splitlines():
         if DUNDER_ASSIGN_RE.search(line):
             exec(line, about)
 changes = ""
 
 TO_STRIP = set([":class:", ":mod:", ":meth:", ":func:", ":doc:"])
-with open(os.path.join(base_dir, "README.rst"), encoding="utf8") as f:
-    readme = f.read()
+with open(os.path.join(base_dir, "README.rst"), "rb") as f:
+    readme = f.read().decode("utf-8")
     for s in TO_STRIP:
         readme = readme.replace(s, "")
 
