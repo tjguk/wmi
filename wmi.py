@@ -84,7 +84,7 @@ http://www.opensource.org/licenses/mit-license.php
 For change history see CHANGELOG.TXT
 """
 from __future__ import with_statement
-__version__ = "1.5"
+__version__ = "1.5.1"
 __VERSION__ = __version__
 __title__ = "WMI"
 __description__ = "Windows Management Instrumentation"
