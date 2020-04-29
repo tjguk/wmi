@@ -36,6 +36,7 @@ install_requires = [
 extras_require = {
     "tests": [
         "pytest",
+        "tox"
     ],
     "docs": ["sphinx"],
     "package": [
