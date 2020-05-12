@@ -1021,6 +1021,57 @@ class _wmi_namespace(object):
         """The raw OLE object representing the WMI namespace"""
         return self._namespace
 
+    def to_list(self, wmi_objects=None, depth=1, root=True):
+        """This function allows to convert wmi_objects into a list of dictionnarie,
+        making it easier to interact with the containing data.
+
+        Example:
+          The equivalent of
+          r = wmi_handle.Win32_LoggedOnUser()
+          print(r[0].Antecedent.AccountType)
+          will be
+          r = wmi_handle.wmi_object_to_list(wmi_handle.Win32_LoggedOnUser(), depth=2)
+          print(r[0]['Antecedent']['AccountType']
+
+        """
+        result = []
+
+        if root is False:
+          dictionnary = {}
+          try:
+            for attribute in wmi_objects.properties:
+              try:
+                if depth > 1:
+                  dictionnary[attribute] = self.to_list(
+                    getattr(wmi_objects, attribute), (depth - 1), root=False)
+                else:
+                  dictionnary[attribute] = getattr(wmi_objects, attribute)
+              except TypeError:
+                dictionnary[attribute] = None
+            return dictionnary
+          # wmi_object.properties might just be a string depending on the depth. Just return as is in that case
+          except AttributeError:
+            return wmi_objects
+
+        for wmi_object in wmi_objects:
+          dictionnary = {}
+          for key in wmi_object.properties.keys():
+            if depth <= 1:
+              try:
+                dictionnary[key] = wmi_object.Properties_(key).Value
+              except TypeError:
+                dictionnary[key] = None
+            else:
+              # noinspection PyBroadException
+              try:
+                dictionnary[key] = self.to_list(getattr(wmi_object, key), (depth - 1), root=False)
+              # Some keys won't have attributes and trigger pywintypes.com_error and others. Need for bare except
+              except Exception as e:
+                print(e)
+                pass
+          result.append(dictionnary)
+        return result
+    
     def subclasses_of(self, root="", regex=r".*"):
         try:
             SubclassesOf = self._namespace.SubclassesOf
@@ -1071,6 +1122,20 @@ class _wmi_namespace(object):
         """
         return [ _wmi_object(obj, instance_of, fields) for obj in self._raw_query(wql) ]
 
+    def query_as_lists(self, wql, instance_of=None, fields=[], wmi_objects=None, depth=1):
+        """Perform an arbitrary query against a WMI object, and return
+        a list of dictionnaries representing the results.
+        Additionnal depth parameter lets control the dictionnary depth.
+        This query function allows all wmi objects to be treated as standard python objects
+
+        Example:
+          The equivalent of
+          wmi_handle.Win32_LoggedOnUser()[0].Antecedent.AccountType
+          will be
+          wmi_handle.query_as_lists('SELECT * FROM Win32_LoggedOnUser', depth=2)[0]['Antecedent']['AccountType']
+        """
+        return self.to_list(wmi_objects=self.query(wql, instance_of, fields), depth=depth)
+    
     def fetch_as_classes(self, wmi_classname, fields=(), **where_clause):
         """Build and execute a wql query to fetch the specified list of fields from
         the specified wmi_classname + where_clause, then return the results as
