@@ -24,7 +24,7 @@ with open(os.path.join(base_dir, "wmi.py"), "rb") as f:
 changes = ""
 
 TO_STRIP = set([":class:", ":mod:", ":meth:", ":func:", ":doc:"])
-with open(os.path.join(base_dir, "README.rst"), "rb") as f:
+with open(os.path.join(base_dir, "readme.rst"), "rb") as f:
     readme = f.read().decode("utf-8")
     for s in TO_STRIP:
         readme = readme.replace(s, "")
