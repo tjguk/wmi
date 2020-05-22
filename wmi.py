@@ -1134,7 +1134,7 @@ class _wmi_namespace(object):
           will be
           wmi_handle.query_as_lists('SELECT * FROM Win32_LoggedOnUser', depth=2)[0]['Antecedent']['AccountType']
         """
-        return self.to_list(wmi_objects=self.query(wql, instance_of, fields), depth=depth)
+        return self.to_list(self.query(wql, instance_of, fields), depth=depth)
     
     def fetch_as_classes(self, wmi_classname, fields=(), **where_clause):
         """Build and execute a wql query to fetch the specified list of fields from
