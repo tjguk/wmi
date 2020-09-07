@@ -847,19 +847,14 @@ class _wmi_class(_wmi_object):
         """Generate a csv listing all the instances of this class with the class
         name as a header.
         """
-        def _to_utf8(item):
-            if isinstance(item, unicode):
-                return item.encode("utf-8")
-            else:
-                return str(item)
         if filepath is None:
             filepath = self._class_name + ".csv"
         fields = list(p.Name for p in self.ole_object.Properties_)
-        with open(filepath, "wb") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(fields)
             for instance in self.query():
-                writer.writerow([_to_utf8(getattr(instance, field)) for field in fields])
+                writer.writerow([str(getattr(instance, field)) for field in fields])
 
     def query(self, fields=[], **where_clause):
         """Make it slightly easier to query against the class,
