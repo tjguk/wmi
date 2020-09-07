@@ -1500,6 +1500,6 @@ if __name__ == '__main__':
     system = WMI()
     for my_computer in system.Win32_ComputerSystem():
         print("Disks on %s" % my_computer.Name)
-        for disk in system.Win32_LogicalDisk():
+        for disk in system.Win32_LogicalDisk(DriveType=3):
             print("%s; %s; %s" % (disk.Caption, disk.Description, disk.ProviderName or ""))
 
