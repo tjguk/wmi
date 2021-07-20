@@ -83,7 +83,6 @@ http://www.opensource.org/licenses/mit-license.php
 
 For change history see CHANGELOG.TXT
 """
-from __future__ import with_statement
 __version__ = "1.5.1"
 __VERSION__ = __version__
 __title__ = "WMI"
@@ -104,6 +103,11 @@ import warnings
 
 from win32com.client import GetObject, Dispatch
 import pywintypes
+
+try:
+    unicode
+except NameError:
+    unicode = str
 
 def signed_to_unsigned(signed):
     """Convert a (possibly signed) long to unsigned hex. Useful
