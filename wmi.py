@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Windows Management Instrumentation (WMI) is Microsoft's answer to
+r"""Windows Management Instrumentation (WMI) is Microsoft's answer to
 the DMTF's Common Information Model. It allows you to query just
 about any conceivable piece of information from any computer which
 is running the necessary agent and over which have you the
@@ -914,7 +914,7 @@ class _wmi_class(_wmi_object):
             handle_com_error()
 
     def new(self, **kwargs):
-        """This is the equivalent to the raw-WMI SpawnInstance\_
+        r"""This is the equivalent to the raw-WMI SpawnInstance\_
         method. Note that there are relatively few uses for
         this, certainly fewer than you might imagine. Most
         classes which need to create a new *real* instance
